@@ -82,7 +82,7 @@ local function gen_ret_conversion(all_types, func)
 	if ctype.handle then
 		func.ret_conversion = string.format(
 			"union { %s c; bgfx::%s cpp; } handle_ret;" ,
-			ctype.name, func.ret.type)
+			ctype.cname, func.ret.type)
 		func.ret_prefix = "handle_ret.cpp = "
 		func.ret_postfix = "\n\treturn handle_ret.c;"
 	else
@@ -116,7 +116,7 @@ local c99temp = [[
 BGFX_C_API $RET $FUNCNAME($ARGS)
 {
 	$CONVERSION
-	$PRERET$CPPFUNC($CALLARGS)$POSTRET
+	$PRERET$CPPFUNC($CALLARGS);$POSTRET
 }
 ]]
 
@@ -129,7 +129,7 @@ function codegen.genc99(func)
 		args[#args+1] = arg.ctype .. " " .. arg.name
 		callargs[#callargs+1] = arg.aname
 	end
-	conversion[#conversion+1] = func.ret.conversion
+	conversion[#conversion+1] = func.ret_conversion
 	local temp = {
 		RET = func.ret.ctype,
 		FUNCNAME = func.attribs.cname,

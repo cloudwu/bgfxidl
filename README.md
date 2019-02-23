@@ -27,13 +27,15 @@ Generate C99 APIs :
 BGFX_C_API bgfx_vertex_buffer_handle_t bgfx_create_vertex_buffer(const bgfx_memory_t * _mem, const bgfx_vertex_decl_t * _decl, uint16_t _flags)
 {
         const bgfx::VertexDecl & decl = *(const bgfx::VertexDecl *)_decl;
-        handle_ret.cpp = bgfx::createVertexBuffer((const bgfx::Memory *)_mem, decl, _flags)
+        union { bgfx_vertex_buffer_handle_t c; bgfx::VertexBufferHandle cpp; } handle_ret;
+        handle_ret.cpp = bgfx::createVertexBuffer((const bgfx::Memory *)_mem, decl, _flags);
         return handle_ret.c;
 }
 
 BGFX_C_API void bgfx_destroy_vertex_buffer(bgfx_vertex_buffer_handle_t _handle)
 {
         union { bgfx_vertex_buffer_handle_t c; bgfx::VertexBufferHandle cpp; } handle = { _handle };
-        bgfx::destory(handle.cpp)
+        bgfx::destory(handle.cpp);
 }
+
 ```
