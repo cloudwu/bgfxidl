@@ -7,12 +7,17 @@ do local _ENV = idl
 	typedef "char"
 	typedef "float"
 	typedef "int32_t"
+	typedef "uint8_t"
 	typedef "uint16_t"
 	typedef "uint32_t"
+	typedef "uint64_t"
 	typedef "Attrib::Enum"
+	typedef "RendererType::Enum"
 	typedef "TextureFormat::Enum"
+	typedef "Caps"
 	typedef "Init"
 	typedef "Memory"
+	typedef "Stats"
 	typedef "VertexDecl"
 	typedef.VertexBufferHandle { "handle" }
 	typedef.IndexBufferHandle  { "handle" }
@@ -39,6 +44,42 @@ do local _ENV = idl
 		.height "uint32_t"
 		.flags  "uint32_t"
 		.format "TextureFormat::Enum"
+
+	func.frame
+		"void"
+		.capture "bool"
+
+	func.getRendererType
+		"RendererType::Enum"
+
+	func.getCaps
+		"const Caps *"
+
+	func.getStats
+		"const Stats *"
+
+	func.alloc
+		"const Memory *"
+		.size "uint32_t"
+
+	func.copy
+		"const Memory *"
+		.data "const void *"
+		.size "uint32_t"
+
+	func.makeRef
+		"const Memory *"
+		.data "const void *"
+		.size "uint32_t"
+
+	func.setDebug
+		"void"
+		.debug "uint32_t"
+
+	func.dbgTextClear
+		"void"
+		.attr  "uint8_t"
+		.small "bool"
 
 	func.createIndexBuffer
 		"IndexBufferHandle"
