@@ -75,18 +75,22 @@ local function gen_arg_conversion(all_types, arg)
 end
 
 local function gen_ret_conversion(all_types, func)
-	if func.ret.fulltype == "void" then
-		return
-	end
+	func.ret_postfix = { func.attribs.vararg and "va_end(argList);" }
 	local ctype = all_types[func.ret.type]
 	if ctype.handle then
 		func.ret_conversion = string.format(
 			"union { %s c; bgfx::%s cpp; } handle_ret;" ,
 			ctype.cname, func.ret.type)
 		func.ret_prefix = "handle_ret.cpp = "
-		func.ret_postfix = "\n\treturn handle_ret.c;"
-	else
-		func.ret_prefix = string.format("return (%s)", func.ret.ctype)
+		func.ret_postfix[#func.ret_postfix+1] = "return handle_ret.c;"
+	elseif func.ret.fulltype ~= "void" then
+		local ctype_conversion = func.ret.type == func.ret.ctype and "" or ("(" ..  func.ret.ctype .. ")")
+		if func.ret_postfix then
+			func.ret_prefix = string.format("%s retValue = %s", func.ret.ctype , ctype_conversion)
+			func.ret_postfix[#func.ret_postfix+1] = "return retValue;"
+		else
+			func.ret_prefix = string.format("return (%s)", ctype_conversion)
+		end
 	end
 end
 
@@ -107,6 +111,21 @@ function codegen.nameconversion(all_types, all_funcs)
 			convert_arg(all_types, arg)
 			gen_arg_conversion(all_types, arg)
 		end
+		if v.attribs.vararg then
+			local args = v.args
+			local vararg = {
+				name = "",
+				ctype = "...",
+				aname = "argList",
+				conversion = string.format(
+					"va_list argList;\n\tva_start(argList, %s);",
+					args[#args].name),
+			}
+			args[#args + 1] = vararg
+			v.implname = v.attribs.vararg
+		else
+			v.implname = v.name
+		end
 		convert_arg(all_types, v.ret)
 		gen_ret_conversion(all_types, v)
 	end
@@ -116,7 +135,8 @@ local c99temp = [[
 BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
 {
 	$CONVERSION
-	$PRERET$CPPFUNC($CALLARGS);$POSTRET
+	$PRERET$CPPFUNC($CALLARGS);
+	$POSTRET
 }
 ]]
 
@@ -136,9 +156,9 @@ function codegen.genc99(func)
 		ARGS = table.concat(args, ", "),
 		CONVERSION = table.concat(conversion, "\n\t"),
 		PRERET = func.ret_prefix or "",
-		CPPFUNC = "bgfx::" .. func.name,
+		CPPFUNC = "bgfx::" .. func.implname,
 		CALLARGS = table.concat(callargs, ", "),
-		POSTRET = func.ret_postfix or "",
+		POSTRET = table.concat(func.ret_postfix, "\n\t"),
 	}
 	return c99temp:gsub("$(%u+)", temp)
 end

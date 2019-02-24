@@ -186,13 +186,12 @@ do local _ENV = idl
 		.attr  "uint8_t"
 		.small "bool"
 
-	func.dbgTextPrintf
+	func.dbgTextPrintf { vararg = "dbgTextPrintfVargs" }
 		"void"
-		.x      "uint16_t"
-		.y      "uint16_t"
-		.attr   "uint8_t"
-		.format "const char *"
--- missing vargs ...
+		._x "uint16_t"
+		._y "uint16_t"
+		._attr "uint8_t"
+		._format "const char *"
 
 	func.dbgTextPrintfVargs
 		"void"
