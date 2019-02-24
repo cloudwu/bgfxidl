@@ -41,7 +41,7 @@ local function funcdef(_, funcname)
 		obj[args_name] = duplicate_arg_name
 		return function (fulltype)
 			f.args[#f.args+1] = {
-				name = args_name,
+				name = "_" .. args_name,
 				fulltype = fulltype,
 			}
 			return args
