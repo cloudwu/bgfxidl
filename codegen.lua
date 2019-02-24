@@ -2,10 +2,8 @@ local codegen = {}
 
 local function camelcase_to_underscorecase(name)
 	local tmp = {}
-	for v in name:gmatch "%u?[%l%d]*" do
-		if v ~= "" then
-			tmp[#tmp+1] = v:lower()
-		end
+	for v in name:gmatch "%u*[%l%d]+" do
+		tmp[#tmp+1] = v:lower()
 	end
 	return table.concat(tmp, "_")
 end
