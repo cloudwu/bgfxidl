@@ -149,11 +149,36 @@ do local _ENV = idl
 		"const char *"
 		.type "RendererType::Enum"
 
-	func.initCtor
+	local init_ctor = [[
+	BX_PLACEMENT_NEW(_init, bgfx::Init);
+	]]
+	func.initCtor { cfunc = init_ctor }
 		"void"
 		.init "Init *"
 
-	func.init
+	local init = [[
+	bgfx_init_t init = *_init;
+
+	if (init.callback != NULL)
+	{
+		static bgfx::CallbackC99 s_callback;
+		s_callback.m_interface = init.callback;
+		init.callback = reinterpret_cast<bgfx_callback_interface_t *>(&s_callback);
+	}
+
+	if (init.allocator != NULL)
+	{
+		static bgfx::AllocatorC99 s_allocator;
+		s_allocator.m_interface = init.allocator;
+		init.allocator = reinterpret_cast<bgfx_allocator_interface_t *>(&s_allocator);
+	}
+
+	union { const bgfx_init_t* c; const bgfx::Init* cpp; } in;
+	in.c = &init;
+
+	return bgfx::init(*in.cpp);
+	]]
+	func.init { cfunc = init }
 		"bool"
 		.init "const Init &"
 

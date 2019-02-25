@@ -188,6 +188,13 @@ BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
 }
 ]]
 
+local c99usertemp = [[
+BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
+{
+$CODE
+}
+]]
+
 function codegen.genc99(func)
 	local conversion = {}
 	local args = {}
@@ -207,6 +214,7 @@ function codegen.genc99(func)
 		callargs[#callargs+1] = arg.aname
 	end
 	conversion[#conversion+1] = func.ret_conversion
+
 	local temp = {
 		RET = func.ret.ctype,
 		FUNCNAME = func.attribs.cname,
@@ -216,8 +224,13 @@ function codegen.genc99(func)
 		CPPFUNC = cppfunc,
 		CALLARGS = table.concat(callargs, ", "),
 		POSTRET = table.concat(func.ret_postfix, "\n\t"),
+		CODE = func.attribs.cfunc,
 	}
-	return c99temp:gsub("$(%u+)", temp)
+	if func.attribs.cfunc then
+		return c99usertemp:gsub("$(%u+)", temp)
+	else
+		return c99temp:gsub("$(%u+)", temp)
+	end
 end
 
 return codegen
