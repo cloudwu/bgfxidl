@@ -138,10 +138,12 @@ function codegen.nameconversion(all_types, all_funcs)
 	end
 
 	for _,v in ipairs(all_funcs) do
-		if v.attribs == nil then
-			v.attribs = { cname = convert_funcname(v.name) }
-		elseif v.attribs.cname == nil then
-			v.attribs.cname = convert_funcname(v.name)
+		if v.attribs.cname == nil then
+			if v.attribs.class then
+				v.attribs.cname = convert_funcname(v.attribs.class) .. "_" .. convert_funcname(v.name)
+			else
+				v.attribs.cname = convert_funcname(v.name)
+			end
 		end
 		for _, arg in ipairs(v.args) do
 			convert_arg(all_types, arg, v.name)
@@ -165,8 +167,12 @@ function codegen.nameconversion(all_types, all_funcs)
 		convert_arg(all_types, v.ret, v.name .. "@rettype")
 		gen_ret_conversion(all_types, v)
 		if v.attribs.class then
-			local classtype = { fulltype = v.attribs.class .. "*" }
-			convert_arg(all_types, classtype, "class " .. v.name)
+			local classname = v.attribs.class
+			if v.attribs.const then
+				classname = "const " .. classname
+			end
+			local classtype = { fulltype = classname .. "*" }
+			convert_arg(all_types, classtype, "class member " .. v.name)
 			v.this = classtype.ctype .. " _this"
 			v.this_conversion = string.format( "%s This = (%s)_this;", classtype.cpptype, classtype.cpptype)
 		end

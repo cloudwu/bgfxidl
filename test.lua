@@ -52,11 +52,11 @@ do local _ENV = idl
 	typedef.VertexBufferHandle        { handle }
 	typedef.VertexDeclHandle          { handle }
 
-	func.begin { class = "VertexDecl" , cname = "vertex_decl_begin" }
+	func.VertexDecl.begin
 		"void"
 		.renderer        "RendererType::Enum"
 
-	func.add { class = "VertexDecl" , cname = "vertex_decl_add" }
+	func.VertexDecl.add
 		"void"
 		.attrib          "Attrib::Enum"
 		.num             "uint8_t"
@@ -64,7 +64,7 @@ do local _ENV = idl
 		.normalized      "bool"
 		.asInt           "bool"
 
-	func.decode { class = "const VertexDecl", cname = "vertex_decl_decode" }
+	func.VertexDecl.decode { const }
 		"void"
 		.attrib          "Attrib::Enum"
 		.num             "uint8_t &"          { out }
@@ -72,16 +72,16 @@ do local _ENV = idl
 		.normalized      "bool &"             { out }
 		.asInt           "bool &"             { out }
 
-	func.has { class = "const VertexDecl", cname = "vertex_decl_has" }
+	func.VertexDecl.has { const }
 		"bool"
 		.attrib          "Attrib::Enum"
 
-	func.skip { class = "VertexDecl", cname = "vertex_decl_skip" }
+	func.VertexDecl.skip
 		"void"
 		.num             "uint8_t"
 
 	-- Notice: `end` is a keyword in lua
-	func["end"] { class = "VertexDecl", cname = "vertex_decl_end" }
+	func.VertexDecl["end"]
 		"void"
 
 	func.vertexPack

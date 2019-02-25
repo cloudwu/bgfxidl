@@ -34,7 +34,7 @@ local function duplicate_arg_name(name)
 end
 
 local function funcdef(_, funcname)
-	local f = { name = funcname , args = {} }
+	local f = { name = funcname , args = {}, attribs = {} }
 	all_funcs[#all_funcs+1] = f
 	local args
 	local function args_desc(obj, args_name)
@@ -65,13 +65,29 @@ local function funcdef(_, funcname)
 		f.ret = { fulltype = value }
 		return args
 	end
-	return function(value)
+
+	local function funcdef(value)
 		if type(value) == "table" then
-			f.attribs = value
+			local attribs = f.attribs
+			for k,v in pairs(value) do
+				if type(k) == "number" then
+					attribs[v] = true
+				else
+					attribs[k] = v
+				end
+			end
 			return rettype
 		end
 		return rettype(value)
 	end
+
+	local function classfunc(_, methodname)
+		f.attribs.class = f.name
+		f.name = methodname
+		return funcdef
+	end
+
+	return setmetatable({} , { __index = classfunc, __call = function(_, value) return funcdef(value) end })
 end
 
 idl.func = setmetatable({}, { __index = funcdef })
@@ -80,6 +96,7 @@ idl.funcs = all_funcs
 idl.handle = "handle"
 idl.enum = "enum"
 idl.out = "out"
+idl.const = "const"
 
 return setmetatable(idl , { __index = function (_, keyword)
 	error (tostring(keyword) .. " is invalid")
