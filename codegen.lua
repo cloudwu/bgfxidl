@@ -17,7 +17,7 @@ local function convert_typename(name)
 end
 
 local function convert_funcname(name)
-	return "bgfx_" .. camelcase_to_underscorecase(name)
+	return camelcase_to_underscorecase(name)
 end
 
 local function convert_arg(all_types, arg)
@@ -113,7 +113,7 @@ function codegen.nameconversion(all_types, all_funcs)
 end
 
 local c99temp = [[
-BGFX_C_API $RET $FUNCNAME($ARGS)
+BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
 {
 	$CONVERSION
 	$PRERET$CPPFUNC($CALLARGS);$POSTRET
