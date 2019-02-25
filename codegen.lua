@@ -20,8 +20,8 @@ local function convert_funcname(name)
 	return camelcase_to_underscorecase(name)
 end
 
-local function convert_arg(all_types, arg)
-	local t, postfix = arg.fulltype:match "(%a[%a%d_]*)%s+([*&]+)%s*$"
+local function convert_arg(all_types, arg, what)
+	local t, postfix = arg.fulltype:match "(%a[%a%d_:]*)%s*([*&]+)%s*$"
 	if t then
 		arg.type = t
 		if postfix == "&" then
@@ -32,10 +32,14 @@ local function convert_arg(all_types, arg)
 	end
 	local ctype = all_types[arg.type]
 	if not ctype then
-		error ("Undefined type " .. arg.type)
+		error ("Undefined type " .. arg.fulltype .. " for " .. what)
 	end
 	arg.ctype = arg.fulltype:gsub(arg.type, ctype.cname):gsub("&", "*")
-	arg.cpptype = arg.fulltype:gsub(arg.type, "bgfx::"..arg.type)
+	if ctype.cname ~= arg.type then
+		arg.cpptype = arg.fulltype:gsub(arg.type, "bgfx::"..arg.type)
+	else
+		arg.cpptype = arg.fulltype
+	end
 	if arg.ref then
 		arg.ptype = arg.cpptype:gsub("&", "*")
 	end
@@ -63,10 +67,14 @@ local function gen_arg_conversion(all_types, arg)
 			"union { %s c; bgfx::%s cpp; } %s = { %s };" ,
 			ctype.cname, arg.type, aname, arg.name)
 	elseif arg.ref then
-		arg.aname = alternative_name(arg.name)
-		arg.conversion = string.format(
-			"%s %s = *(%s)%s;",
-			arg.cpptype, arg.aname, arg.ptype, arg.name)
+		if ctype.cname == arg.type then
+			arg.aname = "*" .. arg.name
+		else
+			arg.aname = alternative_name(arg.name)
+			arg.conversion = string.format(
+				"%s %s = *(%s)%s;",
+				arg.cpptype, arg.aname, arg.ptype, arg.name)
+		end
 	else
 		arg.aname = string.format(
 			"(%s)%s",
@@ -95,10 +103,19 @@ local function gen_ret_conversion(all_types, func)
 end
 
 function codegen.nameconversion(all_types, all_funcs)
+	local enums = {}
 	for k,v in pairs(all_types) do
 		if not v.cname then
 			v.cname = convert_typename(k)
 		end
+		if v.enum then
+			enums[#enums+1] = k
+		end
+	end
+	for _, e in ipairs(enums) do
+		local t = all_types[e]
+		all_types[e] = nil
+		all_types[e .. "::Enum"] = t
 	end
 
 	for _,v in ipairs(all_funcs) do
@@ -108,7 +125,7 @@ function codegen.nameconversion(all_types, all_funcs)
 			v.attribs.cname = convert_funcname(v.name)
 		end
 		for _, arg in ipairs(v.args) do
-			convert_arg(all_types, arg)
+			convert_arg(all_types, arg, v.name)
 			gen_arg_conversion(all_types, arg)
 		end
 		if v.attribs.vararg then
@@ -126,8 +143,14 @@ function codegen.nameconversion(all_types, all_funcs)
 		else
 			v.implname = v.name
 		end
-		convert_arg(all_types, v.ret)
+		convert_arg(all_types, v.ret, v.name .. "@rettype")
 		gen_ret_conversion(all_types, v)
+		if v.attribs.class then
+			local classtype = { fulltype = v.attribs.class .. "*" }
+			convert_arg(all_types, classtype, "class " .. v.name)
+			v.this = classtype.ctype .. " _this"
+			v.this_conversion = string.format( "%s This = (%s)_this;", classtype.cpptype, classtype.cpptype)
+		end
 	end
 end
 
@@ -144,6 +167,15 @@ function codegen.genc99(func)
 	local conversion = {}
 	local args = {}
 	local callargs = {}
+	local cppfunc
+	if func.attribs.class then
+		-- It's a member function
+		args[1] = func.this
+		conversion[1] = func.this_conversion
+		cppfunc = "This->" .. func.name
+	else
+		cppfunc = "bgfx::" .. func.implname
+	end
 	for _, arg in ipairs(func.args) do
 		conversion[#conversion+1] = arg.conversion
 		args[#args+1] = arg.ctype .. " " .. arg.name
@@ -156,7 +188,7 @@ function codegen.genc99(func)
 		ARGS = table.concat(args, ", "),
 		CONVERSION = table.concat(conversion, "\n\t"),
 		PRERET = func.ret_prefix or "",
-		CPPFUNC = "bgfx::" .. func.implname,
+		CPPFUNC = cppfunc,
 		CALLARGS = table.concat(callargs, ", "),
 		POSTRET = table.concat(func.ret_postfix, "\n\t"),
 	}

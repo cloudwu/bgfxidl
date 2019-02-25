@@ -13,17 +13,19 @@ do local _ENV = idl
 	typedef "uint64_t"
 	typedef "va_list"
 
-	typedef "Attrib::Enum"
 	typedef "ReleaseFn"
-	typedef "RendererType::Enum"
-	typedef "TextureFormat::Enum"
-	typedef "TopologyConvert::Enum"
-	typedef "TopologySort::Enum"
 	typedef "Caps"
 	typedef "Init"
 	typedef "Memory"
 	typedef "Stats"
 	typedef "VertexDecl"
+
+	typedef.Attrib            { "enum" }
+	typedef.AttribType        { "enum" }
+	typedef.RendererType      { "enum" }
+	typedef.TextureFormat     { "enum" }
+	typedef.TopologyConvert   { "enum" }
+	typedef.TopologySort      { "enum" }
 
 	typedef.DynamicIndexBufferHandle  { "handle" }
 	typedef.DynamicVertexBufferHandle { "handle" }
@@ -38,29 +40,37 @@ do local _ENV = idl
 	typedef.VertexBufferHandle        { "handle" }
 	typedef.VertexDeclHandle          { "handle" }
 
-	func.vertexDeclBegin
+	func.begin { class = "VertexDecl" , cname = "vertex_decl_begin" }
 		"void"
--- incomplete
+		.renderer        "RendererType::Enum"
 
-	func.vertexDeclAdd
+	func.add { class = "VertexDecl" , cname = "vertex_decl_add" }
 		"void"
--- incomplete
+		.attrib          "Attrib::Enum"
+		.num             "uint8_t"
+		.type            "AttribType::Enum"
+		.normalized      "bool"
+		.asInt           "bool"
 
-	func.vertexDeclDecode
+	func.decode { class = "const VertexDecl", cname = "vertex_decl_decode" }
 		"void"
--- incomplete
+		.attrib          "Attrib::Enum"
+		.num             "uint8_t &"
+		.type            "AttribType::Enum &"
+		.normalized      "bool &"
+		.asInt           "bool &"
 
-	func.vertexDeclHas
+	func.has { class = "const VertexDecl", cname = "vertex_decl_has" }
 		"bool"
--- incomplete
+		.attrib          "Attrib::Enum"
 
-	func.vertexDeclSkip
+	func.skip { class = "VertexDecl", cname = "vertex_decl_skip" }
 		"void"
--- incomplete
+		.num             "uint8_t"
 
-	func.vertexDeclEnd
+	-- Notice: `end` is a keyword in lua
+	func["end"] { class = "VertexDecl", cname = "vertex_decl_end" }
 		"void"
--- incomplete
 
 	func.vertexPack
 		"void"
@@ -129,6 +139,7 @@ do local _ENV = idl
 		"void"
 		.init "Init *"
 
+	-- Todo : cfunc needed
 	func.init
 		"bool"
 		.init "const Init &"
