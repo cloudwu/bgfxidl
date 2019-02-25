@@ -28,6 +28,7 @@ do local _ENV = idl
 	typedef "InstanceDataBuffer"
 	typedef "Memory"
 	typedef "Stats"
+	typedef "TextureInfo"
 	typedef "TransientIndexBuffer"
 	typedef "TransientVertexBuffer"
 	typedef "VertexDecl"
@@ -328,11 +329,13 @@ do local _ENV = idl
 
 	func.createShader
 		"ShaderHandle"
--- incomplete
+		.mem "const Memory *"
 
 	func.getShaderUniforms
 		"uint16_t"
--- incomplete
+		.handle   "ShaderHandle"
+		.uniforms "UniformHandle *"
+		.max      "uint16_t"
 
 	func.setName { cname = "set_shader_name" }
 		"void"
@@ -346,11 +349,14 @@ do local _ENV = idl
 
 	func.createProgram
 		"ProgramHandle"
--- incomplete
+		.vsh "ShaderHandle"
+		.fsh "ShaderHandle"
+		.destroyShaders "bool"
 
 	func.createProgram { cname = "create_compute_program" }
 		"ProgramHandle"
--- incomplete
+		.csh "ShaderHandle"
+		.destroyShaders "bool"
 
 	func.destroy { cname = "destroy_program" }
 		"void"
@@ -358,37 +364,73 @@ do local _ENV = idl
 
 	func.isTextureValid
 		"bool"
--- incomplete
+		.depth     "uint16_t"
+		.cubeMap   "bool"
+		.numLayers "uint16_t"
+		.format    "TextureFormat::Enum"
+		.flags     "uint64_t"
 
 	func.calcTextureSize
 		"void"
--- incomplete
+		.info      "TextureInfo"
+		.width     "uint16_t"
+		.height    "uint16_t"
+		.depth     "uint16_t"
+		.cubeMap   "bool"
+		.hasMips   "bool"
+		.numLayers "uint16_t"
+		.format    "TextureFormat::Enum"
 
 	func.createTexture
 		"TextureHandle"
--- incomplete
+		.mem   "const Memory *"
+		.flags "uint64_t"
+		.skip  "uint8_t"
+		.info  "TextureInfo"
 
-	func.createTexture2d
+	func.createTexture2D
 		"TextureHandle"
--- incomplete
+		.width     "uint16_t"
+		.height    "uint16_t"
+		.hasMips   "bool"
+		.numLayers "uint16_t"
+		.format    "TextureFormat::Enum"
+		.flags     "uint64_t"
+		.mem       "const Memory *"
 
-	func.createTexture2dScaled
+	func.createTexture2D { cname = "create_texture_2d_scaled" }
 		"TextureHandle"
--- incomplete
+		.ratio     "BackbufferRatio::Enum"
+		.hasMips   "bool"
+		.numLayers "uint16_t"
+		.format    "TextureFormat::Enum"
+		.flags     "uint64_t"
+		.mem       "const Memory *"
 
-	func.createTexture3d
+	func.createTexture3D
 		"TextureHandle"
--- incomplete
+		.width     "uint16_t"
+		.height    "uint16_t"
+		.depth     "uint16_t"
+		.hasMips   "bool"
+		.format    "TextureFormat::Enum"
+		.flags     "uint64_t"
+		.mem       "const Memory *"
 
 	func.createTextureCube
 		"TextureHandle"
--- incomplete
+		.size      "uint16_t"
+		.hasMips   "bool"
+		.numLayers "uint16_t"
+		.format    "TextureFormat::Enum"
+		.flags     "uint64_t"
+		.mem       "const Memory *"
 
-	func.updateTexture2d
+	func.updateTexture2D
 		"void"
 -- incomplete
 
-	func.updateTexture3d
+	func.updateTexture3D
 		"void"
 -- incomplete
 
@@ -412,6 +454,7 @@ do local _ENV = idl
 
 	func.destroy { cname = "destroy_texture" }
 		"void"
+		.handle "TextureHandle"
 
 	func.createFrameBuffer
 		"FrameBufferHandle"
@@ -453,6 +496,7 @@ do local _ENV = idl
 
 	func.destroy { cname = "destroy_uniform" }
 		"void"
+		.handle "UniformHandle"
 
 	func.createOcclusionQuery
 		"OcclusionQueryHandle"
