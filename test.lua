@@ -13,16 +13,6 @@ do local _ENV = idl
 	typedef "uint64_t"
 	typedef "va_list"
 
-	typedef "Attrib::Enum"
-	typedef "BackbufferRatio::Enum"
-	typedef "OcclusionQueryResult::Enum"
-	typedef "RendererType::Enum"
-	typedef "TextureFormat::Enum"
-	typedef "TopologyConvert::Enum"
-	typedef "TopologySort::Enum"
-	typedef "UniformType::Enum"
-	typedef "ViewMode::Enum"
-
 	typedef "Attachment"
 	typedef "Caps"
 	typedef "Init"
@@ -37,12 +27,16 @@ do local _ENV = idl
 	typedef "VertexDecl"
 	typedef "ViewId"
 
-	typedef.Attrib            { "enum" }
-	typedef.AttribType        { "enum" }
-	typedef.RendererType      { "enum" }
-	typedef.TextureFormat     { "enum" }
-	typedef.TopologyConvert   { "enum" }
-	typedef.TopologySort      { "enum" }
+	typedef.Attrib               { "enum" }
+	typedef.AttribType           { "enum" }
+	typedef.BackbufferRatio      { "enum" }
+	typedef.OcclusionQueryResult { "enum" }
+	typedef.RendererType         { "enum" }
+	typedef.TextureFormat        { "enum" }
+	typedef.TopologyConvert      { "enum" }
+	typedef.TopologySort         { "enum" }
+	typedef.UniformType          { "enum" }
+	typedef.ViewMode             { "enum" }
 
 	typedef.DynamicIndexBufferHandle  { "handle" }
 	typedef.DynamicVertexBufferHandle { "handle" }
