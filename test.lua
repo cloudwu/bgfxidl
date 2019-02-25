@@ -34,6 +34,13 @@ do local _ENV = idl
 	typedef "VertexDecl"
 	typedef "ViewId"
 
+	typedef.Attrib            { "enum" }
+	typedef.AttribType        { "enum" }
+	typedef.RendererType      { "enum" }
+	typedef.TextureFormat     { "enum" }
+	typedef.TopologyConvert   { "enum" }
+	typedef.TopologySort      { "enum" }
+
 	typedef.DynamicIndexBufferHandle  { "handle" }
 	typedef.DynamicVertexBufferHandle { "handle" }
 	typedef.FrameBufferHandle         { "handle" }
@@ -47,29 +54,37 @@ do local _ENV = idl
 	typedef.VertexBufferHandle        { "handle" }
 	typedef.VertexDeclHandle          { "handle" }
 
-	func.vertexDeclBegin
+	func.begin { class = "VertexDecl" , cname = "vertex_decl_begin" }
 		"void"
--- incomplete
+		.renderer        "RendererType::Enum"
 
-	func.vertexDeclAdd
+	func.add { class = "VertexDecl" , cname = "vertex_decl_add" }
 		"void"
--- incomplete
+		.attrib          "Attrib::Enum"
+		.num             "uint8_t"
+		.type            "AttribType::Enum"
+		.normalized      "bool"
+		.asInt           "bool"
 
-	func.vertexDeclDecode
+	func.decode { class = "const VertexDecl", cname = "vertex_decl_decode" }
 		"void"
--- incomplete
+		.attrib          "Attrib::Enum"
+		.num             "uint8_t &"
+		.type            "AttribType::Enum &"
+		.normalized      "bool &"
+		.asInt           "bool &"
 
-	func.vertexDeclHas
+	func.has { class = "const VertexDecl", cname = "vertex_decl_has" }
 		"bool"
--- incomplete
+		.attrib          "Attrib::Enum"
 
-	func.vertexDeclSkip
+	func.skip { class = "VertexDecl", cname = "vertex_decl_skip" }
 		"void"
--- incomplete
+		.num             "uint8_t"
 
-	func.vertexDeclEnd
+	-- Notice: `end` is a keyword in lua
+	func["end"] { class = "VertexDecl", cname = "vertex_decl_end" }
 		"void"
--- incomplete
 
 	func.vertexPack
 		"void"
@@ -140,6 +155,7 @@ do local _ENV = idl
 		"void"
 		.init "Init *"
 
+	-- Todo : cfunc needed
 	func.init
 		"bool"
 		.init "const Init &"
@@ -197,13 +213,12 @@ do local _ENV = idl
 		.attr  "uint8_t"
 		.small "bool"
 
-	func.dbgTextPrintf
+	func.dbgTextPrintf { vararg = "dbgTextPrintfVargs" }
 		"void"
-		.x      "uint16_t"
-		.y      "uint16_t"
-		.attr   "uint8_t"
-		.format "const char *"
--- missing vargs ...
+		._x "uint16_t"
+		._y "uint16_t"
+		._attr "uint8_t"
+		._format "const char *"
 
 	func.dbgTextPrintfVargs
 		"void"
