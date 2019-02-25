@@ -143,7 +143,7 @@ do local _ENV = idl
 	func.getSupportedRenderers
 		"uint8_t"
 		.max  "uint8_t"
-		.enum "uint32_t *" -- BUG: can't do :: in return types yet RendererType::Enum *"
+		.enum "RendererType::Enum *"
 
 	func.getRendererName
 		"const char *"
