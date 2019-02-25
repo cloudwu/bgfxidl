@@ -65,4 +65,9 @@ end
 idl.func = setmetatable({}, { __index = funcdef })
 idl.funcs = all_funcs
 
-return idl
+idl.handle = "handle"
+idl.enum = "enum"
+
+return setmetatable(idl , { __index = function (_, keyword)
+	error (tostring(keyword) .. " is invalid")
+	end})
