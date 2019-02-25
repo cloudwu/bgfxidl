@@ -25,32 +25,33 @@ do local _ENV = idl
 	typedef "TransientVertexBuffer"
 	typedef "UniformInfo"
 	typedef "VertexDecl"
+
 	typedef "ViewId"
 
-	typedef.Attrib               { "enum" }
-	typedef.AttribType           { "enum" }
-	typedef.BackbufferRatio      { "enum" }
-	typedef.OcclusionQueryResult { "enum" }
-	typedef.RendererType         { "enum" }
-	typedef.TextureFormat        { "enum" }
-	typedef.TopologyConvert      { "enum" }
-	typedef.TopologySort         { "enum" }
-	typedef.UniformType          { "enum" }
-	typedef.ViewMode             { "enum" }
+	typedef.Attrib               { enum }
+	typedef.AttribType           { enum }
+	typedef.BackbufferRatio      { enum }
+	typedef.OcclusionQueryResult { enum }
+	typedef.RendererType         { enum }
+	typedef.TextureFormat        { enum }
+	typedef.TopologyConvert      { enum }
+	typedef.TopologySort         { enum }
+	typedef.UniformType          { enum }
+	typedef.ViewMode             { enum }
 
-	typedef.DynamicIndexBufferHandle  { "handle" }
-	typedef.DynamicVertexBufferHandle { "handle" }
-	typedef.FrameBufferHandle         { "handle" }
-	typedef.IndexBufferHandle         { "handle" }
-	typedef.IndirectBufferHandle      { "handle" }
-	typedef.OcclusionQueryHandle      { "handle" }
-	typedef.ProgramHandle             { "handle" }
-	typedef.ShaderHandle              { "handle" }
-	typedef.TextureHandle             { "handle" }
-	typedef.UniformHandle             { "handle" }
-	typedef.VertexBufferHandle        { "handle" }
-	typedef.VertexDeclHandle          { "handle" }
-
+	typedef.DynamicIndexBufferHandle  { handle }
+	typedef.DynamicVertexBufferHandle { handle }
+	typedef.FrameBufferHandle         { handle }
+	typedef.IndexBufferHandle         { handle }
+	typedef.IndirectBufferHandle      { handle }
+	typedef.OcclusionQueryHandle      { handle }
+	typedef.ProgramHandle             { handle }
+	typedef.ShaderHandle              { handle }
+	typedef.TextureHandle             { handle }
+	typedef.UniformHandle             { handle }
+	typedef.VertexBufferHandle        { handle }
+	typedef.VertexDeclHandle          { handle }
+  
 	func.begin { class = "VertexDecl" , cname = "vertex_decl_begin" }
 		"void"
 		.renderer        "RendererType::Enum"
