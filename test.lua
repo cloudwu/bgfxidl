@@ -20,25 +20,25 @@ do local _ENV = idl
 	typedef "Stats"
 	typedef "VertexDecl"
 
-	typedef.Attrib            { "enum" }
-	typedef.AttribType        { "enum" }
-	typedef.RendererType      { "enum" }
-	typedef.TextureFormat     { "enum" }
-	typedef.TopologyConvert   { "enum" }
-	typedef.TopologySort      { "enum" }
+	typedef.Attrib            { enum }
+	typedef.AttribType        { enum }
+	typedef.RendererType      { enum }
+	typedef.TextureFormat     { enum }
+	typedef.TopologyConvert   { enum }
+	typedef.TopologySort      { enum }
 
-	typedef.DynamicIndexBufferHandle  { "handle" }
-	typedef.DynamicVertexBufferHandle { "handle" }
-	typedef.FrameBufferHandle         { "handle" }
-	typedef.IndexBufferHandle         { "handle" }
-	typedef.IndirectBufferHandle      { "handle" }
-	typedef.OcclusionQueryHandle      { "handle" }
-	typedef.ProgramHandle             { "handle" }
-	typedef.ShaderHandle              { "handle" }
-	typedef.TextureHandle             { "handle" }
-	typedef.UniformHandle             { "handle" }
-	typedef.VertexBufferHandle        { "handle" }
-	typedef.VertexDeclHandle          { "handle" }
+	typedef.DynamicIndexBufferHandle  { handle }
+	typedef.DynamicVertexBufferHandle { handle }
+	typedef.FrameBufferHandle         { handle }
+	typedef.IndexBufferHandle         { handle }
+	typedef.IndirectBufferHandle      { handle }
+	typedef.OcclusionQueryHandle      { handle }
+	typedef.ProgramHandle             { handle }
+	typedef.ShaderHandle              { handle }
+	typedef.TextureHandle             { handle }
+	typedef.UniformHandle             { handle }
+	typedef.VertexBufferHandle        { handle }
+	typedef.VertexDeclHandle          { handle }
 
 	func.begin { class = "VertexDecl" , cname = "vertex_decl_begin" }
 		"void"
