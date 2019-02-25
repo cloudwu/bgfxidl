@@ -20,17 +20,20 @@ do local _ENV = idl
 	typedef "TextureFormat::Enum"
 	typedef "TopologyConvert::Enum"
 	typedef "TopologySort::Enum"
+	typedef "UniformType::Enum"
 	typedef "ViewMode::Enum"
 
-	typedef "ReleaseFn"
+	typedef "Attachment"
 	typedef "Caps"
 	typedef "Init"
 	typedef "InstanceDataBuffer"
 	typedef "Memory"
+	typedef "ReleaseFn"
 	typedef "Stats"
 	typedef "TextureInfo"
 	typedef "TransientIndexBuffer"
 	typedef "TransientVertexBuffer"
+	typedef "UniformInfo"
 	typedef "VertexDecl"
 	typedef "ViewId"
 
@@ -145,7 +148,7 @@ do local _ENV = idl
 	func.getSupportedRenderers
 		"uint8_t"
 		.max  "uint8_t"
-		.enum "uint8_t" -- BUG: can't do :: in return types yet RendererType::Enum *"
+		.enum "uint32_t *" -- BUG: can't do :: in return types yet RendererType::Enum *"
 
 	func.getRendererName
 		"const char *"
@@ -443,19 +446,46 @@ do local _ENV = idl
 
 	func.updateTexture2D
 		"void"
--- incomplete
+		.handle "TextureHandle"
+		.layer  "uint16_t"
+		.mip    "uint16_t"
+		.x      "uint16_t"
+		.y      "uint16_t"
+		.width  "uint16_t"
+		.height "uint16_t"
+		.mem    "const Memory *"
+		.pitch  "uint16_t"
 
 	func.updateTexture3D
 		"void"
--- incomplete
+		.handle "TextureHandle"
+		.mip    "uint16_t"
+		.x      "uint16_t"
+		.y      "uint16_t"
+		.z      "uint16_t"
+		.width  "uint16_t"
+		.height "uint16_t"
+		.depth  "uint16_t"
+		.mem    "const Memory *"
 
 	func.updateTextureCube
 		"void"
--- incomplete
+		.handle "TextureHandle"
+		.layer  "uint16_t"
+		.side   "uint16_t"
+		.mip    "uint16_t"
+		.x      "uint16_t"
+		.y      "uint16_t"
+		.width  "uint16_t"
+		.height "uint16_t"
+		.mem    "const Memory *"
+		.pitch  "uint16_t"
 
 	func.readTexture
 		"uint32_t"
--- incomplete
+		.handle "TextureHandle"
+		.data   "void *"
+		.mip    "uint8_t"
 
 	func.setName { cname = "set_texture_name" }
 		"void"
@@ -465,7 +495,7 @@ do local _ENV = idl
 
 	func.getDirectAccessPtr
 		"void *"
--- incomplete
+		.handle "TextureHandle"
 
 	func.destroy { cname = "destroy_texture" }
 		"void"
@@ -473,19 +503,36 @@ do local _ENV = idl
 
 	func.createFrameBuffer
 		"FrameBufferHandle"
--- incomplete
+		.width        "uint16_t"
+		.height       "uint16_t"
+		.format       "TextureFormat::Enum"
+		.textureFlags "uint64_t"
 
 	func.createFrameBuffer { cname = "create_frame_buffer_scaled" }
 		"FrameBufferHandle"
--- incomplete
+		.ratio "BackbufferRatio::Enum"
+		.format       "TextureFormat::Enum"
+		.textureFlags "uint64_t"
+
+	func.createFrameBuffer { cname = "create_frame_buffer_from_handles" }
+		"FrameBufferHandle"
+		.num            "uint8_t"
+		.handles        "const TextureHandle *"
+		.destroyTexture "bool"
 
 	func.createFrameBuffer { cname = "create_frame_buffer_from_attachment" }
 		"FrameBufferHandle"
--- incomplete
+		.num            "uint8_t"
+		.handles        "const Attachment *"
+		.destroyTexture "bool"
 
 	func.createFrameBuffer { cname = "create_frame_buffer_from_nwh" }
 		"FrameBufferHandle"
--- incomplete
+		.nwh         "void *"
+		.width       "uint16_t"
+		.height      "uint16_t"
+		.format      "TextureFormat::Enum"
+		.depthFormat "TextureFormat::Enum"
 
 	func.setName { cname = "set_frame_buffer_name" }
 		"void"
@@ -495,7 +542,8 @@ do local _ENV = idl
 
 	func.getTexture
 		"TextureHandle"
--- incomplete
+		.handle     "FrameBufferHandle"
+		.attachment "uint8_t"
 
 	func.destroy { cname = "destroy_frame_buffer" }
 		"void"
@@ -503,11 +551,14 @@ do local _ENV = idl
 
 	func.createUniform
 		"UniformHandle"
--- incomplete
+		.name "const char *"
+		.type "UniformType::Enum"
+		.num  "uint16_t"
 
 	func.getUniformInfo
 		"void"
--- incomplete
+		.handle "UniformHandle"
+		.info   "UniformInfo *"
 
 	func.destroy { cname = "destroy_uniform" }
 		"void"
@@ -515,7 +566,6 @@ do local _ENV = idl
 
 	func.createOcclusionQuery
 		"OcclusionQueryHandle"
--- incomplete
 
 	func.getResult
 		"OcclusionQueryResult::Enum"
