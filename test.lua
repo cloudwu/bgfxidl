@@ -696,11 +696,11 @@ do local _ENV = idl
 		"void"
 		.encoder "Encoder *"
 
-	func.setMarker { class = "Encoder" , cname = "encoder_set_marker" }
+	func.Encoder.setMarker
 		"void"
 		.marker "const char *"
 
-	func.setState  { class = "Encoder" , cname = "encoder_set_state" }
+	func.Encoder.setState
 		"void"
 		.state "uint64_t"
 		.rgba  "uint32_t"
