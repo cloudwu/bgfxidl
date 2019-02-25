@@ -15,6 +15,7 @@ do local _ENV = idl
 
 	typedef "Attachment"
 	typedef "Caps"
+	typedef "Encoder"
 	typedef "Init"
 	typedef "InstanceDataBuffer"
 	typedef "Memory"
@@ -25,7 +26,6 @@ do local _ENV = idl
 	typedef "TransientVertexBuffer"
 	typedef "UniformInfo"
 	typedef "VertexDecl"
-
 	typedef "ViewId"
 
 	typedef.Attrib               { enum }
@@ -663,9 +663,24 @@ do local _ENV = idl
 		.num   "uint16_t"
 		.order "const ViewId *"
 
+	func.begin { cname = "encoder_begin" }
+		"Encoder *"
+		.forThread "bool"
+
+	func["end"] { cname = "encoder_end" }
+		"void"
+		.encoder "Encoder *"
+
+	func.setMarker { class = "Encoder" , cname = "encoder_set_marker" }
+		"void"
+		.marker "const char *"
+
+	func.setState  { class = "Encoder" , cname = "encoder_set_state" }
+		"void"
+		.state "uint64_t"
+		.rgba  "uint32_t"
+
 --[[
-encoder_set_marker
-encoder_set_state
 encoder_set_condition
 encoder_set_stencil
 encoder_set_scissor
