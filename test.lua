@@ -152,7 +152,6 @@ do local _ENV = idl
 		"void"
 		.init "Init *"
 
-	-- Todo : cfunc needed
 	func.init
 		"bool"
 		.init "const Init &"
@@ -287,15 +286,21 @@ do local _ENV = idl
 
 	func.createDynamicVertexBuffer
 		"DynamicVertexBufferHandle"
--- incomplete
+		.num   "uint32_t"
+		.decl  "const VertexDecl &"
+		.flags "uint16_t"
 
 	func.createDynamicVertexBuffer { cname = "create_dynamic_vertex_buffer_mem" }
 		"DynamicVertexBufferHandle"
--- incomplete
+		.mem   "const Memory *"
+		.decl  "const VertexDecl &"
+		.flags "uint16_t"
 
 	func.update { cname = "update_dynamic_vertex_buffer" }
 		"void"
--- incomplete
+		.handle      "DynamicVertexBufferHandle"
+		.startVertex "uint32_t"
+		.mem         "const Memory *"
 
 	func.destroy { cname = "destroy_dynamic_vertex_buffer" }
 		"void"
@@ -317,23 +322,31 @@ do local _ENV = idl
 
 	func.allocTransientIndexBuffer
 		"void"
--- incomplete
+		.tib "TransientIndexBuffer *"
+		.num "uint32_t"
 
 	func.allocTransientVertexBuffer
 		"void"
--- incomplete
+		.tvb  "TransientVertexBuffer *"
+		.num  "uint32_t"
+		.decl "const VertexDecl &"
 
 	func.allocTransientBuffers
 		"void"
--- incomplete
+		.tvb         "TransientVertexBuffer *"
+		.decl        "const VertexDecl &"
+		.numVertices "uint32_t"
+		.tib         "TransientIndexBuffer *"
+		.numIndices  "uint32_t"
 
 	func.allocInstanceDataBuffer
 		"void"
--- incomplete
+		.num    "uint32_t"
+		.stride "uint16_t"
 
 	func.createIndirectBuffer
 		"IndirectBufferHandle"
--- incomplete
+		.num "uint32_t"
 
 	func.destroy { cname = "destroy_indirect_buffer" }
 		"void"
@@ -563,7 +576,8 @@ do local _ENV = idl
 
 	func.getResult
 		"OcclusionQueryResult::Enum"
--- incomplete
+		.handle "OcclusionQueryHandle"
+		.result "int32_t *"
 
 	func.destroy { cname = "destroy_occlusion_query" }
 		"void"
@@ -571,7 +585,8 @@ do local _ENV = idl
 
 	func.setPaletteColor
 		"void"
--- incomplete
+		.index "uint8_t"
+		.rgba  "uint32_t"
 
 	func.setViewName
 		"void"
