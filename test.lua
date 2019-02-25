@@ -15,6 +15,7 @@ do local _ENV = idl
 
 	typedef "Attachment"
 	typedef "Caps"
+	typedef "Encoder"
 	typedef "Init"
 	typedef "InstanceDataBuffer"
 	typedef "Memory"
@@ -25,7 +26,6 @@ do local _ENV = idl
 	typedef "TransientVertexBuffer"
 	typedef "UniformInfo"
 	typedef "VertexDecl"
-
 	typedef "ViewId"
 
 	typedef.Attrib               { enum }
@@ -143,7 +143,7 @@ do local _ENV = idl
 	func.getSupportedRenderers
 		"uint8_t"
 		.max  "uint8_t"
-		.enum "uint32_t *" -- BUG: can't do :: in return types yet RendererType::Enum *"
+		.enum "RendererType::Enum *"
 
 	func.getRendererName
 		"const char *"
@@ -153,7 +153,6 @@ do local _ENV = idl
 		"void"
 		.init "Init *"
 
-	-- Todo : cfunc needed
 	func.init
 		"bool"
 		.init "const Init &"
@@ -288,15 +287,21 @@ do local _ENV = idl
 
 	func.createDynamicVertexBuffer
 		"DynamicVertexBufferHandle"
--- incomplete
+		.num   "uint32_t"
+		.decl  "const VertexDecl &"
+		.flags "uint16_t"
 
 	func.createDynamicVertexBuffer { cname = "create_dynamic_vertex_buffer_mem" }
 		"DynamicVertexBufferHandle"
--- incomplete
+		.mem   "const Memory *"
+		.decl  "const VertexDecl &"
+		.flags "uint16_t"
 
 	func.update { cname = "update_dynamic_vertex_buffer" }
 		"void"
--- incomplete
+		.handle      "DynamicVertexBufferHandle"
+		.startVertex "uint32_t"
+		.mem         "const Memory *"
 
 	func.destroy { cname = "destroy_dynamic_vertex_buffer" }
 		"void"
@@ -318,23 +323,31 @@ do local _ENV = idl
 
 	func.allocTransientIndexBuffer
 		"void"
--- incomplete
+		.tib "TransientIndexBuffer *"
+		.num "uint32_t"
 
 	func.allocTransientVertexBuffer
 		"void"
--- incomplete
+		.tvb  "TransientVertexBuffer *"
+		.num  "uint32_t"
+		.decl "const VertexDecl &"
 
 	func.allocTransientBuffers
 		"void"
--- incomplete
+		.tvb         "TransientVertexBuffer *"
+		.decl        "const VertexDecl &"
+		.numVertices "uint32_t"
+		.tib         "TransientIndexBuffer *"
+		.numIndices  "uint32_t"
 
 	func.allocInstanceDataBuffer
 		"void"
--- incomplete
+		.num    "uint32_t"
+		.stride "uint16_t"
 
 	func.createIndirectBuffer
 		"IndirectBufferHandle"
--- incomplete
+		.num "uint32_t"
 
 	func.destroy { cname = "destroy_indirect_buffer" }
 		"void"
@@ -564,7 +577,8 @@ do local _ENV = idl
 
 	func.getResult
 		"OcclusionQueryResult::Enum"
--- incomplete
+		.handle "OcclusionQueryHandle"
+		.result "int32_t *"
 
 	func.destroy { cname = "destroy_occlusion_query" }
 		"void"
@@ -572,7 +586,8 @@ do local _ENV = idl
 
 	func.setPaletteColor
 		"void"
--- incomplete
+		.index "uint8_t"
+		.rgba  "uint32_t"
 
 	func.setViewName
 		"void"
@@ -648,9 +663,24 @@ do local _ENV = idl
 		.num   "uint16_t"
 		.order "const ViewId *"
 
+	func.begin { cname = "encoder_begin" }
+		"Encoder *"
+		.forThread "bool"
+
+	func["end"] { cname = "encoder_end" }
+		"void"
+		.encoder "Encoder *"
+
+	func.setMarker { class = "Encoder" , cname = "encoder_set_marker" }
+		"void"
+		.marker "const char *"
+
+	func.setState  { class = "Encoder" , cname = "encoder_set_state" }
+		"void"
+		.state "uint64_t"
+		.rgba  "uint32_t"
+
 --[[
-encoder_set_marker
-encoder_set_state
 encoder_set_condition
 encoder_set_stencil
 encoder_set_scissor
