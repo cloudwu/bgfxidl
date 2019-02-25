@@ -51,12 +51,12 @@ do local _ENV = idl
 	typedef.UniformHandle             { handle }
 	typedef.VertexBufferHandle        { handle }
 	typedef.VertexDeclHandle          { handle }
-  
-	func.begin { class = "VertexDecl" , cname = "vertex_decl_begin" }
+
+	func.VertexDecl.begin
 		"void"
 		.renderer        "RendererType::Enum"
 
-	func.add { class = "VertexDecl" , cname = "vertex_decl_add" }
+	func.VertexDecl.add
 		"void"
 		.attrib          "Attrib::Enum"
 		.num             "uint8_t"
@@ -64,24 +64,24 @@ do local _ENV = idl
 		.normalized      "bool"
 		.asInt           "bool"
 
-	func.decode { class = "const VertexDecl", cname = "vertex_decl_decode" }
+	func.VertexDecl.decode { const }
 		"void"
 		.attrib          "Attrib::Enum"
-		.num             "uint8_t &"
-		.type            "AttribType::Enum &"
-		.normalized      "bool &"
-		.asInt           "bool &"
+		.num             "uint8_t &"          { out }
+		.type            "AttribType::Enum &" { out }
+		.normalized      "bool &"             { out }
+		.asInt           "bool &"             { out }
 
-	func.has { class = "const VertexDecl", cname = "vertex_decl_has" }
+	func.VertexDecl.has { const }
 		"bool"
 		.attrib          "Attrib::Enum"
 
-	func.skip { class = "VertexDecl", cname = "vertex_decl_skip" }
+	func.VertexDecl.skip
 		"void"
 		.num             "uint8_t"
 
 	-- Notice: `end` is a keyword in lua
-	func["end"] { class = "VertexDecl", cname = "vertex_decl_end" }
+	func.VertexDecl["end"]
 		"void"
 
 	func.vertexPack
@@ -149,11 +149,36 @@ do local _ENV = idl
 		"const char *"
 		.type "RendererType::Enum"
 
-	func.initCtor
+	local init_ctor = [[
+	BX_PLACEMENT_NEW(_init, bgfx::Init);
+	]]
+	func.initCtor { cfunc = init_ctor }
 		"void"
 		.init "Init *"
 
-	func.init
+	local init = [[
+	bgfx_init_t init = *_init;
+
+	if (init.callback != NULL)
+	{
+		static bgfx::CallbackC99 s_callback;
+		s_callback.m_interface = init.callback;
+		init.callback = reinterpret_cast<bgfx_callback_interface_t *>(&s_callback);
+	}
+
+	if (init.allocator != NULL)
+	{
+		static bgfx::AllocatorC99 s_allocator;
+		s_allocator.m_interface = init.allocator;
+		init.allocator = reinterpret_cast<bgfx_allocator_interface_t *>(&s_allocator);
+	}
+
+	union { const bgfx_init_t* c; const bgfx::Init* cpp; } in;
+	in.c = &init;
+
+	return bgfx::init(*in.cpp);
+	]]
+	func.init { cfunc = init }
 		"bool"
 		.init "const Init &"
 
@@ -671,11 +696,11 @@ do local _ENV = idl
 		"void"
 		.encoder "Encoder *"
 
-	func.setMarker { class = "Encoder" , cname = "encoder_set_marker" }
+	func.Encoder.setMarker
 		"void"
 		.marker "const char *"
 
-	func.setState  { class = "Encoder" , cname = "encoder_set_state" }
+	func.Encoder.setState
 		"void"
 		.state "uint64_t"
 		.rgba  "uint32_t"

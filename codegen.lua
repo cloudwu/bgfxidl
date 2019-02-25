@@ -66,6 +66,17 @@ local function gen_arg_conversion(all_types, arg)
 		arg.conversion = string.format(
 			"union { %s c; bgfx::%s cpp; } %s = { %s };" ,
 			ctype.cname, arg.type, aname, arg.name)
+	elseif arg.out then
+		assert(arg.ref, "Always use & for output")
+		if ctype.cname == arg.type then
+			arg.aname = "*" .. arg.name
+		else
+			local aname = alternative_name(arg.name)
+			local cpptype = arg.cpptype:match "(.-)%s*&"	-- remove &
+			arg.aname = "&" .. aname
+			arg.conversion = string.format("%s %s;", cpptype, aname)
+			arg.out_conversion = string.format("*%s = (%s)%s;", arg.name, ctype.cname, aname)
+		end
 	elseif arg.ref then
 		if ctype.cname == arg.type then
 			arg.aname = "*" .. arg.name
@@ -83,19 +94,27 @@ local function gen_arg_conversion(all_types, arg)
 end
 
 local function gen_ret_conversion(all_types, func)
-	func.ret_postfix = { func.attribs.vararg and "va_end(argList);" }
+	local postfix = { func.attribs.vararg and "va_end(argList);" }
+	func.ret_postfix = postfix
+
+	for _, arg in ipairs(func.args) do
+		if arg.out_conversion then
+			postfix[#postfix+1] = arg.out_conversion
+		end
+	end
+
 	local ctype = all_types[func.ret.type]
 	if ctype.handle then
 		func.ret_conversion = string.format(
 			"union { %s c; bgfx::%s cpp; } handle_ret;" ,
 			ctype.cname, func.ret.type)
 		func.ret_prefix = "handle_ret.cpp = "
-		func.ret_postfix[#func.ret_postfix+1] = "return handle_ret.c;"
+		postfix[#postfix+1] = "return handle_ret.c;"
 	elseif func.ret.fulltype ~= "void" then
 		local ctype_conversion = func.ret.type == func.ret.ctype and "" or ("(" ..  func.ret.ctype .. ")")
-		if #func.ret_postfix > 0 then
+		if #postfix > 0 then
 			func.ret_prefix = string.format("%s retValue = %s", func.ret.ctype , ctype_conversion)
-			func.ret_postfix[#func.ret_postfix+1] = "return retValue;"
+			postfix[#postfix+1] = "return retValue;"
 		else
 			func.ret_prefix = string.format("return %s", ctype_conversion)
 		end
@@ -119,10 +138,12 @@ function codegen.nameconversion(all_types, all_funcs)
 	end
 
 	for _,v in ipairs(all_funcs) do
-		if v.attribs == nil then
-			v.attribs = { cname = convert_funcname(v.name) }
-		elseif v.attribs.cname == nil then
-			v.attribs.cname = convert_funcname(v.name)
+		if v.attribs.cname == nil then
+			if v.attribs.class then
+				v.attribs.cname = convert_funcname(v.attribs.class) .. "_" .. convert_funcname(v.name)
+			else
+				v.attribs.cname = convert_funcname(v.name)
+			end
 		end
 		for _, arg in ipairs(v.args) do
 			convert_arg(all_types, arg, v.name)
@@ -146,8 +167,12 @@ function codegen.nameconversion(all_types, all_funcs)
 		convert_arg(all_types, v.ret, v.name .. "@rettype")
 		gen_ret_conversion(all_types, v)
 		if v.attribs.class then
-			local classtype = { fulltype = v.attribs.class .. "*" }
-			convert_arg(all_types, classtype, "class " .. v.name)
+			local classname = v.attribs.class
+			if v.attribs.const then
+				classname = "const " .. classname
+			end
+			local classtype = { fulltype = classname .. "*" }
+			convert_arg(all_types, classtype, "class member " .. v.name)
 			v.this = classtype.ctype .. " _this"
 			v.this_conversion = string.format( "%s This = (%s)_this;", classtype.cpptype, classtype.cpptype)
 		end
@@ -160,6 +185,13 @@ BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
 	$CONVERSION
 	$PRERET$CPPFUNC($CALLARGS);
 	$POSTRET
+}
+]]
+
+local c99usertemp = [[
+BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
+{
+$CODE
 }
 ]]
 
@@ -182,6 +214,7 @@ function codegen.genc99(func)
 		callargs[#callargs+1] = arg.aname
 	end
 	conversion[#conversion+1] = func.ret_conversion
+
 	local temp = {
 		RET = func.ret.ctype,
 		FUNCNAME = func.attribs.cname,
@@ -191,8 +224,13 @@ function codegen.genc99(func)
 		CPPFUNC = cppfunc,
 		CALLARGS = table.concat(callargs, ", "),
 		POSTRET = table.concat(func.ret_postfix, "\n\t"),
+		CODE = func.attribs.cfunc,
 	}
-	return c99temp:gsub("$(%u+)", temp)
+	if func.attribs.cfunc then
+		return c99usertemp:gsub("$(%u+)", temp)
+	else
+		return c99temp:gsub("$(%u+)", temp)
+	end
 end
 
 return codegen
