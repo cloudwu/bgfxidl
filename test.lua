@@ -51,7 +51,7 @@ do local _ENV = idl
 	typedef.UniformHandle             { handle }
 	typedef.VertexBufferHandle        { handle }
 	typedef.VertexDeclHandle          { handle }
-  
+
 	func.begin { class = "VertexDecl" , cname = "vertex_decl_begin" }
 		"void"
 		.renderer        "RendererType::Enum"
@@ -67,10 +67,10 @@ do local _ENV = idl
 	func.decode { class = "const VertexDecl", cname = "vertex_decl_decode" }
 		"void"
 		.attrib          "Attrib::Enum"
-		.num             "uint8_t &"
-		.type            "AttribType::Enum &"
-		.normalized      "bool &"
-		.asInt           "bool &"
+		.num             "uint8_t &"          { out }
+		.type            "AttribType::Enum &" { out }
+		.normalized      "bool &"             { out }
+		.asInt           "bool &"             { out }
 
 	func.has { class = "const VertexDecl", cname = "vertex_decl_has" }
 		"bool"

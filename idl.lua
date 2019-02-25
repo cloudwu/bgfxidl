@@ -40,11 +40,23 @@ local function funcdef(_, funcname)
 	local function args_desc(obj, args_name)
 		obj[args_name] = duplicate_arg_name
 		return function (fulltype)
-			f.args[#f.args+1] = {
+			local arg = {
 				name = "_" .. args_name,
 				fulltype = fulltype,
 			}
-			return args
+			f.args[#f.args+1] = arg
+			local function arg_attrib(_, attrib )
+				assert(type(attrib) == "table", "Arg attributes should be a table")
+				for _, a in ipairs(attrib) do
+					arg[a] = true
+				end
+				return args
+			end
+			return setmetatable( {} , {
+				__index = function(_, name)
+					return args_desc(obj, name)
+				end
+				, __call = arg_attrib } )
 		end
 	end
 	args = setmetatable({}, { __index = args_desc })
@@ -67,6 +79,7 @@ idl.funcs = all_funcs
 
 idl.handle = "handle"
 idl.enum = "enum"
+idl.out = "out"
 
 return setmetatable(idl , { __index = function (_, keyword)
 	error (tostring(keyword) .. " is invalid")

@@ -66,6 +66,17 @@ local function gen_arg_conversion(all_types, arg)
 		arg.conversion = string.format(
 			"union { %s c; bgfx::%s cpp; } %s = { %s };" ,
 			ctype.cname, arg.type, aname, arg.name)
+	elseif arg.out then
+		assert(arg.ref, "Always use & for output")
+		if ctype.cname == arg.type then
+			arg.aname = "*" .. arg.name
+		else
+			local aname = alternative_name(arg.name)
+			local cpptype = arg.cpptype:match "(.-)%s*&"	-- remove &
+			arg.aname = "&" .. aname
+			arg.conversion = string.format("%s %s;", cpptype, aname)
+			arg.out_conversion = string.format("*%s = (%s)%s;", arg.name, ctype.cname, aname)
+		end
 	elseif arg.ref then
 		if ctype.cname == arg.type then
 			arg.aname = "*" .. arg.name
@@ -83,19 +94,27 @@ local function gen_arg_conversion(all_types, arg)
 end
 
 local function gen_ret_conversion(all_types, func)
-	func.ret_postfix = { func.attribs.vararg and "va_end(argList);" }
+	local postfix = { func.attribs.vararg and "va_end(argList);" }
+	func.ret_postfix = postfix
+
+	for _, arg in ipairs(func.args) do
+		if arg.out_conversion then
+			postfix[#postfix+1] = arg.out_conversion
+		end
+	end
+
 	local ctype = all_types[func.ret.type]
 	if ctype.handle then
 		func.ret_conversion = string.format(
 			"union { %s c; bgfx::%s cpp; } handle_ret;" ,
 			ctype.cname, func.ret.type)
 		func.ret_prefix = "handle_ret.cpp = "
-		func.ret_postfix[#func.ret_postfix+1] = "return handle_ret.c;"
+		postfix[#postfix+1] = "return handle_ret.c;"
 	elseif func.ret.fulltype ~= "void" then
 		local ctype_conversion = func.ret.type == func.ret.ctype and "" or ("(" ..  func.ret.ctype .. ")")
-		if #func.ret_postfix > 0 then
+		if #postfix > 0 then
 			func.ret_prefix = string.format("%s retValue = %s", func.ret.ctype , ctype_conversion)
-			func.ret_postfix[#func.ret_postfix+1] = "return retValue;"
+			postfix[#postfix+1] = "return retValue;"
 		else
 			func.ret_prefix = string.format("return %s", ctype_conversion)
 		end
