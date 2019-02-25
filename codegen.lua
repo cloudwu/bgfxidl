@@ -10,7 +10,7 @@ end
 
 local function convert_typename(name)
 	if name:match "^%u" then
-		return "bgfx_" .. camelcase_to_underscorecase(name) .. "_t"	
+		return "bgfx_" .. camelcase_to_underscorecase(name) .. "_t"
 	else
 		return name
 	end
@@ -85,11 +85,11 @@ local function gen_ret_conversion(all_types, func)
 		func.ret_postfix[#func.ret_postfix+1] = "return handle_ret.c;"
 	elseif func.ret.fulltype ~= "void" then
 		local ctype_conversion = func.ret.type == func.ret.ctype and "" or ("(" ..  func.ret.ctype .. ")")
-		if func.ret_postfix then
+		if #func.ret_postfix > 0 then
 			func.ret_prefix = string.format("%s retValue = %s", func.ret.ctype , ctype_conversion)
 			func.ret_postfix[#func.ret_postfix+1] = "return retValue;"
 		else
-			func.ret_prefix = string.format("return (%s)", ctype_conversion)
+			func.ret_prefix = string.format("return %s", ctype_conversion)
 		end
 	end
 end
