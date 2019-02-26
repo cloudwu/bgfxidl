@@ -97,11 +97,10 @@ do local _ENV = idl
 
 	func.vertexUnpack
 		"void"
-		.output          "const float *"
-		.inputNormalized "bool"
+		.output          "float *" { out }
 		.attr            "Attrib::Enum"
 		.decl            "const VertexDecl &"
-		.data            "void *"
+		.data            "const void *"
 		.index           "uint32_t"
 
 	func.vertexConvert
@@ -195,7 +194,7 @@ do local _ENV = idl
 		.format "TextureFormat::Enum"
 
 	func.frame
-		"void"
+		"uint32_t"
 		.capture "bool"
 
 	func.getRendererType
@@ -360,11 +359,11 @@ do local _ENV = idl
 		.decl "const VertexDecl &"
 
 	func.allocTransientBuffers
-		"void"
+		"bool"
 		.tvb         "TransientVertexBuffer *" { out }
 		.decl        "const VertexDecl &"
 		.numVertices "uint32_t"
-		.tib         "TransientIndexBuffer *"
+		.tib         "TransientIndexBuffer *" { out }
 		.numIndices  "uint32_t"
 
 	func.allocInstanceDataBuffer
@@ -388,7 +387,7 @@ do local _ENV = idl
 	func.getShaderUniforms
 		"uint16_t"
 		.handle   "ShaderHandle"
-		.uniforms "UniformHandle *"
+		.uniforms "UniformHandle *" { out }
 		.max      "uint16_t"
 
 	func.setName { cname = "set_shader_name" }
