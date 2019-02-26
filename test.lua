@@ -425,7 +425,7 @@ do local _ENV = idl
 
 	func.calcTextureSize
 		"void"
-		.info      "TextureInfo"
+		.info      "TextureInfo &" { out }
 		.width     "uint16_t"
 		.height    "uint16_t"
 		.depth     "uint16_t"
@@ -439,7 +439,7 @@ do local _ENV = idl
 		.mem   "const Memory *"
 		.flags "uint64_t"
 		.skip  "uint8_t"
-		.info  "TextureInfo"
+		.info  "TextureInfo &" { out }
 
 	func.createTexture2D
 		"TextureHandle"
