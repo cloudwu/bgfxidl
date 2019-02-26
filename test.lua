@@ -22,12 +22,14 @@ do local _ENV = idl
 	typedef "ReleaseFn"
 	typedef "Stats"
 	typedef "TextureInfo"
+	typedef "Transform"
 	typedef "TransientIndexBuffer"
 	typedef "TransientVertexBuffer"
 	typedef "UniformInfo"
 	typedef "VertexDecl"
 	typedef "ViewId"
 
+	typedef.Access               { enum }
 	typedef.Attrib               { enum }
 	typedef.AttribType           { enum }
 	typedef.BackbufferRatio      { enum }
@@ -237,10 +239,10 @@ do local _ENV = idl
 
 	func.dbgTextPrintf { vararg = "dbgTextPrintfVargs" }
 		"void"
-		._x "uint16_t"
-		._y "uint16_t"
-		._attr "uint8_t"
-		._format "const char *"
+		.x      "uint16_t"
+		.y      "uint16_t"
+		.attr   "uint8_t"
+		.format "const char *"
 
 	func.dbgTextPrintfVargs
 		"void"
@@ -705,42 +707,222 @@ do local _ENV = idl
 		.state "uint64_t"
 		.rgba  "uint32_t"
 
---[[
-encoder_set_condition
-encoder_set_stencil
-encoder_set_scissor
-encoder_set_scissor_cached
-encoder_set_transform
-encoder_alloc_transform
-encoder_set_transform_cached
-encoder_set_uniform
-encoder_set_index_buffer
-encoder_set_dynamic_index_buffer
-encoder_set_transient_index_buffer
-encoder_set_vertex_buffer
-encoder_set_dynamic_vertex_buffer
-encoder_set_transient_vertex_buffer
-encoder_set_vertex_count
-encoder_set_instance_data_buffer
-encoder_set_instance_data_from_vertex_buffer
-encoder_set_instance_data_from_dynamic_vertex_buffer
-encoder_set_instance_count
-encoder_set_texture
-encoder_touch
-encoder_submit
-encoder_submit_occlusion_query
-encoder_submit_indirect
-encoder_set_image
-encoder_set_compute_index_buffer
-encoder_set_compute_vertex_buffer
-encoder_set_compute_dynamic_index_buffer
-encoder_set_compute_dynamic_vertex_buffer
-encoder_set_compute_indirect_buffer
-encoder_dispatch
-encoder_dispatch_indirect
-encoder_discard
-encoder_blit
---]]
+	func.Encoder.setCondition
+		"void"
+		.handle  "OcclusionQueryHandle"
+		.visible "bool"
+
+	func.Encoder.setStencil
+		"void"
+		.fstencil "uint32_t"
+		.bstencil "uint32_t"
+
+	func.Encoder.setScissor
+		"void"
+		.x      "uint16_t"
+		.y      "uint16_t"
+		.width  "uint16_t"
+		.height "uint16_t"
+
+	func.Encoder.setScissor { cname = "encoder_set_scissor_cached" }
+		"void"
+		.cache "uint16_t"
+
+	func.Encoder.setTransform
+		"uint32_t"
+		.mtx "const void *"
+		.num "uint16_t"
+
+	func.Encoder.setTransform { cname = "encoder_set_transform_cached" }
+		"void"
+		.cache "uint32_t"
+		.num   "uint16_t"
+
+	func.Encoder.allocTransform
+		"uint32_t"
+		.transform "Transform"
+		.num       "uint16_t"
+
+	func.Encoder.setUniform
+		"void"
+		.handle "UniformHandle"
+		.value  "const void *"
+		.num    "uint16_t"
+
+	func.Encoder.setIndexBuffer
+		"void"
+		.handle     "IndexBufferHandle"
+		.firstIndex "uint32_t"
+		.numIndices "uint32_t"
+
+	func.Encoder.setIndexBuffer { cname = "encoder_set_dynamic_index_buffer" }
+		"void"
+		.handle     "DynamicIndexBufferHandle"
+		.firstIndex "uint32_t"
+		.numIndices "uint32_t"
+
+	func.Encoder.setIndexBuffer { cname = "encoder_set_transient_index_buffer" }
+		"void"
+		.tib        "const TransientIndexBuffer *"
+		.firstIndex "uint32_t"
+		.numIndices "uint32_t"
+
+	func.Encoder.setVertexBuffer
+		"void"
+		.stream      "uint8_t"
+		.handle      "VertexBufferHandle"
+		.startVertex "uint32_t"
+		.numVertices "uint32_t"
+
+	func.Encoder.setVertexBuffer { cname = "encoder_set_dynamic_vertex_buffer" }
+		"void"
+		.stream      "uint8_t"
+		.handle      "DynamicVertexBufferHandle"
+		.startVertex "uint32_t"
+		.numVertices "uint32_t"
+
+	func.Encoder.setVertexBuffer { cname = "encoder_set_transient_vertex_buffer" }
+		"void"
+		.stream      "uint8_t"
+		.tvb         "const TransientVertexBuffer *"
+		.startVertex "uint32_t"
+		.numVertices "uint32_t"
+
+	func.Encoder.setVertexCount
+		"void"
+		.numVertices "uint32_t"
+
+	func.Encoder.setInstanceDataBuffer
+		"void"
+		.idb   "const InstanceDataBuffer *"
+		.start "uint32_t"
+		.num   "uint32_t"
+
+	func.Encoder.setInstanceDataBuffer { cname = "encoder_set_instance_data_from_vertex_buffer" }
+		"void"
+		.handle      "VertexBufferHandle"
+		.startVertex "uint32_t"
+		.num         "uint32_t"
+
+	func.Encoder.setInstanceDataBuffer { cname = "encoder_set_instance_data_from_dynamic_vertex_buffer" }
+		"void"
+		.handle      "DynamicVertexBufferHandle"
+		.startVertex "uint32_t"
+		.num         "uint32_t"
+
+	func.Encoder.setInstanceCount
+		"void"
+		.numInstances "uint32_t"
+
+	func.Encoder.setTexture
+		"void"
+		.stage   "uint8_t"
+		.sampler "UniformHandle"
+		.handle  "TextureHandle"
+		.flags   "uint32_t"
+
+	func.Encoder.touch
+		"void"
+		.id "ViewId"
+
+	func.Encoder.submit
+		"void"
+		.id            "ViewId"
+		.program       "ProgramHandle"
+		.depth         "uint32_t"
+		.preserveState "bool"
+
+	func.Encoder.submit { cname = "encoder_submit_occlusion_query" }
+		"void"
+		.id             "ViewId"
+		.program        "ProgramHandle"
+		.occlusionQuery "OcclusionQueryHandle"
+		.depth          "uint32_t"
+		.preserveState  "bool"
+
+	func.Encoder.submit { cname = "encoder_submit_indirect" }
+		"void"
+		.id             "ViewId"
+		.program        "ProgramHandle"
+		.indirectHandle "IndirectBufferHandle"
+		.start          "uint16_t"
+		.num            "uint16_t"
+		.depth          "uint32_t"
+		.preserveState  "bool"
+
+	func.Encoder.setBuffer { cname = "encoder_set_compute_index_buffer" }
+		"void"
+		.stage  "uint8_t"
+		.handle "IndexBufferHandle"
+		.access "Access::Enum"
+
+	func.Encoder.setBuffer { cname = "encoder_set_compute_vertex_buffer" }
+		"void"
+		.stage  "uint8_t"
+		.handle "VertexBufferHandle"
+		.access "Access::Enum"
+
+	func.Encoder.setBuffer { cname = "encoder_set_compute_dynamic_index_buffer" }
+		"void"
+		.stage  "uint8_t"
+		.handle "DynamicIndexBufferHandle"
+		.access "Access::Enum"
+
+	func.Encoder.setBuffer { cname = "encoder_set_compute_dynamic_vertex_buffer" }
+		"void"
+		.stage  "uint8_t"
+		.handle "DynamicVertexBufferHandle"
+		.access "Access::Enum"
+
+	func.Encoder.setBuffer { cname = "encoder_set_compute_indirect_buffer" }
+		"void"
+		.stage  "uint8_t"
+		.handle "IndirectBufferHandle"
+		.access "Access::Enum"
+
+	func.Encoder.setImage
+		"void"
+		.stage  "uint8_t"
+		.handle "TextureHandle"
+		.mip    "uint8_t"
+		.access "Access::Enum"
+		.format "TextureFormat::Enum"
+
+	func.Encoder.dispatch
+		"void"
+		.id      "ViewId"
+		.program "ProgramHandle"
+		.numX    "uint32_t"
+		.numY    "uint32_t"
+		.numZ    "uint32_t"
+
+	func.Encoder.dispatch { cname = "encoder_dispatch_indirect" }
+		"void"
+		.id             "ViewId"
+		.program        "ProgramHandle"
+		.indirectHandle "IndirectBufferHandle"
+		.start          "uint16_t"
+		.num            "uint16_t"
+
+	func.Encoder.discard
+		"void"
+
+	func.Encoder.blit
+		"void"
+		.id     "ViewId"
+		.dst    "TextureHandle"
+		.dstMip "uint8_t"
+		.dstX   "uint16_t"
+		.dstY   "uint16_t"
+		.dstZ   "uint16_t"
+		.src    "TextureHandle"
+		.srcMip "uint8_t"
+		.srcX   "uint16_t"
+		.srcY   "uint16_t"
+		.srcZ   "uint16_t"
+		.width  "uint16_t"
+		.height "uint16_t"
+		.depth  "uint16_t"
 
 	func.requestScreenShot
 		"void"
