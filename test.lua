@@ -123,7 +123,7 @@ do local _ENV = idl
 	func.topologyConvert
 		"uint32_t"
 		.conversion "TopologyConvert::Enum"
-		.dst        "void *"
+		.dst        "void *" { out }
 		.dstSize    "uint32_t"
 		.indices    "const void *"
 		.numIndices "uint32_t"
@@ -132,7 +132,7 @@ do local _ENV = idl
 	func.topologySortTriList
 		"void"
 		.sort       "TopologySort::Enum"
-		.dst        "void *"
+		.dst        "void *" { out }
 		.dstSize    "uint32_t"
 		.dir        "const float *"
 		.pos        "const float *"
@@ -145,7 +145,7 @@ do local _ENV = idl
 	func.getSupportedRenderers
 		"uint8_t"
 		.max  "uint8_t"
-		.enum "RendererType::Enum *"
+		.enum "RendererType::Enum *" { out }
 
 	func.getRendererName
 		"const char *"
@@ -350,18 +350,18 @@ do local _ENV = idl
 
 	func.allocTransientIndexBuffer
 		"void"
-		.tib "TransientIndexBuffer *"
+		.tib "TransientIndexBuffer *" { out }
 		.num "uint32_t"
 
 	func.allocTransientVertexBuffer
 		"void"
-		.tvb  "TransientVertexBuffer *"
+		.tvb  "TransientVertexBuffer *" { out }
 		.num  "uint32_t"
 		.decl "const VertexDecl &"
 
 	func.allocTransientBuffers
 		"void"
-		.tvb         "TransientVertexBuffer *"
+		.tvb         "TransientVertexBuffer *" { out }
 		.decl        "const VertexDecl &"
 		.numVertices "uint32_t"
 		.tib         "TransientIndexBuffer *"
@@ -369,6 +369,7 @@ do local _ENV = idl
 
 	func.allocInstanceDataBuffer
 		"void"
+		.idb    "InstanceDataBuffer *" { out }
 		.num    "uint32_t"
 		.stride "uint16_t"
 
@@ -545,7 +546,7 @@ do local _ENV = idl
 
 	func.createFrameBuffer { cname = "create_frame_buffer_scaled" }
 		"FrameBufferHandle"
-		.ratio "BackbufferRatio::Enum"
+		.ratio        "BackbufferRatio::Enum"
 		.format       "TextureFormat::Enum"
 		.textureFlags "uint64_t"
 
