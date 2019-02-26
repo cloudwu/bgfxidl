@@ -69,7 +69,7 @@ local function gen_arg_conversion(all_types, arg)
 	elseif arg.ref then
 		if ctype.cname == arg.type then
 			arg.aname = "*" .. arg.name
-		elseif arg.out then
+		elseif arg.out and ctype.enum then
 			local aname = alternative_name(arg.name)
 			local cpptype = arg.cpptype:match "(.-)%s*&"	-- remove &
 			arg.aname = aname
