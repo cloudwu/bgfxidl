@@ -34,7 +34,7 @@ local function duplicate_arg_name(name)
 end
 
 local function funcdef(_, funcname)
-	local f = { name = funcname , args = {}, attribs = {} }
+	local f = { name = funcname , args = {} }
 	all_funcs[#all_funcs+1] = f
 	local args
 	local function args_desc(obj, args_name)
@@ -68,12 +68,11 @@ local function funcdef(_, funcname)
 
 	local function funcdef(value)
 		if type(value) == "table" then
-			local attribs = f.attribs
 			for k,v in pairs(value) do
 				if type(k) == "number" then
-					attribs[v] = true
+					f[v] = true
 				else
-					attribs[k] = v
+					f[k] = v
 				end
 			end
 			return rettype
@@ -82,7 +81,7 @@ local function funcdef(_, funcname)
 	end
 
 	local function classfunc(_, methodname)
-		f.attribs.class = f.name
+		f.class = f.name
 		f.name = methodname
 		return funcdef
 	end

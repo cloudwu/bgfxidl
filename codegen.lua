@@ -94,7 +94,7 @@ local function gen_arg_conversion(all_types, arg)
 end
 
 local function gen_ret_conversion(all_types, func)
-	local postfix = { func.attribs.vararg and "va_end(argList);" }
+	local postfix = { func.vararg and "va_end(argList);" }
 	func.ret_postfix = postfix
 
 	for _, arg in ipairs(func.args) do
@@ -138,18 +138,18 @@ function codegen.nameconversion(all_types, all_funcs)
 	end
 
 	for _,v in ipairs(all_funcs) do
-		if v.attribs.cname == nil then
-			if v.attribs.class then
-				v.attribs.cname = convert_funcname(v.attribs.class) .. "_" .. convert_funcname(v.name)
+		if v.cname == nil then
+			if v.class then
+				v.cname = convert_funcname(v.class) .. "_" .. convert_funcname(v.name)
 			else
-				v.attribs.cname = convert_funcname(v.name)
+				v.cname = convert_funcname(v.name)
 			end
 		end
 		for _, arg in ipairs(v.args) do
 			convert_arg(all_types, arg, v.name)
 			gen_arg_conversion(all_types, arg)
 		end
-		if v.attribs.vararg then
+		if v.vararg then
 			local args = v.args
 			local vararg = {
 				name = "",
@@ -160,15 +160,15 @@ function codegen.nameconversion(all_types, all_funcs)
 					args[#args].name),
 			}
 			args[#args + 1] = vararg
-			v.implname = v.attribs.vararg
+			v.implname = v.vararg
 		else
 			v.implname = v.name
 		end
 		convert_arg(all_types, v.ret, v.name .. "@rettype")
 		gen_ret_conversion(all_types, v)
-		if v.attribs.class then
-			local classname = v.attribs.class
-			if v.attribs.const then
+		if v.class then
+			local classname = v.class
+			if v.const then
 				classname = "const " .. classname
 			end
 			local classtype = { fulltype = classname .. "*" }
@@ -200,7 +200,7 @@ function codegen.genc99(func)
 	local args = {}
 	local callargs = {}
 	local cppfunc
-	if func.attribs.class then
+	if func.class then
 		-- It's a member function
 		args[1] = func.this
 		conversion[1] = func.this_conversion
@@ -217,16 +217,16 @@ function codegen.genc99(func)
 
 	local temp = {
 		RET = func.ret.ctype,
-		FUNCNAME = func.attribs.cname,
+		FUNCNAME = func.cname,
 		ARGS = table.concat(args, ", "),
 		CONVERSION = table.concat(conversion, "\n\t"),
 		PRERET = func.ret_prefix or "",
 		CPPFUNC = cppfunc,
 		CALLARGS = table.concat(callargs, ", "),
 		POSTRET = table.concat(func.ret_postfix, "\n\t"),
-		CODE = func.attribs.cfunc,
+		CODE = func.cfunc,
 	}
-	if func.attribs.cfunc then
+	if func.cfunc then
 		return c99usertemp:gsub("$(%u+)", temp)
 	else
 		return c99temp:gsub("$(%u+)", temp)
