@@ -938,7 +938,7 @@ codegen.nameconversion(idl.types, idl.funcs)
 --end
 
 for _, v in ipairs(idl.funcs) do
---	print(v.name, v.ret.fulltype, v.attribs.cname)
+--	print(v.name, v.ret.fulltype, v.cname)
 --	for i, arg in ipairs(v.args) do
 --		print(i,arg.name, arg.fulltype, arg.ctype)
 --	end
