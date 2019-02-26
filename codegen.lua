@@ -73,7 +73,7 @@ local function gen_arg_conversion(all_types, arg)
 		else
 			local aname = alternative_name(arg.name)
 			local cpptype = arg.cpptype:match "(.-)%s*&"	-- remove &
-			arg.aname = "&" .. aname
+			arg.aname = aname
 			arg.conversion = string.format("%s %s;", cpptype, aname)
 			arg.out_conversion = string.format("*%s = (%s)%s;", arg.name, ctype.cname, aname)
 		end
