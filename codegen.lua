@@ -174,6 +174,18 @@ function codegen.nameconversion(all_types, all_funcs)
 	end
 end
 
+local function lines(tbl)
+	if #tbl == 0 then
+		return "//EMPTYLINE"
+	else
+		return table.concat(tbl, "\n\t")
+	end
+end
+
+local function remove_emptylines(txt)
+	return txt:gsub("\t//EMPTYLINE\n", "")
+end
+
 local c99temp = [[
 BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
 {
@@ -214,17 +226,17 @@ function codegen.genc99(func)
 		RET = func.ret.ctype,
 		FUNCNAME = func.cname,
 		ARGS = table.concat(args, ", "),
-		CONVERSION = table.concat(conversion, "\n\t"),
+		CONVERSION = lines(conversion),
 		PRERET = func.ret_prefix or "",
 		CPPFUNC = cppfunc,
 		CALLARGS = table.concat(callargs, ", "),
-		POSTRET = table.concat(func.ret_postfix, "\n\t"),
+		POSTRET = lines(func.ret_postfix),
 		CODE = func.cfunc,
 	}
 	if func.cfunc then
-		return c99usertemp:gsub("$(%u+)", temp)
+		return (c99usertemp:gsub("$(%u+)", temp))
 	else
-		return c99temp:gsub("$(%u+)", temp)
+		return remove_emptylines(c99temp:gsub("$(%u+)", temp))
 	end
 end
 
