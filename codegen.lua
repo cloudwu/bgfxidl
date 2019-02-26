@@ -66,20 +66,15 @@ local function gen_arg_conversion(all_types, arg)
 		arg.conversion = string.format(
 			"union { %s c; bgfx::%s cpp; } %s = { %s };" ,
 			ctype.cname, arg.type, aname, arg.name)
-	elseif arg.out then
-		assert(arg.ref, "Always use & for output")
+	elseif arg.ref then
 		if ctype.cname == arg.type then
 			arg.aname = "*" .. arg.name
-		else
+		elseif arg.out then
 			local aname = alternative_name(arg.name)
 			local cpptype = arg.cpptype:match "(.-)%s*&"	-- remove &
 			arg.aname = aname
 			arg.conversion = string.format("%s %s;", cpptype, aname)
 			arg.out_conversion = string.format("*%s = (%s)%s;", arg.name, ctype.cname, aname)
-		end
-	elseif arg.ref then
-		if ctype.cname == arg.type then
-			arg.aname = "*" .. arg.name
 		else
 			arg.aname = alternative_name(arg.name)
 			arg.conversion = string.format(
