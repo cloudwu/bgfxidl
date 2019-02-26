@@ -60,7 +60,7 @@ local function gen_arg_conversion(all_types, arg)
 		return
 	end
 	local ctype = all_types[arg.type]
-	if ctype.handle then
+	if ctype.handle and arg.type == arg.fulltype then
 		local aname = alternative_name(arg.name)
 		arg.aname = aname .. ".cpp"
 		arg.conversion = string.format(
