@@ -593,7 +593,7 @@ do local _ENV = idl
 	func.getUniformInfo
 		"void"
 		.handle "UniformHandle"
-		.info   "UniformInfo *"
+		.info   "UniformInfo *" { out }
 
 	func.destroy { cname = "destroy_uniform" }
 		"void"
@@ -605,7 +605,7 @@ do local _ENV = idl
 	func.getResult
 		"OcclusionQueryResult::Enum"
 		.handle "OcclusionQueryHandle"
-		.result "int32_t *"
+		.result "int32_t *" { out }
 
 	func.destroy { cname = "destroy_occlusion_query" }
 		"void"
@@ -740,7 +740,7 @@ do local _ENV = idl
 
 	func.Encoder.allocTransform
 		"uint32_t"
-		.transform "Transform"
+		.transform "Transform *" { out }
 		.num       "uint16_t"
 
 	func.Encoder.setUniform
