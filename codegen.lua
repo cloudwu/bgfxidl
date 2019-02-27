@@ -246,6 +246,10 @@ local template_interface_struct = [[
 function codegen.gen_interface_struct(func)
 	local args = {}
 	local callargs = {}
+	if func.class then
+		-- It's a member function
+		args[1] = func.this
+	end
 	for _, arg in ipairs(func.args) do
 		args[#args+1] = arg.ctype .. " " .. arg.name
 		callargs[#callargs+1] = arg.aname
@@ -280,6 +284,10 @@ BGFX_C_API $RET bgfx_$FUNCNAME($ARGS);
 function codegen.genc99decl(func)
 	local args = {}
 	local callargs = {}
+	if func.class then
+		-- It's a member function
+		args[1] = func.this
+	end
 	for _, arg in ipairs(func.args) do
 		args[#args+1] = arg.ctype .. " " .. arg.name
 		callargs[#callargs+1] = arg.aname

@@ -959,18 +959,9 @@ end
 
 codegen.nameconversion(idl.types, idl.funcs)
 
---for typename, v in pairs(idl.types) do
---	print(typename, v.cname)
---end
-
 -- function declaration
 for _, v in ipairs(idl.funcs) do
 	print((codegen.genc99decl(v)))
-end
-
--- function definition
-for _, v in ipairs(idl.funcs) do
-	print((codegen.genc99(v)))
 end
 
 -- interface struct
@@ -985,6 +976,13 @@ end
 print [[
 } bgfx_interface_vtbl_t;
 ]]
+
+print "--->8"
+
+-- function definition
+for _, v in ipairs(idl.funcs) do
+	print((codegen.genc99(v)))
+end
 
 -- interface import
 print [[
