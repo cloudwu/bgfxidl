@@ -247,7 +247,7 @@ do local _ENV = idl
 		.attr   "uint8_t"
 		.format "const char *"
 
-	func.dbgTextPrintfVargs
+	func.dbgTextPrintfVargs { cname = "dbg_text_vprintf" }
 		"void"
 		.x       "uint16_t"
 		.y       "uint16_t"
@@ -443,7 +443,7 @@ do local _ENV = idl
 		.mem   "const Memory *"
 		.flags "uint64_t"
 		.skip  "uint8_t"
-		.info  "TextureInfo &" { out }
+		.info  "TextureInfo *" { out }
 
 	func.createTexture2D
 		"TextureHandle"
@@ -617,7 +617,7 @@ do local _ENV = idl
 	func.setPaletteColor
 		"void"
 		.index "uint8_t"
-		.rgba  "uint32_t"
+		.rgba  "const float *"
 
 	func.setViewName
 		"void"
@@ -659,7 +659,6 @@ do local _ENV = idl
 		"void"
 		.id      "ViewId"
 		.flags   "uint16_t"
-		.rgba    "uint32_t"
 		.depth   "float"
 		.stencil "uint8_t"
 		.c0      "uint8_t"
@@ -721,7 +720,7 @@ do local _ENV = idl
 		.bstencil "uint32_t"
 
 	func.Encoder.setScissor
-		"void"
+		"uint16_t"
 		.x      "uint16_t"
 		.y      "uint16_t"
 		.width  "uint16_t"
@@ -938,17 +937,17 @@ do local _ENV = idl
 
 	func.setPlatformData
 		"void"
-		.data "PlatformData"
+		.data "const PlatformData &"
 
 	func.getInternalData
 		"const InternalData *"
 
-	func.overrideInternalTexture { cname = "override_internal_texture_ptr" }
+	func.overrideInternal { cname = "override_internal_texture_ptr" }
 		"uintptr_t"
 		.handle "TextureHandle"
 		.ptr    "uintptr_t"
 
-	func.overrideInternalTexture
+	func.overrideInternal { cname = "override_internal_texture" }
 		"uintptr_t"
 		.handle  "TextureHandle"
 		.width   "uint16_t"
