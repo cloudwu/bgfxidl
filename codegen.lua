@@ -186,7 +186,7 @@ local function lines(tbl)
 end
 
 local function remove_emptylines(txt)
-	return txt:gsub("\t//EMPTYLINE\n", "")
+	return (txt:gsub("\t//EMPTYLINE\n", ""))
 end
 
 local function codetemp(func)
