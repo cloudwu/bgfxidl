@@ -458,7 +458,6 @@ do local _ENV = idl
 		.numLayers "uint16_t"
 		.format    "TextureFormat::Enum"
 		.flags     "uint64_t"
-		.mem       "const Memory *"
 
 	func.createTexture3D
 		"TextureHandle"
@@ -507,8 +506,8 @@ do local _ENV = idl
 		"void"
 		.handle "TextureHandle"
 		.layer  "uint16_t"
-		.side   "uint16_t"
-		.mip    "uint16_t"
+		.side   "uint8_t"
+		.mip    "uint8_t"
 		.x      "uint16_t"
 		.y      "uint16_t"
 		.width  "uint16_t"
@@ -593,7 +592,7 @@ do local _ENV = idl
 	func.getUniformInfo
 		"void"
 		.handle "UniformHandle"
-		.info   "UniformInfo *" { out }
+		.info   "UniformInfo &" { out }
 
 	func.destroy { cname = "destroy_uniform" }
 		"void"
