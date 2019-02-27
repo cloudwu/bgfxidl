@@ -729,7 +729,7 @@ do local _ENV = idl
 		.width  "uint16_t"
 		.height "uint16_t"
 
-	func.Encoder.setScissor { cname = "encoder_set_scissor_cached" }
+	func.Encoder.setScissor { cname = "set_scissor_cached" }
 		"void"
 		.cache "uint16_t"
 
@@ -738,7 +738,7 @@ do local _ENV = idl
 		.mtx "const void *"
 		.num "uint16_t"
 
-	func.Encoder.setTransform { cname = "encoder_set_transform_cached" }
+	func.Encoder.setTransform { cname = "set_transform_cached" }
 		"void"
 		.cache "uint32_t"
 		.num   "uint16_t"
@@ -760,13 +760,13 @@ do local _ENV = idl
 		.firstIndex "uint32_t"
 		.numIndices "uint32_t"
 
-	func.Encoder.setIndexBuffer { cname = "encoder_set_dynamic_index_buffer" }
+	func.Encoder.setIndexBuffer { cname = "set_dynamic_index_buffer" }
 		"void"
 		.handle     "DynamicIndexBufferHandle"
 		.firstIndex "uint32_t"
 		.numIndices "uint32_t"
 
-	func.Encoder.setIndexBuffer { cname = "encoder_set_transient_index_buffer" }
+	func.Encoder.setIndexBuffer { cname = "set_transient_index_buffer" }
 		"void"
 		.tib        "const TransientIndexBuffer *"
 		.firstIndex "uint32_t"
@@ -779,14 +779,14 @@ do local _ENV = idl
 		.startVertex "uint32_t"
 		.numVertices "uint32_t"
 
-	func.Encoder.setVertexBuffer { cname = "encoder_set_dynamic_vertex_buffer" }
+	func.Encoder.setVertexBuffer { cname = "set_dynamic_vertex_buffer" }
 		"void"
 		.stream      "uint8_t"
 		.handle      "DynamicVertexBufferHandle"
 		.startVertex "uint32_t"
 		.numVertices "uint32_t"
 
-	func.Encoder.setVertexBuffer { cname = "encoder_set_transient_vertex_buffer" }
+	func.Encoder.setVertexBuffer { cname = "set_transient_vertex_buffer" }
 		"void"
 		.stream      "uint8_t"
 		.tvb         "const TransientVertexBuffer *"
@@ -803,13 +803,13 @@ do local _ENV = idl
 		.start "uint32_t"
 		.num   "uint32_t"
 
-	func.Encoder.setInstanceDataBuffer { cname = "encoder_set_instance_data_from_vertex_buffer" }
+	func.Encoder.setInstanceDataBuffer { cname = "set_instance_data_from_vertex_buffer" }
 		"void"
 		.handle      "VertexBufferHandle"
 		.startVertex "uint32_t"
 		.num         "uint32_t"
 
-	func.Encoder.setInstanceDataBuffer { cname = "encoder_set_instance_data_from_dynamic_vertex_buffer" }
+	func.Encoder.setInstanceDataBuffer { cname = "set_instance_data_from_dynamic_vertex_buffer" }
 		"void"
 		.handle      "DynamicVertexBufferHandle"
 		.startVertex "uint32_t"
@@ -837,7 +837,7 @@ do local _ENV = idl
 		.depth         "uint32_t"
 		.preserveState "bool"
 
-	func.Encoder.submit { cname = "encoder_submit_occlusion_query" }
+	func.Encoder.submit { cname = "submit_occlusion_query" }
 		"void"
 		.id             "ViewId"
 		.program        "ProgramHandle"
@@ -845,7 +845,7 @@ do local _ENV = idl
 		.depth          "uint32_t"
 		.preserveState  "bool"
 
-	func.Encoder.submit { cname = "encoder_submit_indirect" }
+	func.Encoder.submit { cname = "submit_indirect" }
 		"void"
 		.id             "ViewId"
 		.program        "ProgramHandle"
@@ -855,31 +855,31 @@ do local _ENV = idl
 		.depth          "uint32_t"
 		.preserveState  "bool"
 
-	func.Encoder.setBuffer { cname = "encoder_set_compute_index_buffer" }
+	func.Encoder.setBuffer { cname = "set_compute_index_buffer" }
 		"void"
 		.stage  "uint8_t"
 		.handle "IndexBufferHandle"
 		.access "Access::Enum"
 
-	func.Encoder.setBuffer { cname = "encoder_set_compute_vertex_buffer" }
+	func.Encoder.setBuffer { cname = "set_compute_vertex_buffer" }
 		"void"
 		.stage  "uint8_t"
 		.handle "VertexBufferHandle"
 		.access "Access::Enum"
 
-	func.Encoder.setBuffer { cname = "encoder_set_compute_dynamic_index_buffer" }
+	func.Encoder.setBuffer { cname = "set_compute_dynamic_index_buffer" }
 		"void"
 		.stage  "uint8_t"
 		.handle "DynamicIndexBufferHandle"
 		.access "Access::Enum"
 
-	func.Encoder.setBuffer { cname = "encoder_set_compute_dynamic_vertex_buffer" }
+	func.Encoder.setBuffer { cname = "set_compute_dynamic_vertex_buffer" }
 		"void"
 		.stage  "uint8_t"
 		.handle "DynamicVertexBufferHandle"
 		.access "Access::Enum"
 
-	func.Encoder.setBuffer { cname = "encoder_set_compute_indirect_buffer" }
+	func.Encoder.setBuffer { cname = "set_compute_indirect_buffer" }
 		"void"
 		.stage  "uint8_t"
 		.handle "IndirectBufferHandle"
@@ -901,7 +901,7 @@ do local _ENV = idl
 		.numY    "uint32_t"
 		.numZ    "uint32_t"
 
-	func.Encoder.dispatch { cname = "encoder_dispatch_indirect" }
+	func.Encoder.dispatch { cname = "dispatch_indirect" }
 		"void"
 		.id             "ViewId"
 		.program        "ProgramHandle"
