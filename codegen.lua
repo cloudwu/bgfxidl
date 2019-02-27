@@ -268,31 +268,4 @@ function codegen.gen_interface_import(func)
 	return "bgfx_" .. func.cname
 end
 
-local template_function_declaration = [[
-/**/
-BGFX_C_API $RET bgfx_$FUNCNAME($ARGS);
-]]
-
-function codegen.genc99decl(func)
-	local args = {}
-	local callargs = {}
-	if func.class then
-		-- It's a member function
-		args[1] = func.this
-	end
-	for _, arg in ipairs(func.args) do
-		args[#args+1] = arg.ctype .. " " .. arg.name
-		callargs[#callargs+1] = arg.aname
-	end
-
-	local temp = {
-		RET = func.ret.ctype,
-		FUNCNAME = func.cname,
-		ARGS = table.concat(args, ", "),
-		CALLARGS = table.concat(callargs, ", "),
-	}
-
-	return (template_function_declaration:gsub("$(%u+)", temp))
-end
-
 return codegen
