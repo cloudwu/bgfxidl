@@ -190,23 +190,7 @@ local function remove_emptylines(txt)
 	return txt:gsub("\t//EMPTYLINE\n", "")
 end
 
-local c99temp = [[
-BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
-{
-	$CONVERSION
-	$PRERET$CPPFUNC($CALLARGS);
-	$POSTRET
-}
-]]
-
-local c99usertemp = [[
-BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
-{
-$CODE
-}
-]]
-
-function codegen.gen_c99(func)
+local function codetemp(func)
 	local conversion = {}
 	local args = {}
 	local callargs = {}
@@ -226,7 +210,7 @@ function codegen.gen_c99(func)
 	end
 	conversion[#conversion+1] = func.ret_conversion
 
-	local temp = {
+	return {
 		RET = func.ret.ctype,
 		FUNCNAME = func.cname,
 		ARGS = table.concat(args, ", "),
@@ -237,29 +221,48 @@ function codegen.gen_c99(func)
 		POSTRET = lines(func.ret_postfix),
 		CODE = func.cfunc,
 	}
+end
+
+local function apply_template(func, temp)
+	func.codetemp = func.codetemp or codetemp(func)
+	return (temp:gsub("$(%u+)", func.codetemp))
+end
+
+local c99temp = [[
+BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
+{
+	$CONVERSION
+	$PRERET$CPPFUNC($CALLARGS);
+	$POSTRET
+}
+]]
+
+local c99usertemp = [[
+BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
+{
+$CODE
+}
+]]
+
+function codegen.gen_c99(func)
 	if func.cfunc then
-		return (c99usertemp:gsub("$(%u+)", temp))
+		return apply_template(func, c99usertemp)
 	else
-		return (remove_emptylines(c99temp:gsub("$(%u+)", temp)))
+		return remove_emptylines(apply_template(func, c99temp))
 	end
 end
 
+local template_function_declaration = [[
+/**/
+BGFX_C_API $RET bgfx_$FUNCNAME($ARGS);
+]]
+
+function codegen.gen_c99decl(func)
+	return apply_template(func, template_function_declaration)
+end
+
 function codegen.gen_interface_struct(func)
-	local args = {}
-	local callargs = {}
-	for _, arg in ipairs(func.args) do
-		args[#args+1] = arg.ctype .. " " .. arg.name
-		callargs[#callargs+1] = arg.aname
-	end
-
-	local temp = {
-		RET = func.ret.ctype,
-		FUNCNAME = func.cname,
-		ARGS = table.concat(args, ", "),
-		CALLARGS = table.concat(callargs, ", "),
-	}
-
-	return (("$RET (*$FUNCNAME)($ARGS);"):gsub("$(%u+)", temp))
+	return apply_template(func, "$RET (*$FUNCNAME)($ARGS);")
 end
 
 function codegen.gen_interface_import(func)

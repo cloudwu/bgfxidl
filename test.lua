@@ -974,6 +974,8 @@ codegen.nameconversion(idl.types, idl.funcs)
 --end
 
 local code_temp = [[
+$c99decl
+
 $c99
 
 typedef struct bgfx_interface_vtbl
@@ -1001,6 +1003,7 @@ local function gen_codes()
 	local temp = {}
 	local action = {
 		c99 = "\n",
+		c99decl = "\n",
 		interface_struct = "\n\t",
 		interface_import = ",\n\t\t\t",
 	}
