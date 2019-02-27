@@ -203,7 +203,7 @@ $CODE
 }
 ]]
 
-function codegen.genc99(func)
+function codegen.gen_c99(func)
 	local conversion = {}
 	local args = {}
 	local callargs = {}
@@ -237,12 +237,9 @@ function codegen.genc99(func)
 	if func.cfunc then
 		return (c99usertemp:gsub("$(%u+)", temp))
 	else
-		return remove_emptylines(c99temp:gsub("$(%u+)", temp))
+		return (remove_emptylines(c99temp:gsub("$(%u+)", temp)))
 	end
 end
-
-local template_interface_struct = [[
-	$RET (*$FUNCNAME)($ARGS);]]
 
 function codegen.gen_interface_struct(func)
 	local args = {}
@@ -259,18 +256,11 @@ function codegen.gen_interface_struct(func)
 		CALLARGS = table.concat(callargs, ", "),
 	}
 
-	return (template_interface_struct:gsub("$(%u+)", temp))
+	return (("$RET (*$FUNCNAME)($ARGS);"):gsub("$(%u+)", temp))
 end
 
-local template_interface_import = [[
-			bgfx_$FUNCNAME,]]
-
 function codegen.gen_interface_import(func)
-	local temp = {
-		FUNCNAME = func.cname,
-	}
-
-	return (template_interface_import:gsub("$(%u+)", temp))
+	return "bgfx_" .. func.cname
 end
 
 return codegen
