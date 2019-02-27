@@ -975,7 +975,6 @@ codegen.nameconversion(idl.types, idl.funcs)
 
 local code_temp = [[
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -995,7 +994,6 @@ typedef struct bgfx_interface_vtbl
 --->8
 
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
