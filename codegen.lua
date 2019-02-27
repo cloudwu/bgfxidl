@@ -138,11 +138,10 @@ function codegen.nameconversion(all_types, all_funcs)
 
 	for _,v in ipairs(all_funcs) do
 		if v.cname == nil then
-			if v.class then
-				v.cname = convert_funcname(v.class) .. "_" .. convert_funcname(v.name)
-			else
-				v.cname = convert_funcname(v.name)
-			end
+			v.cname = convert_funcname(v.name)
+		end
+		if v.class then
+			v.cname = convert_funcname(v.class) .. "_" .. v.cname
 		end
 		for _, arg in ipairs(v.args) do
 			convert_arg(all_types, arg, v.name)
