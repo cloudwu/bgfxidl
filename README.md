@@ -39,3 +39,10 @@ BGFX_C_API void bgfx_destroy_vertex_buffer(bgfx_vertex_buffer_handle_t _handle)
 }
 
 ```
+
+License
+=======
+
+The same with bgfx :
+
+https://github.com/bkaradzic/bgfx/blob/master/LICENSE

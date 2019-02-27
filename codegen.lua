@@ -1,3 +1,6 @@
+-- Copyright 2019 云风 https://github.com/cloudwu . All rights reserved.
+-- License (the same with bgfx) : https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+
 local codegen = {}
 
 local function camelcase_to_underscorecase(name)
@@ -187,23 +190,7 @@ local function remove_emptylines(txt)
 	return txt:gsub("\t//EMPTYLINE\n", "")
 end
 
-local template_function_body = [[
-BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
-{
-	$CONVERSION
-	$PRERET$CPPFUNC($CALLARGS);
-	$POSTRET
-}
-]]
-
-local template_function_body_user_defined = [[
-BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
-{
-$CODE
-}
-]]
-
-function codegen.genc99(func)
+local function codetemp(func)
 	local conversion = {}
 	local args = {}
 	local callargs = {}
@@ -223,7 +210,7 @@ function codegen.genc99(func)
 	end
 	conversion[#conversion+1] = func.ret_conversion
 
-	local temp = {
+	return {
 		RET = func.ret.ctype,
 		FUNCNAME = func.cname,
 		ARGS = table.concat(args, ", "),
@@ -234,47 +221,52 @@ function codegen.genc99(func)
 		POSTRET = lines(func.ret_postfix),
 		CODE = func.cfunc,
 	}
+end
+
+local function apply_template(func, temp)
+	func.codetemp = func.codetemp or codetemp(func)
+	return (temp:gsub("$(%u+)", func.codetemp))
+end
+
+local c99temp = [[
+BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
+{
+	$CONVERSION
+	$PRERET$CPPFUNC($CALLARGS);
+	$POSTRET
+}
+]]
+
+local c99usertemp = [[
+BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
+{
+$CODE
+}
+]]
+
+function codegen.gen_c99(func)
 	if func.cfunc then
-		return (template_function_body_user_defined:gsub("$(%u+)", temp))
+		return apply_template(func, c99usertemp)
 	else
-		return remove_emptylines(template_function_body:gsub("$(%u+)", temp))
+		return remove_emptylines(apply_template(func, c99temp))
 	end
 end
 
-local template_interface_struct = [[
-	$RET (*$FUNCNAME)($ARGS);]]
+local template_function_declaration = [[
+/**/
+BGFX_C_API $RET bgfx_$FUNCNAME($ARGS);
+]]
+
+function codegen.gen_c99decl(func)
+	return apply_template(func, template_function_declaration)
+end
 
 function codegen.gen_interface_struct(func)
-	local args = {}
-	local callargs = {}
-	if func.class then
-		-- It's a member function
-		args[1] = func.this
-	end
-	for _, arg in ipairs(func.args) do
-		args[#args+1] = arg.ctype .. " " .. arg.name
-		callargs[#callargs+1] = arg.aname
-	end
-
-	local temp = {
-		RET = func.ret.ctype,
-		FUNCNAME = func.cname,
-		ARGS = table.concat(args, ", "),
-		CALLARGS = table.concat(callargs, ", "),
-	}
-
-	return (template_interface_struct:gsub("$(%u+)", temp))
+	return apply_template(func, "$RET (*$FUNCNAME)($ARGS);")
 end
 
-local template_interface_import = [[
-			bgfx_$FUNCNAME,]]
-
 function codegen.gen_interface_import(func)
-	local temp = {
-		FUNCNAME = func.cname,
-	}
-
-	return (template_interface_import:gsub("$(%u+)", temp))
+	return "bgfx_" .. func.cname
 end
 
 local template_function_declaration = [[

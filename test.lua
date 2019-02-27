@@ -1,3 +1,6 @@
+-- Copyright 2019 云风 https://github.com/cloudwu . All rights reserved.
+-- License (the same with bgfx) : https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+
 local idl     = require "idl"
 local codegen = require "codegen"
 
@@ -959,45 +962,34 @@ end
 
 codegen.nameconversion(idl.types, idl.funcs)
 
--- function declaration
-for _, v in ipairs(idl.funcs) do
-	print((codegen.genc99decl(v)))
-end
+--for typename, v in pairs(idl.types) do
+--	print(typename, v.cname)
+--end
 
--- interface struct
-print [[
+--for _, v in ipairs(idl.funcs) do
+--	print(v.name, v.ret.fulltype, v.cname)
+--	for i, arg in ipairs(v.args) do
+--		print(i,arg.name, arg.fulltype, arg.ctype)
+--	end
+--end
+
+local code_temp = [[
+$c99decl
+
+$c99
+
 typedef struct bgfx_interface_vtbl
-{]]
-
-for _, v in ipairs(idl.funcs) do
-	print((codegen.gen_interface_struct(v)))
-end
-
-print [[
+{
+	$interface_struct
 } bgfx_interface_vtbl_t;
-]]
 
-print "--->8"
-
--- function definition
-for _, v in ipairs(idl.funcs) do
-	print((codegen.genc99(v)))
-end
-
--- interface import
-print [[
 BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 {
 	if (_version == BGFX_API_VERSION)
 	{
 		static bgfx_interface_vtbl_t s_bgfx_interface =
-		{]]
-
-for _, v in ipairs(idl.funcs) do
-	print((codegen.gen_interface_import(v)))
-end
-
-print [[
+		{
+			$interface_import
 		};
 
 		return &s_bgfx_interface;
@@ -1006,3 +998,29 @@ print [[
 	return NULL;
 }
 ]]
+
+local function gen_codes()
+	local temp = {}
+	local action = {
+		c99 = "\n",
+		c99decl = "\n",
+		interface_struct = "\n\t",
+		interface_import = ",\n\t\t\t",
+	}
+	for k in pairs(action) do
+		temp[k] = {}
+	end
+	for _, f in ipairs(idl.funcs) do
+		for k in pairs(action) do
+			table.insert(temp[k], (codegen["gen_"..k](f)))
+		end
+	end
+
+	for k, ident in pairs(action) do
+		temp[k] = table.concat(temp[k], ident)
+	end
+
+	return (code_temp:gsub("$([%l%d_]+)", temp))
+end
+
+print(gen_codes())
