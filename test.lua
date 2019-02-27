@@ -2,7 +2,6 @@ local idl     = require "idl"
 local codegen = require "codegen"
 
 do local _ENV = idl
-	typedef "void"
 	typedef "bool"
 	typedef "char"
 	typedef "float"
@@ -11,14 +10,18 @@ do local _ENV = idl
 	typedef "uint16_t"
 	typedef "uint32_t"
 	typedef "uint64_t"
+	typedef "uintptr_t"
 	typedef "va_list"
+	typedef "void"
 
 	typedef "Attachment"
 	typedef "Caps"
 	typedef "Encoder"
 	typedef "Init"
 	typedef "InstanceDataBuffer"
+	typedef "InternalData"
 	typedef "Memory"
+	typedef "PlatformData"
 	typedef "ReleaseFn"
 	typedef "Stats"
 	typedef "TextureInfo"
@@ -34,6 +37,7 @@ do local _ENV = idl
 	typedef.AttribType           { enum }
 	typedef.BackbufferRatio      { enum }
 	typedef.OcclusionQueryResult { enum }
+	typedef.RenderFrame          { enum }
 	typedef.RendererType         { enum }
 	typedef.TextureFormat        { enum }
 	typedef.TopologyConvert      { enum }
@@ -243,7 +247,7 @@ do local _ENV = idl
 		.attr   "uint8_t"
 		.format "const char *"
 
-	func.dbgTextPrintfVargs
+	func.dbgTextPrintfVargs { cname = "dbg_text_vprintf" }
 		"void"
 		.x       "uint16_t"
 		.y       "uint16_t"
@@ -439,7 +443,7 @@ do local _ENV = idl
 		.mem   "const Memory *"
 		.flags "uint64_t"
 		.skip  "uint8_t"
-		.info  "TextureInfo &" { out }
+		.info  "TextureInfo *" { out }
 
 	func.createTexture2D
 		"TextureHandle"
@@ -458,7 +462,6 @@ do local _ENV = idl
 		.numLayers "uint16_t"
 		.format    "TextureFormat::Enum"
 		.flags     "uint64_t"
-		.mem       "const Memory *"
 
 	func.createTexture3D
 		"TextureHandle"
@@ -507,8 +510,8 @@ do local _ENV = idl
 		"void"
 		.handle "TextureHandle"
 		.layer  "uint16_t"
-		.side   "uint16_t"
-		.mip    "uint16_t"
+		.side   "uint8_t"
+		.mip    "uint8_t"
 		.x      "uint16_t"
 		.y      "uint16_t"
 		.width  "uint16_t"
@@ -593,7 +596,7 @@ do local _ENV = idl
 	func.getUniformInfo
 		"void"
 		.handle "UniformHandle"
-		.info   "UniformInfo *" { out }
+		.info   "UniformInfo &" { out }
 
 	func.destroy { cname = "destroy_uniform" }
 		"void"
@@ -614,7 +617,7 @@ do local _ENV = idl
 	func.setPaletteColor
 		"void"
 		.index "uint8_t"
-		.rgba  "uint32_t"
+		.rgba  "const float *"
 
 	func.setViewName
 		"void"
@@ -656,7 +659,6 @@ do local _ENV = idl
 		"void"
 		.id      "ViewId"
 		.flags   "uint16_t"
-		.rgba    "uint32_t"
 		.depth   "float"
 		.stencil "uint8_t"
 		.c0      "uint8_t"
@@ -718,7 +720,7 @@ do local _ENV = idl
 		.bstencil "uint32_t"
 
 	func.Encoder.setScissor
-		"void"
+		"uint16_t"
 		.x      "uint16_t"
 		.y      "uint16_t"
 		.width  "uint16_t"
@@ -928,6 +930,31 @@ do local _ENV = idl
 		"void"
 		.handle   "FrameBufferHandle"
 		.filePath "const char *"
+
+	func.renderFrame
+		"RenderFrame::Enum"
+		.msecs "int32_t"
+
+	func.setPlatformData
+		"void"
+		.data "const PlatformData &"
+
+	func.getInternalData
+		"const InternalData *"
+
+	func.overrideInternal { cname = "override_internal_texture_ptr" }
+		"uintptr_t"
+		.handle "TextureHandle"
+		.ptr    "uintptr_t"
+
+	func.overrideInternal { cname = "override_internal_texture" }
+		"uintptr_t"
+		.handle  "TextureHandle"
+		.width   "uint16_t"
+		.height  "uint16_t"
+		.numMips "uint8_t"
+		.format  "TextureFormat::Enum"
+		.flags   "uint32_t"
 end
 
 codegen.nameconversion(idl.types, idl.funcs)
@@ -943,3 +970,37 @@ for _, v in ipairs(idl.funcs) do
 --	end
 	print((codegen.genc99(v)))
 end
+
+print [[
+typedef struct bgfx_interface_vtbl
+{]]
+
+for _, v in ipairs(idl.funcs) do
+	print((codegen.gen_interface_struct(v)))
+end
+
+print [[
+} bgfx_interface_vtbl_t;
+]]
+
+print [[
+BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
+{
+	if (_version == BGFX_API_VERSION)
+	{
+		static bgfx_interface_vtbl_t s_bgfx_interface =
+		{]]
+
+for _, v in ipairs(idl.funcs) do
+	print((codegen.gen_interface_import(v)))
+end
+
+print [[
+		};
+
+		return &s_bgfx_interface;
+	}
+
+	return NULL;
+}
+]]

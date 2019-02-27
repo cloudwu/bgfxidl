@@ -240,4 +240,36 @@ function codegen.genc99(func)
 	end
 end
 
+local template_interface_struct = [[
+	$RET (*$FUNCNAME)($ARGS);]]
+
+function codegen.gen_interface_struct(func)
+	local args = {}
+	local callargs = {}
+	for _, arg in ipairs(func.args) do
+		args[#args+1] = arg.ctype .. " " .. arg.name
+		callargs[#callargs+1] = arg.aname
+	end
+
+	local temp = {
+		RET = func.ret.ctype,
+		FUNCNAME = func.cname,
+		ARGS = table.concat(args, ", "),
+		CALLARGS = table.concat(callargs, ", "),
+	}
+
+	return (template_interface_struct:gsub("$(%u+)", temp))
+end
+
+local template_interface_import = [[
+			bgfx_$FUNCNAME,]]
+
+function codegen.gen_interface_import(func)
+	local temp = {
+		FUNCNAME = func.cname,
+	}
+
+	return (template_interface_import:gsub("$(%u+)", temp))
+end
+
 return codegen
