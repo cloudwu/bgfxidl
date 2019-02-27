@@ -2,7 +2,6 @@ local idl     = require "idl"
 local codegen = require "codegen"
 
 do local _ENV = idl
-	typedef "void"
 	typedef "bool"
 	typedef "char"
 	typedef "float"
@@ -11,14 +10,18 @@ do local _ENV = idl
 	typedef "uint16_t"
 	typedef "uint32_t"
 	typedef "uint64_t"
+	typedef "uintptr_t"
 	typedef "va_list"
+	typedef "void"
 
 	typedef "Attachment"
 	typedef "Caps"
 	typedef "Encoder"
 	typedef "Init"
 	typedef "InstanceDataBuffer"
+	typedef "InternalData"
 	typedef "Memory"
+	typedef "PlatformData"
 	typedef "ReleaseFn"
 	typedef "Stats"
 	typedef "TextureInfo"
@@ -34,6 +37,7 @@ do local _ENV = idl
 	typedef.AttribType           { enum }
 	typedef.BackbufferRatio      { enum }
 	typedef.OcclusionQueryResult { enum }
+	typedef.RenderFrame          { enum }
 	typedef.RendererType         { enum }
 	typedef.TextureFormat        { enum }
 	typedef.TopologyConvert      { enum }
@@ -927,6 +931,31 @@ do local _ENV = idl
 		"void"
 		.handle   "FrameBufferHandle"
 		.filePath "const char *"
+
+	func.renderFrame
+		"RenderFrame::Enum"
+		.msecs "int32_t"
+
+	func.setPlatformData
+		"void"
+		.data "PlatformData"
+
+	func.getInternalData
+		"const InternalData *"
+
+	func.overrideInternalTexture { cname = "override_internal_texture_ptr" }
+		"uintptr_t"
+		.handle "TextureHandle"
+		.ptr    "uintptr_t"
+
+	func.overrideInternalTexture
+		"uintptr_t"
+		.handle  "TextureHandle"
+		.width   "uint16_t"
+		.height  "uint16_t"
+		.numMips "uint8_t"
+		.format  "TextureFormat::Enum"
+		.flags   "uint32_t"
 end
 
 codegen.nameconversion(idl.types, idl.funcs)
