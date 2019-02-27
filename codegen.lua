@@ -186,7 +186,7 @@ local function remove_emptylines(txt)
 	return txt:gsub("\t//EMPTYLINE\n", "")
 end
 
-local c99temp = [[
+local template_function_body = [[
 BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
 {
 	$CONVERSION
@@ -195,7 +195,7 @@ BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
 }
 ]]
 
-local c99usertemp = [[
+local template_function_body_user_defined = [[
 BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
 {
 $CODE
@@ -234,9 +234,9 @@ function codegen.genc99(func)
 		CODE = func.cfunc,
 	}
 	if func.cfunc then
-		return (c99usertemp:gsub("$(%u+)", temp))
+		return (template_function_body_user_defined:gsub("$(%u+)", temp))
 	else
-		return remove_emptylines(c99temp:gsub("$(%u+)", temp))
+		return remove_emptylines(template_function_body:gsub("$(%u+)", temp))
 	end
 end
 
@@ -270,6 +270,29 @@ function codegen.gen_interface_import(func)
 	}
 
 	return (template_interface_import:gsub("$(%u+)", temp))
+end
+
+local template_function_declaration = [[
+/**/
+BGFX_C_API $RET bgfx_$FUNCNAME($ARGS);
+]]
+
+function codegen.genc99decl(func)
+	local args = {}
+	local callargs = {}
+	for _, arg in ipairs(func.args) do
+		args[#args+1] = arg.ctype .. " " .. arg.name
+		callargs[#callargs+1] = arg.aname
+	end
+
+	local temp = {
+		RET = func.ret.ctype,
+		FUNCNAME = func.cname,
+		ARGS = table.concat(args, ", "),
+		CALLARGS = table.concat(callargs, ", "),
+	}
+
+	return (template_function_declaration:gsub("$(%u+)", temp))
 end
 
 return codegen

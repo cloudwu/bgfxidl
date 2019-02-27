@@ -963,14 +963,17 @@ codegen.nameconversion(idl.types, idl.funcs)
 --	print(typename, v.cname)
 --end
 
+-- function declaration
 for _, v in ipairs(idl.funcs) do
---	print(v.name, v.ret.fulltype, v.cname)
---	for i, arg in ipairs(v.args) do
---		print(i,arg.name, arg.fulltype, arg.ctype)
---	end
+	print((codegen.genc99decl(v)))
+end
+
+-- function definition
+for _, v in ipairs(idl.funcs) do
 	print((codegen.genc99(v)))
 end
 
+-- interface struct
 print [[
 typedef struct bgfx_interface_vtbl
 {]]
@@ -983,6 +986,7 @@ print [[
 } bgfx_interface_vtbl_t;
 ]]
 
+-- interface import
 print [[
 BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 {
