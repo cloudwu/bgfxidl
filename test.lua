@@ -970,3 +970,37 @@ for _, v in ipairs(idl.funcs) do
 --	end
 	print((codegen.genc99(v)))
 end
+
+print [[
+typedef struct bgfx_interface_vtbl
+{]]
+
+for _, v in ipairs(idl.funcs) do
+	print((codegen.gen_interface_struct(v)))
+end
+
+print [[
+} bgfx_interface_vtbl_t;
+]]
+
+print [[
+BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
+{
+	if (_version == BGFX_API_VERSION)
+	{
+		static bgfx_interface_vtbl_t s_bgfx_interface =
+		{]]
+
+for _, v in ipairs(idl.funcs) do
+	print((codegen.gen_interface_import(v)))
+end
+
+print [[
+		};
+
+		return &s_bgfx_interface;
+	}
+
+	return NULL;
+}
+]]
