@@ -159,7 +159,7 @@ do local _ENV = idl
 
 	local init_ctor = [[
 	BX_PLACEMENT_NEW(_init, bgfx::Init);
-	]]
+]]
 	func.initCtor { cfunc = init_ctor }
 		"void"
 		.init "Init *"
@@ -185,7 +185,7 @@ do local _ENV = idl
 	in.c = &init;
 
 	return bgfx::init(*in.cpp);
-	]]
+]]
 	func.init { cfunc = init }
 		"bool"
 		.init "const Init &"
@@ -973,7 +973,7 @@ codegen.nameconversion(idl.types, idl.funcs)
 --	end
 --end
 
-local code_temp = [[
+local code_temp_include = [[
 /*
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
@@ -990,9 +990,9 @@ typedef struct bgfx_interface_vtbl
 {
 	$interface_struct
 } bgfx_interface_vtbl_t;
+]]
 
---->8
-
+local code_temp_impl = [[
 /*
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
@@ -1021,7 +1021,7 @@ BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 }
 ]]
 
-local function gen_codes()
+local function codes()
 	local temp = {}
 	local action = {
 		c99 = "\n",
@@ -1042,7 +1042,17 @@ local function gen_codes()
 		temp[k] = table.concat(temp[k], ident)
 	end
 
-	return (code_temp:gsub("$([%l%d_]+)", temp))
+	return temp
 end
 
-print(gen_codes())
+local codes_tbl = codes()
+
+for filename, temp in pairs {
+	["../include/bgfx/c99/bgfx.idl.h"] = code_temp_include ,
+	["../src/bgfx.idl.inl"] = code_temp_impl } do
+
+	print ("Generate " .. filename)
+	local out = io.open(filename, "wb")
+	out:write((temp:gsub("$([%l%d_]+)", codes_tbl)))
+	out:close()
+end
