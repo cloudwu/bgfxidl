@@ -985,7 +985,7 @@ local code_temp = [[
  */
 
 $c99decl
-
+/**/
 typedef struct bgfx_interface_vtbl
 {
 	$interface_struct
@@ -1004,7 +1004,7 @@ typedef struct bgfx_interface_vtbl
  */
 
 $c99
-
+/**/
 BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 {
 	if (_version == BGFX_API_VERSION)
