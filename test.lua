@@ -974,15 +974,37 @@ codegen.nameconversion(idl.types, idl.funcs)
 --end
 
 local code_temp = [[
+/*
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ */
+
+/*
+ *
+ * AUTO GENERATED! DO NOT EDIT!
+ *
+ */
+
 $c99decl
-
-$c99
-
+/**/
 typedef struct bgfx_interface_vtbl
 {
 	$interface_struct
 } bgfx_interface_vtbl_t;
 
+--->8
+
+/*
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ */
+
+/*
+ *
+ * AUTO GENERATED! DO NOT EDIT!
+ *
+ */
+
+$c99
+/**/
 BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 {
 	if (_version == BGFX_API_VERSION)
