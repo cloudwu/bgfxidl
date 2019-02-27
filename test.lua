@@ -1,3 +1,6 @@
+-- Copyright 2019 云风 https://github.com/cloudwu . All rights reserved.
+-- License (the same with bgfx) : https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+
 local idl     = require "idl"
 local codegen = require "codegen"
 
@@ -963,12 +966,12 @@ codegen.nameconversion(idl.types, idl.funcs)
 --	print(typename, v.cname)
 --end
 
-for _, v in ipairs(idl.funcs) do
+--for _, v in ipairs(idl.funcs) do
 --	print(v.name, v.ret.fulltype, v.cname)
 --	for i, arg in ipairs(v.args) do
 --		print(i,arg.name, arg.fulltype, arg.ctype)
 --	end
-end
+--end
 
 local code_temp = [[
 $c99

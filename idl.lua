@@ -1,3 +1,6 @@
+-- Copyright 2019 云风 https://github.com/cloudwu . All rights reserved.
+-- License (the same with bgfx) : https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+
 local idl = {}
 
 local all_types = {}

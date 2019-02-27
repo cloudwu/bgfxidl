@@ -1,3 +1,6 @@
+-- Copyright 2019 云风 https://github.com/cloudwu . All rights reserved.
+-- License (the same with bgfx) : https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+
 local codegen = {}
 
 local function camelcase_to_underscorecase(name)
