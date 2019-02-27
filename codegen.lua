@@ -2,7 +2,7 @@ local codegen = {}
 
 local function camelcase_to_underscorecase(name)
 	local tmp = {}
-	for v in name:gmatch "%u*[%l%d]+" do
+	for v in name:gmatch "[%u%d]+%l*" do
 		tmp[#tmp+1] = v:lower()
 	end
 	return table.concat(tmp, "_")
@@ -17,6 +17,7 @@ local function convert_typename(name)
 end
 
 local function convert_funcname(name)
+	name = name:gsub("^%l", string.upper)	-- Change to upper CamlCase
 	return camelcase_to_underscorecase(name)
 end
 
