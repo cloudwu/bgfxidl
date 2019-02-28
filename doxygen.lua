@@ -7,6 +7,7 @@ local idl_defines = {
 	typedef = true,
 	enum = true,
 	handle = true,
+	struct = true,
 }
 
 function doxygen.import(filename)

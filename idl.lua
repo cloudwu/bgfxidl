@@ -64,6 +64,40 @@ end
 
 idl.enum = setmetatable({} , { __index = enumdef, __call = enumdef })
 
+local function structdef(_, typename)
+	assert(all_types[typename] == nil, "Duplicate type (Struct)")
+	local t = { struct = {} }
+	all_types[typename] = t
+
+	local function struct_attrib(obj, attribs)
+		copy_attribs(t, attribs)
+		return obj
+	end
+
+	local function new_struct_item(_, itemname)
+		local item = { name = itemname }
+		t.struct[#t.struct + 1] = item
+
+		local function item_attrib(obj, attribs)
+			if type(attribs) == "string" then
+				item.comment = attribs
+			else
+				copy_attribs(item, attribs)
+			end
+			return obj
+		end
+
+		return function (itemtype)
+			item.fulltype = itemtype
+			return setmetatable({}, { __index = new_struct_item, __call = item_attrib })
+		end
+	end
+
+	return setmetatable({}, { __index = new_struct_item , __call = struct_attrib })
+end
+
+idl.struct = setmetatable({}, { __index = structdef , __call = structdef })
+
 local function handledef(_, typename)
 	assert(all_types[typename] == nil, "Duplicate type (Handle)")
 
@@ -136,6 +170,7 @@ idl.funcs = all_funcs
 
 idl.out = "out"
 idl.const = "const"
+idl.ctor = "ctor"
 idl.NULL = "NULL"
 idl.UINT16_MAX = "UINT16_MAX"
 idl.INT32_MAX = "INT32_MAX"
@@ -146,8 +181,9 @@ local all_comments = {}
 idl.comments = all_comments
 
 local function comment(_, what)
-	local comments = {}
-	if all_comments[what] == nil then
+	local comments = all_comments[what]
+	if comments == nil then
+		comments = {}
 		all_comments[what] = comments
 	end
 	return function(comment)

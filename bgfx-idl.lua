@@ -23,6 +23,8 @@ local func_actions = {
 local type_actions = {
 	enums = "\n",
 	cenums = "\n",
+	structs = "\n",
+	cstructs = "\n",
 }
 
 assert(loadfile("bgfx.idl" , "t", idl))()
@@ -32,21 +34,36 @@ codegen.nameconversion(idl.types, idl.funcs)
 
 local typegen = {}
 
-function typegen.enums(typedef)
-	if typedef.enum then
+local function add_doxygen(typedef, define)
 		local doc = codegen.doxygen_type(typedef, idl.comments[typedef.name])
-		local define = codegen.gen_enum_define(typedef)
 		if doc then
 			return doc .. "\n" .. define
 		else
 			return define
 		end
+end
+
+function typegen.enums(typedef)
+	if typedef.enum then
+		return add_doxygen(typedef, codegen.gen_enum_define(typedef))
 	end
 end
 
 function typegen.cenums(typedef)
 	if typedef.enum then
 		return codegen.gen_enum_cdefine(typedef)
+	end
+end
+
+function typegen.structs(typedef)
+	if typedef.struct then
+		return add_doxygen(typedef, codegen.gen_struct_define(typedef))
+	end
+end
+
+function typegen.cstructs(typedef)
+	if typedef.struct then
+		return codegen.gen_cstruct_define(typedef)
 	end
 end
 
@@ -103,11 +120,13 @@ BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 -- For bgfx.types.h
 local code_temp_enums = [[
 $enums
+$structs
 ]]
 
 -- For bgfx.ctypes.h
 local code_temp_cenums = [[
 $cenums
+$cstructs
 ]]
 
 local function codes()

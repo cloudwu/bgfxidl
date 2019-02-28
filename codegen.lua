@@ -3,6 +3,12 @@
 
 local codegen = {}
 
+local NAMEALIGN = 10
+
+local function namealign(name)
+	return string.rep(" ", NAMEALIGN - #name)
+end
+
 local function camelcase_to_underscorecase(name)
 	local tmp = {}
 	for v in name:gmatch "[%u%d]+%l*" do
@@ -131,10 +137,19 @@ function codegen.nameconversion(all_types, all_funcs)
 			enums[#enums+1] = k
 		end
 	end
+
 	for _, e in ipairs(enums) do
 		local t = all_types[e]
 		all_types[e] = nil
 		all_types[e .. "::Enum"] = t
+	end
+
+	for k,v in pairs(all_types) do
+		if v.struct then
+			for _, item in ipairs(v.struct) do
+				convert_arg(all_types, item, v.name)
+			end
+		end
 	end
 
 	for _,v in ipairs(all_funcs) do
@@ -304,8 +319,8 @@ function codegen.gen_enum_define(enum)
 		if not item.comment then
 			text = item.name .. ","
 		else
-			text = string.format("%s,%s//!< %s",
-				item.name, string.rep(" ", 20 - #item.name), item.comment)
+			text = string.format("%s,%s //!< %s",
+				item.name, namealign(item.name), item.comment)
 		end
 		items[#items+1] = text
 	end
@@ -346,6 +361,58 @@ function codegen.gen_enum_cdefine(enum)
 	}
 
 	return (cenum_temp:gsub("$(%u+)", temp))
+end
+
+local struct_temp = [[
+struct $NAME
+{
+	$CTOR
+	$ITEMS
+};
+]]
+function codegen.gen_struct_define(struct)
+	assert(type(struct.struct) == "table", "Not a struct")
+	local items = {}
+	for _, item in ipairs(struct.struct) do
+		local text = string.format("%s%s %s;", item.fulltype, namealign(item.fulltype), item.name)
+		if item.comment then
+			text = string.format("%s %s//!< %s", text,  namealign(item.name),  item.comment)
+		end
+		items[#items+1] = text
+	end
+	local ctor = {}
+	if struct.ctor then
+		ctor[1] = struct.name .. "();"
+		ctor[2] = ""
+	end
+	local temp = {
+		NAME = struct.name,
+		ITEMS = table.concat(items, "\n\t"),
+		CTOR = lines(ctor),
+	}
+	return remove_emptylines(struct_temp:gsub("$(%u+)", temp))
+end
+
+local cstruct_temp = [[
+typedef struct $NAME_s
+{
+	$ITEMS
+
+} $NAME_t;
+]]
+function codegen.gen_cstruct_define(struct)
+	assert(type(struct.struct) == "table", "Not a struct")
+	local cname = struct.cname:match "(.-)_t$"
+	local items = {}
+	for _, item in ipairs(struct.struct) do
+		local text = string.format("%s%s %s;", item.ctype, namealign(item.ctype), item.name)
+		items[#items+1] = text
+	end
+	local temp = {
+		NAME = cname,
+		ITEMS = table.concat(items, "\n\t"),
+	}
+	return cstruct_temp:gsub("$(%u+)", temp)
 end
 
 return codegen

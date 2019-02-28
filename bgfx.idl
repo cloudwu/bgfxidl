@@ -18,8 +18,6 @@ typedef "Encoder"
 typedef "Init"
 typedef "InstanceDataBuffer"
 typedef "InternalData"
-typedef "Memory"
-typedef "PlatformData"
 typedef "ReleaseFn"
 typedef "Stats"
 typedef "TextureInfo"
@@ -29,6 +27,22 @@ typedef "TransientVertexBuffer"
 typedef "UniformInfo"
 typedef "VertexDecl"
 typedef "ViewId"
+
+
+--- Platform data.
+struct.PlatformData { ctor }
+	.ndt          "void*"   "Native display type."
+	.nwh          "void*"   "Native window handle."
+	.context      "void*"   "GL context, or D3D device."
+	.backBuffer   "void*"   "GL backbuffer, or D3D render target view."
+	.backBufferDS "void*"   "Backbuffer depth/stencil."
+
+--- Memory must be obtained by calling `bgfx::alloc`, `bgfx::copy`, or `bgfx::makeRef`.
+---
+--- @attention It is illegal to create this structure on stack and pass it to any bgfx API.
+struct.Memory
+	.data "uint8_t *" "Pointer to data."
+	.size "uint32_t"  "Data size."
 
 --- Fatal error enum.
 enum.Fatal                { comment = "" }
