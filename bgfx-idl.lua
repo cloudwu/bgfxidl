@@ -3,11 +3,54 @@
 
 local idl     = require "idl"
 local codegen = require "codegen"
+local doxygen = require "doxygen"
+
+local paths = (...) or {
+	["bgfx.idl.h"] = "../include/bgfx/c99",
+	["bgfx.idl.inl"] = "../src",
+	-- todo: cpp header path here
+	["bgfx.types.h"] = ".",
+	["bgfx.ctypes.h"] = ".",
+}
+
+local func_actions = {
+	c99 = "\n",
+	c99decl = "\n",
+	interface_struct = "\n\t",
+	interface_import = ",\n\t\t\t",
+}
+
+local type_actions = {
+	enums = "\n",
+	cenums = "\n",
+}
 
 assert(loadfile("bgfx.idl" , "t", idl))()
 
+doxygen.import "bgfx.idl"
 codegen.nameconversion(idl.types, idl.funcs)
 
+local typegen = {}
+
+function typegen.enums(typedef)
+	if typedef.enum then
+		local doc = codegen.doxygen_type(typedef, idl.comments[typedef.name])
+		local define = codegen.gen_enum_define(typedef)
+		if doc then
+			return doc .. "\n" .. define
+		else
+			return define
+		end
+	end
+end
+
+function typegen.cenums(typedef)
+	if typedef.enum then
+		return codegen.gen_enum_cdefine(typedef)
+	end
+end
+
+-- For bgfx.idl.h
 local code_temp_include = [[
 /*
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
@@ -27,6 +70,7 @@ typedef struct bgfx_interface_vtbl
 } bgfx_interface_vtbl_t;
 ]]
 
+-- For bgfx.idl.inl
 local code_temp_impl = [[
 /*
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
@@ -56,24 +100,57 @@ BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 }
 ]]
 
+-- For bgfx.types.h
+local code_temp_enums = [[
+$enums
+]]
+
+-- For bgfx.ctypes.h
+local code_temp_cenums = [[
+$cenums
+]]
+
 local function codes()
 	local temp = {}
-	local action = {
-		c99 = "\n",
-		c99decl = "\n",
-		interface_struct = "\n\t",
-		interface_import = ",\n\t\t\t",
-	}
-	for k in pairs(action) do
+	for k in pairs(func_actions) do
 		temp[k] = {}
 	end
+
+	for k in pairs(type_actions) do
+		temp[k] = {}
+	end
+
+	-- call actions with func
 	for _, f in ipairs(idl.funcs) do
-		for k in pairs(action) do
-			table.insert(temp[k], (codegen["gen_"..k](f)))
+		for k in pairs(func_actions) do
+			local funcgen = codegen["gen_"..k]
+			if funcgen then
+				table.insert(temp[k], (funcgen(f)))
+			end
 		end
 	end
 
-	for k, ident in pairs(action) do
+	-- call actions with type
+	local types = {}
+	for k in pairs(idl.types) do
+		types[#types+1] = k
+	end
+	table.sort(types)
+
+	for _, typename in ipairs(types) do
+		local typedef = idl.types[typename]
+		for k in pairs(type_actions) do
+			local typegen = typegen[k]
+			if typegen then
+				table.insert(temp[k], (typegen(typedef)))
+			end
+		end
+	end
+
+	for k, ident in pairs(func_actions) do
+		temp[k] = table.concat(temp[k], ident)
+	end
+	for k, ident in pairs(type_actions) do
 		temp[k] = table.concat(temp[k], ident)
 	end
 
@@ -81,11 +158,6 @@ local function codes()
 end
 
 local codes_tbl = codes()
-
-local paths = (...) or {
-	["bgfx.idl.h"] = "../include/bgfx/c99",
-	["bgfx.idl.inl"] = "../src",
-}
 
 local function add_path(filename)
 	local path
@@ -99,7 +171,10 @@ end
 
 for filename, temp in pairs {
 	[add_path "bgfx.idl.h"] = code_temp_include ,
-	[add_path "bgfx.idl.inl"] = code_temp_impl } do
+	[add_path "bgfx.idl.inl"] = code_temp_impl ,
+	[add_path "bgfx.types.h"] = code_temp_enums ,
+	[add_path "bgfx.ctypes.h"] = code_temp_cenums ,
+	} do
 
 	print ("Generate " .. filename)
 	local out = assert(io.open(filename, "wb"))

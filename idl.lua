@@ -5,15 +5,23 @@ local idl = {}
 
 local all_types = {}
 
+local function copy_attribs(to, from)
+	assert(type(from) == "table", "Attribs should be a table")
+	for k, v in pairs(from) do
+		if type(k) == "number" then
+			to[v] = true
+		else
+			to[k] = v
+		end
+	end
+end
+
 local function typedef(_, typename)
 	assert(all_types[typename] == nil, "Duplicate type")
 	local t = {}
 	all_types[typename] = t
 	local function type_attrib(attrib)
-		assert(type(attrib) == "table", "type attrib should be a table")
-		for _, a in ipairs(attrib) do
-			t[a] = true
-		end
+		copy_attribs(t, attrib)
 	end
 	return function(cname)
 		local typ = type(cname)
@@ -29,6 +37,46 @@ end
 
 idl.typedef = setmetatable({} , { __index = typedef, __call = typedef })
 idl.types = all_types
+
+local function enumdef(_, typename)
+	assert(all_types[typename] == nil, "Duplicate type (Enum)")
+
+	local t = { enum = {} }
+	all_types[typename] = t
+
+	local function enum_attrib(obj, attribs)
+		copy_attribs(t, attribs)
+		return obj
+	end
+
+	local function new_enum_item(_, itemname)
+		local item = { name = itemname }
+		t.enum[#t.enum + 1] = item
+		local function add_comment(obj , comment)
+			item.comment = comment
+			return obj
+		end
+		return setmetatable({}, { __index = new_enum_item, __call = add_comment })
+	end
+
+	return setmetatable({}, { __index = new_enum_item , __call = enum_attrib })
+end
+
+idl.enum = setmetatable({} , { __index = enumdef, __call = enumdef })
+
+local function handledef(_, typename)
+	assert(all_types[typename] == nil, "Duplicate type (Handle)")
+
+	local t = { handle = true }
+	all_types[typename] = t
+
+	return function (attribs)
+		copy_attribs(t, attribs)
+		return obj
+	end
+end
+
+idl.handle = setmetatable({} , { __index = handledef, __call = handledef })
 
 local all_funcs = {}
 
@@ -49,10 +97,7 @@ local function funcdef(_, funcname)
 			}
 			f.args[#f.args+1] = arg
 			local function arg_attrib(_, attrib )
-				assert(type(attrib) == "table", "Arg attributes should be a table")
-				for _, a in ipairs(attrib) do
-					arg[a] = true
-				end
+				copy_attribs(arg, attrib)
 				return args
 			end
 			return setmetatable( {} , {
@@ -71,13 +116,7 @@ local function funcdef(_, funcname)
 
 	local function funcdef(value)
 		if type(value) == "table" then
-			for k,v in pairs(value) do
-				if type(k) == "number" then
-					f[v] = true
-				else
-					f[k] = v
-				end
-			end
+			copy_attribs(f, value)
 			return rettype
 		end
 		return rettype(value)
@@ -95,10 +134,24 @@ end
 idl.func = setmetatable({}, { __index = funcdef })
 idl.funcs = all_funcs
 
-idl.handle = "handle"
-idl.enum = "enum"
 idl.out = "out"
 idl.const = "const"
+
+local all_comments = {}
+idl.comments = all_comments
+
+local function comment(_, what)
+	local comments = {}
+	if all_comments[what] == nil then
+		all_comments[what] = comments
+	end
+	return function(comment)
+		assert(type(comment) == "string" , "Doxygen comment should be a string")
+		comments[#comments + 1] = comment
+	end
+end
+
+idl.comment = setmetatable({} , { __index = comment })
 
 return setmetatable(idl , { __index = function (_, keyword)
 	error (tostring(keyword) .. " is invalid")

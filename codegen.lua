@@ -126,6 +126,7 @@ function codegen.nameconversion(all_types, all_funcs)
 		if not v.cname then
 			v.cname = convert_typename(k)
 		end
+		v.name = k
 		if v.enum then
 			enums[#enums+1] = k
 		end
@@ -266,6 +267,85 @@ end
 
 function codegen.gen_interface_import(func)
 	return "bgfx_" .. func.cname
+end
+
+function codegen.doxygen_type(typedef, doxygen)
+	if doxygen == nil then
+		return
+	end
+	local result = {}
+	for _, line in ipairs(doxygen) do
+		result[#result+1] = "/// " .. line
+	end
+	result[#result+1] = "///"
+	result[#result+1] = string.format("/// @attention C99 equivalent is `%s`.", typedef.cname)
+	result[#result+1] = "///"
+	return table.concat(result, "\n")
+end
+
+local enum_temp = [[
+struct $NAME
+{
+	$COMMENT
+	enum Enum
+	{
+		$ITEMS
+
+		Count
+	};
+};
+]]
+
+function codegen.gen_enum_define(enum)
+	assert(type(enum.enum) == "table", "Not an enum")
+	local items = {}
+	for _, item in ipairs(enum.enum) do
+		local text
+		if not item.comment then
+			text = item.name .. ","
+		else
+			text = string.format("%s,%s//!< %s",
+				item.name, string.rep(" ", 20 - #item.name), item.comment)
+		end
+		items[#items+1] = text
+	end
+	local comment = ""
+	if enum.comment then
+		comment = "/// " .. enum.comment
+	end
+	local temp = {
+		NAME = enum.name,
+		COMMENT = comment,
+		ITEMS = table.concat(items, "\n\t\t"),
+	}
+	return (enum_temp:gsub("$(%u+)", temp))
+end
+
+local cenum_temp = [[
+typedef enum $NAME
+{
+	$ITEMS
+
+	$COUNT
+
+} $NAME_t;
+]]
+function codegen.gen_enum_cdefine(enum)
+	assert(type(enum.enum) == "table", "Not an enum")
+	local cname = enum.cname:match "(.-)_t$"
+	local uname = cname:upper()
+	local items = {}
+	for _, item in ipairs(enum.enum) do
+		items[#items+1] = uname .. "_" .. item.name:upper()
+	end
+
+	local temp = {
+		NAME = cname,
+		COUNT = uname .. "_COUNT",
+		ITEMS = table.concat(items, ",\n\t"),
+	}
+
+	return (cenum_temp:gsub("$(%u+)", temp))
 end
 
 return codegen
