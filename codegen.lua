@@ -3,7 +3,7 @@
 
 local codegen = {}
 
-local NAMEALIGN = 10
+local NAMEALIGN = 20
 
 local function namealign(name)
 	return string.rep(" ", NAMEALIGN - #name)
@@ -31,6 +31,11 @@ local function convert_funcname(name)
 end
 
 local function convert_arg(all_types, arg, what)
+	local fulltype, array = arg.fulltype:match "(.-)(%[%s*[%d%a_]*%s*%])"
+	if array then
+		arg.fulltype = fulltype
+		arg.array = array
+	end
 	local t, postfix = arg.fulltype:match "(%a[%a%d_:]*)%s*([*&]+)%s*$"
 	if t then
 		arg.type = t
@@ -374,9 +379,13 @@ function codegen.gen_struct_define(struct)
 	assert(type(struct.struct) == "table", "Not a struct")
 	local items = {}
 	for _, item in ipairs(struct.struct) do
-		local text = string.format("%s%s %s;", item.fulltype, namealign(item.fulltype), item.name)
+		local name = item.name
+		if item.array then
+			name = name .. item.array
+		end
+		local text = string.format("%s%s %s;", item.fulltype, namealign(item.fulltype), name)
 		if item.comment then
-			text = string.format("%s %s//!< %s", text,  namealign(item.name),  item.comment)
+			text = string.format("%s %s//!< %s", text,  namealign(name),  item.comment)
 		end
 		items[#items+1] = text
 	end
@@ -405,7 +414,7 @@ function codegen.gen_cstruct_define(struct)
 	local cname = struct.cname:match "(.-)_t$"
 	local items = {}
 	for _, item in ipairs(struct.struct) do
-		local text = string.format("%s%s %s;", item.ctype, namealign(item.ctype), item.name)
+		local text = string.format("%s%s %s%s;", item.ctype, namealign(item.ctype), item.name, item.array or "")
 		items[#items+1] = text
 	end
 	local temp = {

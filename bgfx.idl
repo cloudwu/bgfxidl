@@ -56,8 +56,7 @@ struct.Resolution { ctor }
 
 --- Uniform info.
 struct.UniformInfo
-	-- Improve it later, .name "char[256]" would be better
-	["name[256]"] "char"      "Uniform name."
+	.name "char[256]"         "Uniform name."
 	.type "UniformType::Enum" "Uniform type."
 	.num  "uint16_t"          "Number of elements in array."
 
