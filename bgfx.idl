@@ -44,6 +44,16 @@ struct.Memory
 	.data "uint8_t *" "Pointer to data."
 	.size "uint32_t"  "Data size."
 
+
+--- Backbuffer resolution and reset parameters.
+struct.Resolution { ctor }
+	.format "TextureFormat::Enum" "Backbuffer format."
+	.width	"uint32_t"            "Backbuffer width."
+	.height	"uint32_t"            "Backbuffer height."
+	.reset	"uint32_t"            "Reset parameters."
+	.numBackBuffers	"uint8_t"     "Number of back buffers."
+	.maxFrameLatency "uint8_t"    "Maximum frame latency."
+
 --- Fatal error enum.
 enum.Fatal                { comment = "" }
 
