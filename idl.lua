@@ -136,6 +136,11 @@ idl.funcs = all_funcs
 
 idl.out = "out"
 idl.const = "const"
+idl.NULL = "NULL"
+idl.UINT16_MAX = "UINT16_MAX"
+idl.INT32_MAX = "INT32_MAX"
+idl.UINT32_MAX = "UINT32_MAX"
+idl.UINT8_MAX = "UINT8_MAX"
 
 local all_comments = {}
 idl.comments = all_comments

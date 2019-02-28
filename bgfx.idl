@@ -258,7 +258,7 @@ func.reset
 
 func.frame
 	"uint32_t"
-	.capture "bool"
+	.capture "bool"  { default = false }
 
 func.getRendererType
 	"RendererType::Enum"
@@ -287,8 +287,8 @@ func.makeRef { cname = "make_ref_release" }
 	"const Memory *"
 	.data      "const void *"
 	.size      "uint32_t"
-	.releaseFn "ReleaseFn"
-	.userData  "void *"
+	.releaseFn "ReleaseFn" { default = NULL }
+	.userData  "void *" { default = NULL }
 
 func.setDebug
 	"void"
@@ -947,7 +947,7 @@ func.Encoder.setImage
 	.handle "TextureHandle"
 	.mip    "uint8_t"
 	.access "Access::Enum"
-	.format "TextureFormat::Enum"
+	.format "TextureFormat::Enum"  { default = "TextureFormat::Count" }
 
 func.Encoder.dispatch
 	"void"
@@ -1237,10 +1237,10 @@ func.blit
 	.dstY   "uint16_t"
 	.dstZ   "uint16_t"
 	.src    "TextureHandle"
-	.srcMip "uint8_t"
-	.srcX   "uint16_t"
-	.srcY   "uint16_t"
-	.srcZ   "uint16_t"
-	.width  "uint16_t"
-	.height "uint16_t"
-	.depth  "uint16_t"
+	.srcMip "uint8_t"      { default = 0 }
+	.srcX   "uint16_t"     { default = 0 }
+	.srcY   "uint16_t"     { default = 0 }
+	.srcZ   "uint16_t"     { default = 0 }
+	.width  "uint16_t"     { default = UINT16_MAX }
+	.height "uint16_t"     { default = UINT16_MAX }
+	.depth  "uint16_t"     { default = UINT16_MAX }
