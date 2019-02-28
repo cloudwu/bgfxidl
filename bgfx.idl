@@ -181,7 +181,7 @@ func.VertexDecl["end"]
 
 func.vertexPack
 	"void"
-	.input           "const float *"
+	.input           "const float[4]"
 	.inputNormalized "bool"
 	.attr            "Attrib::Enum"
 	.decl            "const VertexDecl &"
@@ -190,7 +190,7 @@ func.vertexPack
 
 func.vertexUnpack
 	"void"
-	.output          "float *" { out }
+	.output          "float[4]" { out }
 	.attr            "Attrib::Enum"
 	.decl            "const VertexDecl &"
 	.data            "const void *"
@@ -226,8 +226,8 @@ func.topologySortTriList
 	.sort       "TopologySort::Enum"
 	.dst        "void *" { out }
 	.dstSize    "uint32_t"
-	.dir        "const float *"
-	.pos        "const float *"
+	.dir        "const float[3]"
+	.pos        "const float[3]"
 	.vertices   "const void *"
 	.stride     "uint32_t"
 	.indices    "const void *"
@@ -706,7 +706,7 @@ func.destroy { cname = "destroy_occlusion_query" }
 func.setPaletteColor
 	"void"
 	.index "uint8_t"
-	.rgba  "const float *"
+	.rgba  "const float[4]"
 
 func.setViewName
 	"void"

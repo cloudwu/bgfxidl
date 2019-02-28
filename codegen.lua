@@ -31,7 +31,7 @@ local function convert_funcname(name)
 end
 
 local function convert_arg(all_types, arg, what)
-	local fulltype, array = arg.fulltype:match "(.-)(%[%s*[%d%a_]*%s*%])"
+	local fulltype, array = arg.fulltype:match "(.-)%s*(%[%s*[%d%a_]*%s*%])"
 	if array then
 		arg.fulltype = fulltype
 		arg.array = array
@@ -43,7 +43,12 @@ local function convert_arg(all_types, arg, what)
 			arg.ref = true
 		end
 	else
-		arg.type = arg.fulltype
+		local prefix, t = arg.fulltype:match "^%s*(%a+)%s+(%S+)"
+		if prefix then
+			arg.type = t
+		else
+			arg.type = arg.fulltype
+		end
 	end
 	local ctype = all_types[arg.type]
 	if not ctype then
@@ -97,9 +102,13 @@ local function gen_arg_conversion(all_types, arg)
 				arg.cpptype, arg.aname, arg.ptype, arg.name)
 		end
 	else
+		local cpptype = arg.cpptype
+		if arg.array then
+			cpptype = cpptype .. "*"
+		end
 		arg.aname = string.format(
 			"(%s)%s",
-			arg.cpptype, arg.name)
+			cpptype, arg.name)
 	end
 end
 
@@ -225,7 +234,11 @@ local function codetemp(func)
 	end
 	for _, arg in ipairs(func.args) do
 		conversion[#conversion+1] = arg.conversion
-		args[#args+1] = arg.ctype .. " " .. arg.name
+		local name = arg.ctype .. " " .. arg.name
+		if arg.array then
+			name = name .. arg.array
+		end
+		args[#args+1] = name
 		callargs[#callargs+1] = arg.aname
 	end
 	conversion[#conversion+1] = func.ret_conversion
