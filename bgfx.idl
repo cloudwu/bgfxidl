@@ -30,11 +30,11 @@ typedef "ViewId"
 
 --- Platform data.
 struct.PlatformData { ctor }
-	.ndt          "void*"   "Native display type."
-	.nwh          "void*"   "Native window handle."
-	.context      "void*"   "GL context, or D3D device."
-	.backBuffer   "void*"   "GL backbuffer, or D3D render target view."
-	.backBufferDS "void*"   "Backbuffer depth/stencil."
+	.ndt          "void*"   [[Native display type.]]
+	.nwh          "void*"   [[Native window handle.]]
+	.context      "void*"   [[GL context, or D3D device.]]
+	.backBuffer   "void*"   [[GL backbuffer, or D3D render target view.]]
+	.backBufferDS "void*"   [[Backbuffer depth/stencil.]]
 
 --- Memory must be obtained by calling `bgfx::alloc`, `bgfx::copy`, or `bgfx::makeRef`.
 ---
@@ -46,19 +46,19 @@ struct.Memory
 
 --- Backbuffer resolution and reset parameters.
 struct.Resolution { ctor }
-	.format "TextureFormat::Enum" "Backbuffer format."
-	.width	"uint32_t"            "Backbuffer width."
-	.height	"uint32_t"            "Backbuffer height."
-	.reset	"uint32_t"            "Reset parameters."
-	.numBackBuffers	"uint8_t"     "Number of back buffers."
-	.maxFrameLatency "uint8_t"    "Maximum frame latency."
+	.format "TextureFormat::Enum" [[Backbuffer format.]]
+	.width	"uint32_t"            [[Backbuffer width.]]
+	.height	"uint32_t"            [[Backbuffer height.]]
+	.reset	"uint32_t"            [[Reset parameters.]]
+	.numBackBuffers	"uint8_t"     [[Number of back buffers.]]
+	.maxFrameLatency "uint8_t"    [[Maximum frame latency.]]
 
 
 --- Uniform info.
 struct.UniformInfo
-	.name "char[256]"         "Uniform name."
-	.type "UniformType::Enum" "Uniform type."
-	.num  "uint16_t"          "Number of elements in array."
+	.name "char[256]"         [[Uniform name.]]
+	.type "UniformType::Enum" [[Uniform type.]]
+	.num  "uint16_t"          [[Number of elements in array.]]
 
 --- Fatal error enum.
 enum.Fatal                { comment = "" }
@@ -71,24 +71,24 @@ enum.Access               { comment = "" }
 
 --- Vertex attribute enum.
 enum.Attrib { comment = "Corresponds to vertex shader attribute." }
-	.Position  "a_position"
-	.Normal    "a_normal"
-	.Tangent   "a_tangent"
-	.Bitangent "a_bitangent"
-	.Color0    "a_color0"
-	.Color1    "a_color1"
-	.Color2    "a_color2"
-	.Color3    "a_color3"
-	.Indices   "a_indices"
-	.Weight    "a_weight"
-	.TexCoord0 "a_texcoord0"
-	.TexCoord1 "a_texcoord1"
-	.TexCoord2 "a_texcoord2"
-	.TexCoord3 "a_texcoord3"
-	.TexCoord4 "a_texcoord4"
-	.TexCoord5 "a_texcoord5"
-	.TexCoord6 "a_texcoord6"
-	.TexCoord7 "a_texcoord7"
+	.Position  [[a_position]]
+	.Normal    [[a_normal]]
+	.Tangent   [[a_tangent]]
+	.Bitangent [[a_bitangent]]
+	.Color0    [[a_color0]]
+	.Color1    [[a_color1]]
+	.Color2    [[a_color2]]
+	.Color3    [[a_color3]]
+	.Indices   [[a_indices]]
+	.Weight    [[a_weight]]
+	.TexCoord0 [[a_texcoord0]]
+	.TexCoord1 [[a_texcoord1]]
+	.TexCoord2 [[a_texcoord2]]
+	.TexCoord3 [[a_texcoord3]]
+	.TexCoord4 [[a_texcoord4]]
+	.TexCoord5 [[a_texcoord5]]
+	.TexCoord6 [[a_texcoord6]]
+	.TexCoord7 [[a_texcoord7]]
 
 --- Vertex attribute type enum.
 enum.AttribType           { comment = "" }
