@@ -82,12 +82,27 @@ end
 
 local codes_tbl = codes()
 
+local paths = (...) or {
+	["bgfx.idl.h"] = "../include/bgfx/c99",
+	["bgfx.idl.inl"] = "../src",
+}
+
+local function add_path(filename)
+	local path
+	if type(paths) == "string" then
+		path = paths
+	else
+		path = assert(paths[filename])
+	end
+	return path .. "/" .. filename
+end
+
 for filename, temp in pairs {
-	["../include/bgfx/c99/bgfx.idl.h"] = code_temp_include ,
-	["../src/bgfx.idl.inl"] = code_temp_impl } do
+	[add_path "bgfx.idl.h"] = code_temp_include ,
+	[add_path "bgfx.idl.inl"] = code_temp_impl } do
 
 	print ("Generate " .. filename)
-	local out = io.open(filename, "wb")
+	local out = assert(io.open(filename, "wb"))
 	out:write((temp:gsub("$([%l%d_]+)", codes_tbl)))
 	out:close()
 end

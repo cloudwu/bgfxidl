@@ -1,7 +1,9 @@
 An IDL for bgfx code generation
 ====
 
-See https://github.com/cloudwu/sproto/issues/83
+See https://github.com/cloudwu/bgfxidl/issues/9
+
+Use `lua bgfx-idl.lua .` to generate bgfx IDL in current dir.
 
 ```lua
 typedef "void"
