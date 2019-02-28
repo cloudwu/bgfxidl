@@ -24,7 +24,6 @@ typedef "TextureInfo"
 typedef "Transform"
 typedef "TransientIndexBuffer"
 typedef "TransientVertexBuffer"
-typedef "UniformInfo"
 typedef "VertexDecl"
 typedef "ViewId"
 
@@ -53,6 +52,14 @@ struct.Resolution { ctor }
 	.reset	"uint32_t"            "Reset parameters."
 	.numBackBuffers	"uint8_t"     "Number of back buffers."
 	.maxFrameLatency "uint8_t"    "Maximum frame latency."
+
+
+--- Uniform info.
+struct.UniformInfo
+	-- Improve it later, .name "char[256]" would be better
+	["name[256]"] "char"      "Uniform name."
+	.type "UniformType::Enum" "Uniform type."
+	.num  "uint16_t"          "Number of elements in array."
 
 --- Fatal error enum.
 enum.Fatal                { comment = "" }
