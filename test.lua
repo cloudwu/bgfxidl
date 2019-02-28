@@ -79,7 +79,7 @@ for typename, v in pairs(idl.types) do
 	print("TYPE:", typename, v.cname)
 	print(codegen.doxygen_type(v, idl.comments[v.name]))
 	if v.enum then
-		print(codegen.typegen_enums(v))
+		print(codegen.gen_enum_define(v))
 	end
 end
 
