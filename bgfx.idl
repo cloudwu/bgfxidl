@@ -269,6 +269,11 @@ struct.Resolution { ctor }
 	.numBackBuffers  "uint8_t"             [[Number of back buffers.]]
 	.maxFrameLatency "uint8_t"             [[Maximum frame latency.]]
 
+struct.Limits { namespace = "Init" }
+	.maxEncoders    "uint16_t"             [[Maximum number of encoder threads.]]
+	.transientVbSize "uint32_t"            [[Maximum transient vertex buffer size.]]
+	.transientIbSize "uint32_t"            [[Maximum transient index buffer size.]]
+
 --- Initialization parameters used by `bgfx::init`.
 struct.Init { ctor }
 	.type            "RendererType::Enum"  [[Select rendering backend. When set to RendererType::Count]]
@@ -297,12 +302,6 @@ struct.Init { ctor }
 	.allocator      "bx::AllocatorI*"      [[Custom allocator. When a custom allocator is not    ]]
 	                                       [[specified, bgfx uses the CRT allocator. Bgfx assumes]]
 	                                       [[custom allocator is thread safe.                    ]]
-
-struct.Limits { namespace = "Init" }
-	.maxEncoders    "uint16_t"             [[Maximum number of encoder threads.]]
-	.transientVbSize "uint32_t"            [[Maximum transient vertex buffer size.]]
-	.transientIbSize "uint32_t"            [[Maximum transient index buffer size.]]
-
 
 --- Memory must be obtained by calling `bgfx::alloc`, `bgfx::copy`, or `bgfx::makeRef`.
 ---

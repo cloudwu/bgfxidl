@@ -172,6 +172,16 @@ function codegen.nameconversion(all_types, all_funcs)
 
 	-- make index
 	for _,v in ipairs(all_types) do
+		if not v.namespace then
+			if all_types[v.name] then
+				error ("Duplicate type " .. v.name)
+			end
+			all_types[v.name] = v
+		end
+	end
+
+	-- make sub struct index
+	for _,v in ipairs(all_types) do
 		if v.namespace then
 			local super = all_types[v.namespace]
 			if not super then
@@ -186,11 +196,6 @@ function codegen.nameconversion(all_types, all_funcs)
 				error ( "Duplicate sub struct " .. v.name .. " in " .. v.namespace)
 			end
 			substruct[v.name] = v
-		else
-			if all_types[v.name] then
-				error ("Duplicate type " .. v.name)
-			end
-			all_types[v.name] = v
 		end
 	end
 
