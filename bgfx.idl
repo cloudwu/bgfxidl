@@ -265,7 +265,7 @@ struct.PlatformData { ctor }
 ---
 --- @attention It is illegal to create this structure on stack and pass it to any bgfx API.
 struct.Memory
-	.data "uint8_t *" "Pointer to data."
+	.data "uint8_t*" "Pointer to data."
 	.size "uint32_t"  "Data size."
 
 --- Backbuffer resolution and reset parameters.
@@ -334,7 +334,7 @@ func.vertexPack
 	.inputNormalized "bool"
 	.attr            "Attrib::Enum"
 	.decl            "const VertexDecl &"
-	.data            "void *"
+	.data            "void*"
 	.index           "uint32_t"
 
 func.vertexUnpack
@@ -342,54 +342,54 @@ func.vertexUnpack
 	.output          "float[4]" { out }
 	.attr            "Attrib::Enum"
 	.decl            "const VertexDecl &"
-	.data            "const void *"
+	.data            "const void*"
 	.index           "uint32_t"
 
 func.vertexConvert
 	"void"
 	.dstDecl "const VertexDecl &"
-	.dstData "void *"
+	.dstData "void*"
 	.srcDecl "const VertexDecl &"
-	.srcData "const void *"
+	.srcData "const void*"
 	.num     "uint32_t"
 
 func.weldVertices
 	"uint16_t"
-	.output  "uint16_t *"
+	.output  "uint16_t*"
 	.decl    "const VertexDecl &"
-	.data    "const void *"
+	.data    "const void*"
 	.num     "uint16_t"
 	.epsilon "float"
 
 func.topologyConvert
 	"uint32_t"
 	.conversion "TopologyConvert::Enum"
-	.dst        "void *" { out }
+	.dst        "void*" { out }
 	.dstSize    "uint32_t"
-	.indices    "const void *"
+	.indices    "const void*"
 	.numIndices "uint32_t"
 	.index32    "bool"
 
 func.topologySortTriList
 	"void"
 	.sort       "TopologySort::Enum"
-	.dst        "void *" { out }
+	.dst        "void*" { out }
 	.dstSize    "uint32_t"
 	.dir        "const float[3]"
 	.pos        "const float[3]"
-	.vertices   "const void *"
+	.vertices   "const void*"
 	.stride     "uint32_t"
-	.indices    "const void *"
+	.indices    "const void*"
 	.numIndices "uint32_t"
 	.index32    "bool"
 
 func.getSupportedRenderers
 	"uint8_t"
 	.max  "uint8_t"
-	.enum "RendererType::Enum *" { out }
+	.enum "RendererType::Enum*" { out }
 
 func.getRendererName
-	"const char *"
+	"const char*"
 	.type "RendererType::Enum"
 
 local init_ctor = [[
@@ -397,23 +397,23 @@ local init_ctor = [[
 ]]
 func.initCtor { cfunc = init_ctor }
 	"void"
-	.init "Init *"
+	.init "Init*"
 
 local init = [[
-	bgfx_init_t init = *_init;
+	bgfx_init_t init =*_init;
 
 	if (init.callback != NULL)
 	{
 		static bgfx::CallbackC99 s_callback;
 		s_callback.m_interface = init.callback;
-		init.callback = reinterpret_cast<bgfx_callback_interface_t *>(&s_callback);
+		init.callback = reinterpret_cast<bgfx_callback_interface_t*>(&s_callback);
 	}
 
 	if (init.allocator != NULL)
 	{
 		static bgfx::AllocatorC99 s_allocator;
 		s_allocator.m_interface = init.allocator;
-		init.allocator = reinterpret_cast<bgfx_allocator_interface_t *>(&s_allocator);
+		init.allocator = reinterpret_cast<bgfx_allocator_interface_t*>(&s_allocator);
 	}
 
 	union { const bgfx_init_t* c; const bgfx::Init* cpp; } in;
@@ -443,31 +443,31 @@ func.getRendererType
 	"RendererType::Enum"
 
 func.getCaps
-	"const Caps *"
+	"const Caps*"
 
 func.getStats
-	"const Stats *"
+	"const Stats*"
 
 func.alloc
-	"const Memory *"
+	"const Memory*"
 	.size "uint32_t"
 
 func.copy
-	"const Memory *"
-	.data "const void *"
+	"const Memory*"
+	.data "const void*"
 	.size "uint32_t"
 
 func.makeRef
-	"const Memory *"
-	.data "const void *"
+	"const Memory*"
+	.data "const void*"
 	.size "uint32_t"
 
 func.makeRef { cname = "make_ref_release" }
-	"const Memory *"
-	.data      "const void *"
+	"const Memory*"
+	.data      "const void*"
 	.size      "uint32_t"
 	.releaseFn "ReleaseFn" { default = NULL }
-	.userData  "void *" { default = NULL }
+	.userData  "void*" { default = NULL }
 
 func.setDebug
 	"void"
@@ -483,14 +483,14 @@ func.dbgTextPrintf { vararg = "dbgTextPrintfVargs" }
 	.x      "uint16_t"
 	.y      "uint16_t"
 	.attr   "uint8_t"
-	.format "const char *"
+	.format "const char*"
 
 func.dbgTextPrintfVargs { cname = "dbg_text_vprintf" }
 	"void"
 	.x       "uint16_t"
 	.y       "uint16_t"
 	.attr    "uint8_t"
-	.format  "const char *"
+	.format  "const char*"
 	.argList "va_list"
 
 func.dbgTextImage
@@ -499,18 +499,18 @@ func.dbgTextImage
 	.y       "uint16_t"
 	.width   "uint16_t"
 	.height  "uint16_t"
-	.data    "const void *"
+	.data    "const void*"
 	.pitch   "uint16_t"
 
 func.createIndexBuffer
 	"IndexBufferHandle"
-	.mem   "const Memory *"
+	.mem   "const Memory*"
 	.flags "uint16_t"
 
 func.setName { cname = "set_index_buffer_name" }
 	"void"
 	.handle "IndexBufferHandle"
-	.name   "const char *"
+	.name   "const char*"
 	.len    "int32_t"
 
 func.destroy { cname = "destroy_index_buffer" }
@@ -519,14 +519,14 @@ func.destroy { cname = "destroy_index_buffer" }
 
 func.createVertexBuffer
 	"VertexBufferHandle"
-	.mem   "const Memory *"
+	.mem   "const Memory*"
 	.decl  "const VertexDecl &"
 	.flags "uint16_t"
 
 func.setName { cname = "set_vertex_buffer_name" }
 	"void"
 	.handle "VertexBufferHandle"
-	.name   "const char *"
+	.name   "const char*"
 	.len    "int32_t"
 
 func.destroy { cname = "destroy_vertex_buffer" }
@@ -540,14 +540,14 @@ func.createDynamicIndexBuffer
 
 func.createDynamicIndexBuffer { cname = "create_dynamic_index_buffer_mem" }
 	"DynamicIndexBufferHandle"
-	.mem   "const Memory *"
+	.mem   "const Memory*"
 	.flags "uint16_t"
 
 func.update { cname = "update_dynamic_index_buffer" }
 	"void"
 	.handle     "DynamicIndexBufferHandle"
 	.startIndex "uint32_t"
-	.mem        "const Memory *"
+	.mem        "const Memory*"
 
 func.destroy { cname = "destroy_dynamic_index_buffer" }
 	"void"
@@ -561,7 +561,7 @@ func.createDynamicVertexBuffer
 
 func.createDynamicVertexBuffer { cname = "create_dynamic_vertex_buffer_mem" }
 	"DynamicVertexBufferHandle"
-	.mem   "const Memory *"
+	.mem   "const Memory*"
 	.decl  "const VertexDecl &"
 	.flags "uint16_t"
 
@@ -569,7 +569,7 @@ func.update { cname = "update_dynamic_vertex_buffer" }
 	"void"
 	.handle      "DynamicVertexBufferHandle"
 	.startVertex "uint32_t"
-	.mem         "const Memory *"
+	.mem         "const Memory*"
 
 func.destroy { cname = "destroy_dynamic_vertex_buffer" }
 	"void"
@@ -591,26 +591,26 @@ func.getAvailInstanceDataBuffer
 
 func.allocTransientIndexBuffer
 	"void"
-	.tib "TransientIndexBuffer *" { out }
+	.tib "TransientIndexBuffer*" { out }
 	.num "uint32_t"
 
 func.allocTransientVertexBuffer
 	"void"
-	.tvb  "TransientVertexBuffer *" { out }
+	.tvb  "TransientVertexBuffer*" { out }
 	.num  "uint32_t"
 	.decl "const VertexDecl &"
 
 func.allocTransientBuffers
 	"bool"
-	.tvb         "TransientVertexBuffer *" { out }
+	.tvb         "TransientVertexBuffer*" { out }
 	.decl        "const VertexDecl &"
 	.numVertices "uint32_t"
-	.tib         "TransientIndexBuffer *" { out }
+	.tib         "TransientIndexBuffer*" { out }
 	.numIndices  "uint32_t"
 
 func.allocInstanceDataBuffer
 	"void"
-	.idb    "InstanceDataBuffer *" { out }
+	.idb    "InstanceDataBuffer*" { out }
 	.num    "uint32_t"
 	.stride "uint16_t"
 
@@ -624,18 +624,18 @@ func.destroy { cname = "destroy_indirect_buffer" }
 
 func.createShader
 	"ShaderHandle"
-	.mem "const Memory *"
+	.mem "const Memory*"
 
 func.getShaderUniforms
 	"uint16_t"
 	.handle   "ShaderHandle"
-	.uniforms "UniformHandle *" { out }
+	.uniforms "UniformHandle*" { out }
 	.max      "uint16_t"
 
 func.setName { cname = "set_shader_name" }
 	"void"
 	.handle "ShaderHandle"
-	.name   "const char *"
+	.name   "const char*"
 	.len    "int32_t"
 
 func.destroy { cname = "destroy_shader" }
@@ -678,10 +678,10 @@ func.calcTextureSize
 
 func.createTexture
 	"TextureHandle"
-	.mem   "const Memory *"
+	.mem   "const Memory*"
 	.flags "uint64_t"
 	.skip  "uint8_t"
-	.info  "TextureInfo *" { out }
+	.info  "TextureInfo*" { out }
 
 func.createTexture2D
 	"TextureHandle"
@@ -691,7 +691,7 @@ func.createTexture2D
 	.numLayers "uint16_t"
 	.format    "TextureFormat::Enum"
 	.flags     "uint64_t"
-	.mem       "const Memory *"
+	.mem       "const Memory*"
 
 func.createTexture2D { cname = "create_texture_2d_scaled" }
 	"TextureHandle"
@@ -709,7 +709,7 @@ func.createTexture3D
 	.hasMips   "bool"
 	.format    "TextureFormat::Enum"
 	.flags     "uint64_t"
-	.mem       "const Memory *"
+	.mem       "const Memory*"
 
 func.createTextureCube
 	"TextureHandle"
@@ -718,7 +718,7 @@ func.createTextureCube
 	.numLayers "uint16_t"
 	.format    "TextureFormat::Enum"
 	.flags     "uint64_t"
-	.mem       "const Memory *"
+	.mem       "const Memory*"
 
 func.updateTexture2D
 	"void"
@@ -729,7 +729,7 @@ func.updateTexture2D
 	.y      "uint16_t"
 	.width  "uint16_t"
 	.height "uint16_t"
-	.mem    "const Memory *"
+	.mem    "const Memory*"
 	.pitch  "uint16_t"
 
 func.updateTexture3D
@@ -742,7 +742,7 @@ func.updateTexture3D
 	.width  "uint16_t"
 	.height "uint16_t"
 	.depth  "uint16_t"
-	.mem    "const Memory *"
+	.mem    "const Memory*"
 
 func.updateTextureCube
 	"void"
@@ -754,23 +754,23 @@ func.updateTextureCube
 	.y      "uint16_t"
 	.width  "uint16_t"
 	.height "uint16_t"
-	.mem    "const Memory *"
+	.mem    "const Memory*"
 	.pitch  "uint16_t"
 
 func.readTexture
 	"uint32_t"
 	.handle "TextureHandle"
-	.data   "void *"
+	.data   "void*"
 	.mip    "uint8_t"
 
 func.setName { cname = "set_texture_name" }
 	"void"
 	.handle "TextureHandle"
-	.name   "const char *"
+	.name   "const char*"
 	.len    "int32_t"
 
 func.getDirectAccessPtr
-	"void *"
+	"void*"
 	.handle "TextureHandle"
 
 func.destroy { cname = "destroy_texture" }
@@ -793,18 +793,18 @@ func.createFrameBuffer { cname = "create_frame_buffer_scaled" }
 func.createFrameBuffer { cname = "create_frame_buffer_from_handles" }
 	"FrameBufferHandle"
 	.num            "uint8_t"
-	.handles        "const TextureHandle *"
+	.handles        "const TextureHandle*"
 	.destroyTexture "bool"
 
 func.createFrameBuffer { cname = "create_frame_buffer_from_attachment" }
 	"FrameBufferHandle"
 	.num            "uint8_t"
-	.handles        "const Attachment *"
+	.handles        "const Attachment*"
 	.destroyTexture "bool"
 
 func.createFrameBuffer { cname = "create_frame_buffer_from_nwh" }
 	"FrameBufferHandle"
-	.nwh         "void *"
+	.nwh         "void*"
 	.width       "uint16_t"
 	.height      "uint16_t"
 	.format      "TextureFormat::Enum"
@@ -813,7 +813,7 @@ func.createFrameBuffer { cname = "create_frame_buffer_from_nwh" }
 func.setName { cname = "set_frame_buffer_name" }
 	"void"
 	.handle "FrameBufferHandle"
-	.name   "const char *"
+	.name   "const char*"
 	.len    "int32_t"
 
 func.getTexture
@@ -827,7 +827,7 @@ func.destroy { cname = "destroy_frame_buffer" }
 
 func.createUniform
 	"UniformHandle"
-	.name "const char *"
+	.name "const char*"
 	.type "UniformType::Enum"
 	.num  "uint16_t"
 
@@ -846,7 +846,7 @@ func.createOcclusionQuery
 func.getResult
 	"OcclusionQueryResult::Enum"
 	.handle "OcclusionQueryHandle"
-	.result "int32_t *" { out }
+	.result "int32_t*" { out }
 
 func.destroy { cname = "destroy_occlusion_query" }
 	"void"
@@ -860,7 +860,7 @@ func.setPaletteColor
 func.setViewName
 	"void"
 	.id   "ViewId"
-	.name "const char *"
+	.name "const char*"
 
 func.setViewRect
 	"void"
@@ -921,26 +921,26 @@ func.setViewFrameBuffer
 func.setViewTransform
 	"void"
 	.id   "ViewId"
-	.view "const void *"
-	.proj "const void *"
+	.view "const void*"
+	.proj "const void*"
 
 func.setViewOrder
 	"void"
 	.id    "ViewId"
 	.num   "uint16_t"
-	.order "const ViewId *"
+	.order "const ViewId*"
 
 func.begin { cname = "encoder_begin" }
-	"Encoder *"
+	"Encoder*"
 	.forThread "bool"
 
 func["end"] { cname = "encoder_end" }
 	"void"
-	.encoder "Encoder *"
+	.encoder "Encoder*"
 
 func.Encoder.setMarker
 	"void"
-	.marker "const char *"
+	.marker "const char*"
 
 func.Encoder.setState
 	"void"
@@ -970,7 +970,7 @@ func.Encoder.setScissor { cname = "set_scissor_cached" }
 
 func.Encoder.setTransform
 	"uint32_t"
-	.mtx "const void *"
+	.mtx "const void*"
 	.num "uint16_t"
 
 func.Encoder.setTransform { cname = "set_transform_cached" }
@@ -980,13 +980,13 @@ func.Encoder.setTransform { cname = "set_transform_cached" }
 
 func.Encoder.allocTransform
 	"uint32_t"
-	.transform "Transform *" { out }
+	.transform "Transform*" { out }
 	.num       "uint16_t"
 
 func.Encoder.setUniform
 	"void"
 	.handle "UniformHandle"
-	.value  "const void *"
+	.value  "const void*"
 	.num    "uint16_t"
 
 func.Encoder.setIndexBuffer
@@ -1003,7 +1003,7 @@ func.Encoder.setIndexBuffer { cname = "set_dynamic_index_buffer" }
 
 func.Encoder.setIndexBuffer { cname = "set_transient_index_buffer" }
 	"void"
-	.tib        "const TransientIndexBuffer *"
+	.tib        "const TransientIndexBuffer*"
 	.firstIndex "uint32_t"
 	.numIndices "uint32_t"
 
@@ -1024,7 +1024,7 @@ func.Encoder.setVertexBuffer { cname = "set_dynamic_vertex_buffer" }
 func.Encoder.setVertexBuffer { cname = "set_transient_vertex_buffer" }
 	"void"
 	.stream      "uint8_t"
-	.tvb         "const TransientVertexBuffer *"
+	.tvb         "const TransientVertexBuffer*"
 	.startVertex "uint32_t"
 	.numVertices "uint32_t"
 
@@ -1034,7 +1034,7 @@ func.Encoder.setVertexCount
 
 func.Encoder.setInstanceDataBuffer
 	"void"
-	.idb   "const InstanceDataBuffer *"
+	.idb   "const InstanceDataBuffer*"
 	.start "uint32_t"
 	.num   "uint32_t"
 
@@ -1167,7 +1167,7 @@ func.Encoder.blit
 func.requestScreenShot
 	"void"
 	.handle   "FrameBufferHandle"
-	.filePath "const char *"
+	.filePath "const char*"
 
 func.renderFrame
 	"RenderFrame::Enum"
@@ -1178,7 +1178,7 @@ func.setPlatformData
 	.data "const PlatformData &"
 
 func.getInternalData
-	"const InternalData *"
+	"const InternalData*"
 
 func.overrideInternal { cname = "override_internal_texture_ptr" }
 	"uintptr_t"
@@ -1200,7 +1200,7 @@ func.overrideInternal { cname = "override_internal_texture" }
 
 func.setMarker
 	"void"
-	.marker "const char *"
+	.marker "const char*"
 
 func.setState
 	"void"
@@ -1230,7 +1230,7 @@ func.setScissor { cname = "set_scissor_cached" }
 
 func.setTransform
 	"uint32_t"
-	.mtx "const void *"
+	.mtx "const void*"
 	.num "uint16_t"
 
 func.setTransform { cname = "set_transform_cached" }
@@ -1240,13 +1240,13 @@ func.setTransform { cname = "set_transform_cached" }
 
 func.allocTransform
 	"uint32_t"
-	.transform "Transform *" { out }
+	.transform "Transform*" { out }
 	.num       "uint16_t"
 
 func.setUniform
 	"void"
 	.handle "UniformHandle"
-	.value  "const void *"
+	.value  "const void*"
 	.num    "uint16_t"
 
 func.setIndexBuffer
@@ -1263,7 +1263,7 @@ func.setIndexBuffer { cname = "set_dynamic_index_buffer" }
 
 func.setIndexBuffer { cname = "set_transient_index_buffer" }
 	"void"
-	.tib        "const TransientIndexBuffer *"
+	.tib        "const TransientIndexBuffer*"
 	.firstIndex "uint32_t"
 	.numIndices "uint32_t"
 
@@ -1284,7 +1284,7 @@ func.setVertexBuffer { cname = "set_dynamic_vertex_buffer" }
 func.setVertexBuffer { cname = "set_transient_vertex_buffer" }
 	"void"
 	.stream      "uint8_t"
-	.tvb         "const TransientVertexBuffer *"
+	.tvb         "const TransientVertexBuffer*"
 	.startVertex "uint32_t"
 	.numVertices "uint32_t"
 
@@ -1294,7 +1294,7 @@ func.setVertexCount
 
 func.setInstanceDataBuffer
 	"void"
-	.idb   "const InstanceDataBuffer *"
+	.idb   "const InstanceDataBuffer*"
 	.start "uint32_t"
 	.num   "uint32_t"
 
