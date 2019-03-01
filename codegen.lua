@@ -551,7 +551,7 @@ typedef struct $NAME_s { uint16_t idx; } $NAME_t;
 ]]
 function codegen.gen_chandle(handle)
 	assert(handle.handle, "Not a handle")
-	return (chandle_temp:gsub("$(%u+)", { NAME = handle.cname }))
+	return (chandle_temp:gsub("$(%u+)", { NAME = handle.cname:match "(.-)_t$" }))
 end
 
 local handle_temp = [[
