@@ -322,7 +322,7 @@ function codegen.doxygen_ctype(typedef, doxygen)
 		return
 	end
 	local result = {
-		"/*",
+		"/**",
 	}
 	for _, line in ipairs(doxygen) do
 		result[#result+1] = " * " .. line
@@ -385,7 +385,7 @@ function codegen.gen_enum_cdefine(enum)
 	local items = {}
 	for index , item in ipairs(enum.enum) do
 		local comment = item.comment or ""
-		items[#items+1] = string.format("%s_%s,%s /* (%2d) %s%s */",
+		items[#items+1] = string.format("%s_%s,%s /** (%2d) %s%s */",
 			uname,
 			item.cname or camelcase_to_underscorecase(item.name):upper(),
 			namealign(item.name),
@@ -455,7 +455,7 @@ function codegen.gen_struct_cdefine(struct)
 		end
 		local text = string.format("%s%s %s;", item.ctype, namealign(item.ctype), name)
 		if item.comment then
-			text = string.format("%s %s/* %s%s */", text,  namealign(name),  item.comment, namealign(item.comment, 40))
+			text = string.format("%s %s/** %s%s */", text,  namealign(name),  item.comment, namealign(item.comment, 40))
 		end
 		items[#items+1] = text
 	end
