@@ -18,14 +18,6 @@ local function camelcase_to_underscorecase(name)
 	return table.concat(tmp, "_")
 end
 
-local function convert_typename(name)
-	if name:match "^%u" then
-		return "bgfx_" .. camelcase_to_underscorecase(name) .. "_t"
-	else
-		return name
-	end
-end
-
 local function convert_funcname(name)
 	name = name:gsub("^%l", string.upper)	-- Change to upper CamlCase
 	return camelcase_to_underscorecase(name)
@@ -141,25 +133,43 @@ local function gen_ret_conversion(all_types, func)
 	end
 end
 
+--local function convert_typename(name)
+--	if name:match "^%u" then
+--		return "bgfx_" .. camelcase_to_underscorecase(name) .. "_t"
+--	else
+--		return name
+--	end
+--end
+
 function codegen.nameconversion(all_types, all_funcs)
-	local enums = {}
-	for k,v in pairs(all_types) do
-		if not v.cname then
-			v.cname = convert_typename(k)
+	for _,v in ipairs(all_types) do
+		local name = v.name
+		local cname = v.cname
+		if cname == nil then
+			if name:match "^%u" then
+				cname = camelcase_to_underscorecase(name)
+			else
+				cname = name
+			end
 		end
-		v.name = k
+		if v.namespace then
+			cname = camelcase_to_underscorecase(v.namespace) .. "_" .. cname
+		end
+		v.cname = "bgfx_".. cname .. "_t"
 		if v.enum then
-			enums[#enums+1] = k
+			v.name = v.name .. "::Enum"
 		end
 	end
 
-	for _, e in ipairs(enums) do
-		local t = all_types[e]
-		all_types[e] = nil
-		all_types[e .. "::Enum"] = t
+	-- make index
+	for _,v in ipairs(all_types) do
+		if all_types[v.name] then
+			error ("Duplicate type " .. v.name)
+		end
+		all_types[v.name] = v
 	end
 
-	for k,v in pairs(all_types) do
+	for _,v in ipairs(all_types) do
 		if v.struct then
 			for _, item in ipairs(v.struct) do
 				convert_arg(all_types, item, v.name)
@@ -403,6 +413,45 @@ function codegen.gen_enum_cdefine(enum)
 	return (cenum_temp:gsub("$(%u+)", temp))
 end
 
+local function strip_space(c)
+	return (c:match "(.-)%s*$")
+end
+
+local function text_with_comments(items, item, cstyle)
+	local name = item.name
+	if item.array then
+		name = name .. item.array
+	end
+	local typename
+	if cstyle then
+		typename = item.ctype
+	else
+		typename = item.fulltype
+	end
+	local text = string.format("%s%s %s;", typename, namealign(typename), name)
+	if item.comment then
+		if type(item.comment) == "table" then
+			table.insert(items, "")
+			if cstyle then
+				table.insert(items, "/**")
+				for _, c in ipairs(item.comment) do
+					table.insert(items, " * " .. strip_space(c))
+				end
+				table.insert(items, " */")
+			else
+				for _, c in ipairs(item.comment) do
+					table.insert(items, "/// " .. strip_space(c))
+				end
+			end
+		else
+			text = string.format(
+				cstyle and "%s %s/** %s%s */" or "%s %s//!< %s",
+				text, namealign(name),  item.comment, namealign(item.comment, 40))
+		end
+	end
+	items[#items+1] = text
+end
+
 local struct_temp = [[
 struct $NAME
 {
@@ -414,15 +463,7 @@ function codegen.gen_struct_define(struct)
 	assert(type(struct.struct) == "table", "Not a struct")
 	local items = {}
 	for _, item in ipairs(struct.struct) do
-		local name = item.name
-		if item.array then
-			name = name .. item.array
-		end
-		local text = string.format("%s%s %s;", item.fulltype, namealign(item.fulltype), name)
-		if item.comment then
-			text = string.format("%s %s//!< %s", text,  namealign(name),  item.comment)
-		end
-		items[#items+1] = text
+		text_with_comments(items, item)
 	end
 	local ctor = {}
 	if struct.ctor then
@@ -449,15 +490,7 @@ function codegen.gen_struct_cdefine(struct)
 	local cname = struct.cname:match "(.-)_t$"
 	local items = {}
 	for _, item in ipairs(struct.struct) do
-		local name = item.name
-		if item.array then
-			name = name .. item.array
-		end
-		local text = string.format("%s%s %s;", item.ctype, namealign(item.ctype), name)
-		if item.comment then
-			text = string.format("%s %s/** %s%s */", text,  namealign(name),  item.comment, namealign(item.comment, 40))
-		end
-		items[#items+1] = text
+		text_with_comments(items, item, true)
 	end
 	local temp = {
 		NAME = cname,

@@ -146,14 +146,8 @@ local function codes()
 	end
 
 	-- call actions with type
-	local types = {}
-	for k in pairs(idl.types) do
-		types[#types+1] = k
-	end
-	table.sort(types)
 
-	for _, typename in ipairs(types) do
-		local typedef = idl.types[typename]
+	for _, typedef in ipairs(idl.types) do
 		for k in pairs(type_actions) do
 			local typegen = typegen[k]
 			if typegen then

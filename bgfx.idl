@@ -19,6 +19,8 @@ typedef "InternalData"
 typedef "ReleaseFn"
 typedef "VertexDecl"
 typedef "ViewId"
+typedef "CallbackI" { cname = "callback_interface" }
+typedef "bx::AllocatorI" { cname = "allocator_interface" }
 
 --- Fatal error enum.
 enum.Fatal { comment = "" }
@@ -267,8 +269,39 @@ struct.Resolution { ctor }
 	.numBackBuffers  "uint8_t"             [[Number of back buffers.]]
 	.maxFrameLatency "uint8_t"             [[Maximum frame latency.]]
 
+struct.Limits { namespace = "Init" }
+	.maxEncoders    "uint16_t"             [[Maximum number of encoder threads.]]
+	.transientVbSize "uint32_t"            [[Maximum transient vertex buffer size.]]
+	.transientIbSize "uint32_t"            [[Maximum transient index buffer size.]]
+
 --- Initialization parameters used by `bgfx::init`.
 struct.Init { ctor }
+	.type            "RendererType::Enum"  [[Select rendering backend. When set to RendererType::Count]]
+	                                       [[a default rendering backend will be selected appropriate to the platform.]]
+	                                       [[See: `bgfx::RendererType`]]
+
+	.vendorId       "uint16_t"             [[Vendor PCI id. If set to `BGFX_PCI_ID_NONE` it will select the first]]
+	                                       [[device.                                                             ]]
+	                                       [[  - `BGFX_PCI_ID_NONE` - Autoselect adapter.                        ]]
+	                                       [[  - `BGFX_PCI_ID_SOFTWARE_RASTERIZER` - Software rasterizer.        ]]
+	                                       [[  - `BGFX_PCI_ID_AMD` - AMD adapter.                                ]]
+	                                       [[  - `BGFX_PCI_ID_INTEL` - Intel adapter.                            ]]
+	                                       [[  - `BGFX_PCI_ID_NVIDIA` - nVidia adapter.                          ]]
+
+	.deviceId       "uint16_t"             [[Device id. If set to 0 it will select first device, or device with ]]
+	                                       [[matching id. ]]
+
+	.debug          "bool"                 [[Enable device for debuging.]]
+	.profile        "bool"                 [[Enable device for profiling.]]
+	.platformData   "PlatformData"         [[Platform data.]]
+	.resolution     "Resolution"           [[Backbuffer resolution and reset parameters. See: `bgfx::Resolution`.]]
+	.limits         "Limits"
+	.callback       "CallbackI*"           [[Provide application specific callback interface.]]
+	                                       [[See: `bgfx::CallbackI`]]
+
+	.allocator      "bx::AllocatorI*"      [[Custom allocator. When a custom allocator is not    ]]
+	                                       [[specified, bgfx uses the CRT allocator. Bgfx assumes]]
+	                                       [[custom allocator is thread safe.                    ]]
 
 --- Memory must be obtained by calling `bgfx::alloc`, `bgfx::copy`, or `bgfx::makeRef`.
 ---
