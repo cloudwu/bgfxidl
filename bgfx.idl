@@ -4,6 +4,7 @@ typedef "bool"
 typedef "char"
 typedef "float"
 typedef "int32_t"
+typedef "int64_t"
 typedef "uint8_t"
 typedef "uint16_t"
 typedef "uint32_t"
@@ -12,18 +13,9 @@ typedef "uintptr_t"
 typedef "va_list"
 typedef "void"
 
-typedef "Attachment"
-typedef "Caps"
 typedef "Encoder"
-typedef "Init"
-typedef "InstanceDataBuffer"
 typedef "InternalData"
 typedef "ReleaseFn"
-typedef "Stats"
-typedef "TextureInfo"
-typedef "Transform"
-typedef "TransientIndexBuffer"
-typedef "TransientVertexBuffer"
 typedef "VertexDecl"
 typedef "ViewId"
 
@@ -265,13 +257,6 @@ struct.PlatformData { ctor }
 	.backBuffer   "void*" [[GL backbuffer, or D3D render target view.]]
 	.backBufferDS "void*" [[Backbuffer depth/stencil.]]
 
---- Memory must be obtained by calling `bgfx::alloc`, `bgfx::copy`, or `bgfx::makeRef`.
----
---- @attention It is illegal to create this structure on stack and pass it to any bgfx API.
-struct.Memory
-	.data "uint8_t*" "Pointer to data."
-	.size "uint32_t"  "Data size."
-
 --- Backbuffer resolution and reset parameters.
 struct.Resolution { ctor }
 	.format          "TextureFormat::Enum" [[Backbuffer format.]]
@@ -281,11 +266,62 @@ struct.Resolution { ctor }
 	.numBackBuffers  "uint8_t"             [[Number of back buffers.]]
 	.maxFrameLatency "uint8_t"             [[Maximum frame latency.]]
 
+--- Initialization parameters used by `bgfx::init`.
+struct.Init { ctor }
+
+--- Memory must be obtained by calling `bgfx::alloc`, `bgfx::copy`, or `bgfx::makeRef`.
+---
+--- @attention It is illegal to create this structure on stack and pass it to any bgfx API.
+struct.Memory
+	.data "uint8_t*" [[Pointer to data.]]
+	.size "uint32_t" [[Data size.]]
+
+--- Renderer capabilities.
+struct.Caps
+	.rendererType "RendererType::Enum"
+
+--- Transient index buffer.
+struct.TransientIndexBuffer
+	.data "uint8_t*"
+
+--- Transient vertex buffer.
+struct.TransientVertexBuffer
+	.data "uint8_t*"
+
+--- Instance data buffer info.
+struct.InstanceDataBuffer
+	.data "uint8_t*"
+
+--- Texture info.
+struct.TextureInfo
+	.format "TextureFormat::Enum"
+
 --- Uniform info.
 struct.UniformInfo
 	.name "char[256]"         [[Uniform name.]]
 	.type "UniformType::Enum" [[Uniform type.]]
 	.num  "uint16_t"          [[Number of elements in array.]]
+
+--- Frame buffer texture attachment info.
+struct.Attachment
+	.access "Access::Enum"
+
+--- Transform data.
+struct.Transform
+	.data "float*"
+
+--- View stats.
+struct.ViewStats
+	.name "char[256]"         [[View name.]]
+
+--- Encoder stats.
+struct.EncoderStats
+	.cpuTimeBegin "int64_t" [[Encoder thread CPU submit begin time.]]
+	.cpuTimeEnd   "int64_t" [[Encoder thread CPU submit end time.]]
+
+--- Renderer statistics data.
+struct.Stats
+	.cpuTimeFrame "int64_t" [[CPU time between two `bgfx::frame` calls.]]
 
 handle "DynamicIndexBufferHandle"
 handle "DynamicVertexBufferHandle"
@@ -302,7 +338,7 @@ handle "VertexDeclHandle"
 
 func.VertexDecl.begin
 	"void"
-	.renderer        "RendererType::Enum"
+	.rendererType    "RendererType::Enum"
 
 func.VertexDecl.add
 	"void"
@@ -314,19 +350,19 @@ func.VertexDecl.add
 
 func.VertexDecl.decode { const }
 	"void"
-	.attrib          "Attrib::Enum"
-	.num             "uint8_t &"          { out }
-	.type            "AttribType::Enum &" { out }
-	.normalized      "bool &"             { out }
-	.asInt           "bool &"             { out }
+	.attrib     "Attrib::Enum"
+	.num        "uint8_t &"          { out }
+	.type       "AttribType::Enum &" { out }
+	.normalized "bool &"             { out }
+	.asInt      "bool &"             { out }
 
 func.VertexDecl.has { const }
 	"bool"
-	.attrib          "Attrib::Enum"
+	.attrib "Attrib::Enum"
 
 func.VertexDecl.skip
 	"void"
-	.num             "uint8_t"
+	.num "uint8_t"
 
 -- Notice: `end` is a keyword in lua
 func.VertexDecl["end"]
@@ -343,11 +379,11 @@ func.vertexPack
 
 func.vertexUnpack
 	"void"
-	.output          "float[4]" { out }
-	.attr            "Attrib::Enum"
-	.decl            "const VertexDecl &"
-	.data            "const void*"
-	.index           "uint32_t"
+	.output "float[4]" { out }
+	.attr   "Attrib::Enum"
+	.decl   "const VertexDecl &"
+	.data   "const void*"
+	.index  "uint32_t"
 
 func.vertexConvert
 	"void"
