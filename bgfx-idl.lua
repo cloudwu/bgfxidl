@@ -24,6 +24,8 @@ local type_actions = {
 	cenums = "\n",
 	structs = "\n",
 	cstructs = "\n",
+	handles = "\n",
+	chandles = "\n",
 }
 
 assert(loadfile("bgfx.idl" , "t", idl))()
@@ -67,6 +69,18 @@ function typegen.cstructs(typedef)
 	end
 end
 
+function typegen.handles(typedef)
+	if typedef.handle then
+		return codegen.gen_handle(typedef)
+	end
+end
+
+function typegen.chandles(typedef)
+	if typedef.handle then
+		return codegen.gen_chandle(typedef)
+	end
+end
+
 -- For bgfx.idl.h
 local code_temp_include = [[
 /*
@@ -79,6 +93,7 @@ local code_temp_include = [[
  *
  */
 
+$chandles
 $cenums
 $cstructs
 $c99decl
@@ -120,7 +135,8 @@ BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 ]]
 
 -- For bgfx.types.h
-local code_temp_enums = [[
+local code_temp_cpp = [[
+$handles
 $enums
 $structs
 ]]
@@ -181,7 +197,7 @@ end
 for filename, temp in pairs {
 	[add_path "bgfx.idl.h"] = code_temp_include ,
 	[add_path "bgfx.idl.inl"] = code_temp_impl ,
-	[add_path "bgfx.types.h"] = code_temp_enums ,
+	[add_path "bgfx.types.h"] = code_temp_cpp ,
 	} do
 
 	print ("Generate " .. filename)

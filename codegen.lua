@@ -543,7 +543,24 @@ function codegen.gen_struct_cdefine(struct)
 		NAME = cname,
 		ITEMS = table.concat(items, "\n\t"),
 	}
-	return cstruct_temp:gsub("$(%u+)", temp)
+	return (cstruct_temp:gsub("$(%u+)", temp))
+end
+
+local chandle_temp = [[
+typedef struct $NAME_s { uint16_t idx; } $NAME_t;
+]]
+function codegen.gen_chandle(handle)
+	assert(handle.handle, "Not a handle")
+	return (chandle_temp:gsub("$(%u+)", { NAME = handle.cname }))
+end
+
+local handle_temp = [[
+struct $NAME { uint16_t idx; };
+inline bool isValid($NAME _handle) { return bgfx::kInvalidHandle != _handle.idx; }
+]]
+function codegen.gen_handle(handle)
+	assert(handle.handle, "Not a handle")
+	return (handle_temp:gsub("$(%u+)", { NAME = handle.name }))
 end
 
 return codegen
