@@ -29,11 +29,12 @@ typedef "ViewId"
 
 --- Fatal error enum.
 enum.Fatal { comment = "" }
-	.DebugCheck            [[]]
-	.InvalidShader         [[]]
-	.UnableToInitialize    [[]]
-	.UnableToCreateTexture [[]]
-	.DeviceLost            [[]]
+	.DebugCheck
+	.InvalidShader
+	.UnableToInitialize
+	.UnableToCreateTexture
+	.DeviceLost
+	()	-- end of enum
 
 --- Renderer backend type enum.
 enum.RendererType { comment = "Renderer types:" }
@@ -126,64 +127,65 @@ enum.TextureFormat { comment = "Texture formats:" }
 	.ASTC8x6      [[ASTC 8x6 2.67 BPP]]
 	.ASTC10x5     [[ASTC 10x5 2.56 BPP]]
 	.Unknown      [[Compressed formats above.]]
-	.R1           [[]]
-	.A8           [[]]
-	.R8           [[]]
-	.R8I          [[]]
-	.R8U          [[]]
-	.R8S          [[]]
-	.R16          [[]]
-	.R16I         [[]]
-	.R16U         [[]]
-	.R16F         [[]]
-	.R16S         [[]]
-	.R32I         [[]]
-	.R32U         [[]]
-	.R32F         [[]]
-	.RG8          [[]]
-	.RG8I         [[]]
-	.RG8U         [[]]
-	.RG8S         [[]]
-	.RG16         [[]]
-	.RG16I        [[]]
-	.RG16U        [[]]
-	.RG16F        [[]]
-	.RG16S        [[]]
-	.RG32I        [[]]
-	.RG32U        [[]]
-	.RG32F        [[]]
-	.RGB8         [[]]
-	.RGB8I        [[]]
-	.RGB8U        [[]]
-	.RGB8S        [[]]
-	.RGB9E5F      [[]]
-	.BGRA8        [[]]
-	.RGBA8        [[]]
-	.RGBA8I       [[]]
-	.RGBA8U       [[]]
-	.RGBA8S       [[]]
-	.RGBA16       [[]]
-	.RGBA16I      [[]]
-	.RGBA16U      [[]]
-	.RGBA16F      [[]]
-	.RGBA16S      [[]]
-	.RGBA32I      [[]]
-	.RGBA32U      [[]]
-	.RGBA32F      [[]]
-	.R5G6B5       [[]]
-	.RGBA4        [[]]
-	.RGB5A1       [[]]
-	.RGB10A2      [[]]
-	.RG11B10F     [[]]
+	.R1
+	.A8
+	.R8
+	.R8I
+	.R8U
+	.R8S
+	.R16
+	.R16I
+	.R16U
+	.R16F
+	.R16S
+	.R32I
+	.R32U
+	.R32F
+	.RG8
+	.RG8I
+	.RG8U
+	.RG8S
+	.RG16
+	.RG16I
+	.RG16U
+	.RG16F
+	.RG16S
+	.RG32I
+	.RG32U
+	.RG32F
+	.RGB8
+	.RGB8I
+	.RGB8U
+	.RGB8S
+	.RGB9E5F
+	.BGRA8
+	.RGBA8
+	.RGBA8I
+	.RGBA8U
+	.RGBA8S
+	.RGBA16
+	.RGBA16I
+	.RGBA16U
+	.RGBA16F
+	.RGBA16S
+	.RGBA32I
+	.RGBA32U
+	.RGBA32F
+	.R5G6B5
+	.RGBA4
+	.RGB5A1
+	.RGB10A2
+	.RG11B10F
 	.UnknownDepth [[Depth formats below.]]
-	.D16          [[]]
-	.D24          [[]]
-	.D24S8        [[]]
-	.D32          [[]]
-	.D16F         [[]]
-	.D24F         [[]]
-	.D32F         [[]]
-	.D0S8         [[]]
+	.D16
+	.D24
+	.D24S8
+	.D32
+	.D16F
+	.D24F
+	.D32F
+	.D0S8
+	()
 
 --- Uniform type enum.
 enum.UniformType          { comment = "Uniform types:" }
@@ -226,18 +228,19 @@ enum.TopologyConvert { comment = "Topology conversion functions:" }
 
 --- Topology sort order.
 enum.TopologySort { comment = "Topology sort order:" }
-	.DirectionFrontToBackMin [[]]
-	.DirectionFrontToBackAvg [[]]
-	.DirectionFrontToBackMax [[]]
-	.DirectionBackToFrontMin [[]]
-	.DirectionBackToFrontAvg [[]]
-	.DirectionBackToFrontMax [[]]
-	.DistanceFrontToBackMin  [[]]
-	.DistanceFrontToBackAvg  [[]]
-	.DistanceFrontToBackMax  [[]]
-	.DistanceBackToFrontMin  [[]]
-	.DistanceBackToFrontAvg  [[]]
-	.DistanceBackToFrontMax  [[]]
+	.DirectionFrontToBackMin
+	.DirectionFrontToBackAvg
+	.DirectionFrontToBackMax
+	.DirectionBackToFrontMin
+	.DirectionBackToFrontAvg
+	.DirectionBackToFrontMax
+	.DistanceFrontToBackMin
+	.DistanceFrontToBackAvg
+	.DistanceFrontToBackMax
+	.DistanceBackToFrontMin
+	.DistanceBackToFrontAvg
+	.DistanceBackToFrontMax
+	()
 
 --- View mode sets draw call sort order.
 enum.ViewMode { comment = "View modes:" }
@@ -248,10 +251,11 @@ enum.ViewMode { comment = "View modes:" }
 
 --- Render frame enum.
 enum.RenderFrame { comment = "" }
-	.NoContext [[]]
-	.Render    [[]]
-	.Timeout   [[]]
-	.Exiting   [[]]
+	.NoContext
+	.Render
+	.Timeout
+	.Exiting
+	()
 
 --- Platform data.
 struct.PlatformData { ctor }

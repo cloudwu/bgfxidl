@@ -10,7 +10,6 @@ local paths = (...) or {
 	["bgfx.idl.inl"] = "../src",
 	-- todo: cpp header path here
 	["bgfx.types.h"] = ".",
-	["bgfx.ctypes.h"] = ".",
 }
 
 local func_actions = {
@@ -79,6 +78,8 @@ local code_temp_include = [[
  *
  */
 
+$cenums
+$cstructs
 $c99decl
 /**/
 typedef struct bgfx_interface_vtbl
@@ -121,12 +122,6 @@ BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 local code_temp_enums = [[
 $enums
 $structs
-]]
-
--- For bgfx.ctypes.h
-local code_temp_cenums = [[
-$cenums
-$cstructs
 ]]
 
 local function codes()
@@ -192,7 +187,6 @@ for filename, temp in pairs {
 	[add_path "bgfx.idl.h"] = code_temp_include ,
 	[add_path "bgfx.idl.inl"] = code_temp_impl ,
 	[add_path "bgfx.types.h"] = code_temp_enums ,
-	[add_path "bgfx.ctypes.h"] = code_temp_cenums ,
 	} do
 
 	print ("Generate " .. filename)
