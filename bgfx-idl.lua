@@ -57,7 +57,10 @@ end
 
 function typegen.structs(typedef)
 	if typedef.struct then
-		return add_doxygen(typedef, codegen.gen_struct_define(typedef))
+		-- todo: nest struct
+		if not typedef.namespace then
+			return add_doxygen(typedef, codegen.gen_struct_define(typedef))
+		end
 	end
 end
 

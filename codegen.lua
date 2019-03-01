@@ -23,7 +23,7 @@ local function convert_funcname(name)
 	return camelcase_to_underscorecase(name)
 end
 
-local function convert_arg(all_types, arg, what)
+local function convert_arg(all_types, arg, namespace)
 	local fulltype, array = arg.fulltype:match "(.-)%s*(%[%s*[%d%a_:]*%s*%])"
 	if array then
 		arg.fulltype = fulltype
@@ -51,9 +51,16 @@ local function convert_arg(all_types, arg, what)
 			arg.type = arg.fulltype
 		end
 	end
-	local ctype = all_types[arg.type]
+	local ctype
+	local substruct = namespace.substruct
+	if substruct then
+		ctype = substruct[arg.type]
+	end
 	if not ctype then
-		error ("Undefined type " .. arg.fulltype .. " for " .. what)
+		ctype = all_types[arg.type]
+	end
+	if not ctype then
+		error ("Undefined type " .. arg.fulltype .. " in " .. namespace.name)
 	end
 	arg.ctype = arg.fulltype:gsub(arg.type, ctype.cname):gsub("&", "*")
 	if ctype.cname ~= arg.type then
@@ -165,16 +172,32 @@ function codegen.nameconversion(all_types, all_funcs)
 
 	-- make index
 	for _,v in ipairs(all_types) do
-		if all_types[v.name] then
-			error ("Duplicate type " .. v.name)
+		if v.namespace then
+			local super = all_types[v.namespace]
+			if not super then
+				error ("Define " .. v.namespace .. " first")
+			end
+			local substruct = super.substruct
+			if not substruct then
+				substruct = {}
+				super.substruct = substruct
+			end
+			if substruct[v.name] then
+				error ( "Duplicate sub struct " .. v.name .. " in " .. v.namespace)
+			end
+			substruct[v.name] = v
+		else
+			if all_types[v.name] then
+				error ("Duplicate type " .. v.name)
+			end
+			all_types[v.name] = v
 		end
-		all_types[v.name] = v
 	end
 
 	for _,v in ipairs(all_types) do
 		if v.struct then
 			for _, item in ipairs(v.struct) do
-				convert_arg(all_types, item, v.name)
+				convert_arg(all_types, item, v)
 			end
 		end
 	end
@@ -187,7 +210,7 @@ function codegen.nameconversion(all_types, all_funcs)
 			v.cname = convert_funcname(v.class) .. "_" .. v.cname
 		end
 		for _, arg in ipairs(v.args) do
-			convert_arg(all_types, arg, v.name)
+			convert_arg(all_types, arg, v)
 			gen_arg_conversion(all_types, arg)
 		end
 		if v.vararg then
@@ -205,15 +228,15 @@ function codegen.nameconversion(all_types, all_funcs)
 		else
 			v.implname = v.name
 		end
-		convert_arg(all_types, v.ret, v.name .. "@rettype")
+		convert_arg(all_types, v.ret, v)
 		gen_ret_conversion(all_types, v)
-		if v.class then
-			local classname = v.class
+		if namespace then
+			local classname = namespace
 			if v.const then
 				classname = "const " .. classname
 			end
 			local classtype = { fulltype = classname .. "*" }
-			convert_arg(all_types, classtype, "class member " .. v.name)
+			convert_arg(all_types, classtype, v)
 			v.this = classtype.ctype .. " _this"
 			v.this_conversion = string.format( "%s This = (%s)_this;", classtype.cpptype, classtype.cpptype)
 		end
