@@ -5,8 +5,9 @@ local codegen = {}
 
 local NAMEALIGN = 20
 
-local function namealign(name)
-	return string.rep(" ", NAMEALIGN - #name)
+local function namealign(name, align)
+	align = align or NAMEALIGN
+	return string.rep(" ", align - #name)
 end
 
 local function camelcase_to_underscorecase(name)
@@ -316,6 +317,20 @@ function codegen.doxygen_type(typedef, doxygen)
 	return table.concat(result, "\n")
 end
 
+function codegen.doxygen_ctype(typedef, doxygen)
+	if doxygen == nil then
+		return
+	end
+	local result = {
+		"/*",
+	}
+	for _, line in ipairs(doxygen) do
+		result[#result+1] = " * " .. line
+	end
+	result[#result+1] = " */"
+	return table.concat(result, "\n")
+end
+
 local enum_temp = [[
 struct $NAME
 {
@@ -368,14 +383,21 @@ function codegen.gen_enum_cdefine(enum)
 	local cname = enum.cname:match "(.-)_t$"
 	local uname = cname:upper()
 	local items = {}
-	for _, item in ipairs(enum.enum) do
-		items[#items+1] = uname .. "_" .. item.name:upper()
+	for index , item in ipairs(enum.enum) do
+		local comment = item.comment or ""
+		items[#items+1] = string.format("%s_%s,%s /* (%2d) %s%s */",
+			uname,
+			item.name:upper(),
+			namealign(item.name),
+			index - 1,
+			comment,
+			namealign(comment, 30))
 	end
 
 	local temp = {
 		NAME = cname,
 		COUNT = uname .. "_COUNT",
-		ITEMS = table.concat(items, ",\n\t"),
+		ITEMS = table.concat(items, "\n\t"),
 	}
 
 	return (cenum_temp:gsub("$(%u+)", temp))
@@ -422,12 +444,19 @@ typedef struct $NAME_s
 
 } $NAME_t;
 ]]
-function codegen.gen_cstruct_define(struct)
+function codegen.gen_struct_cdefine(struct)
 	assert(type(struct.struct) == "table", "Not a struct")
 	local cname = struct.cname:match "(.-)_t$"
 	local items = {}
 	for _, item in ipairs(struct.struct) do
-		local text = string.format("%s%s %s%s;", item.ctype, namealign(item.ctype), item.name, item.array or "")
+		local name = item.name
+		if item.array then
+			name = name .. item.array
+		end
+		local text = string.format("%s%s %s;", item.ctype, namealign(item.ctype), name)
+		if item.comment then
+			text = string.format("%s %s/* %s%s */", text,  namealign(name),  item.comment, namealign(item.comment, 40))
+		end
 		items[#items+1] = text
 	end
 	local temp = {

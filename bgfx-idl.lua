@@ -33,8 +33,9 @@ codegen.nameconversion(idl.types, idl.funcs)
 
 local typegen = {}
 
-local function add_doxygen(typedef, define)
-		local doc = codegen.doxygen_type(typedef, idl.comments[typedef.name])
+local function add_doxygen(typedef, define, cstyle)
+		local func = cstyle and codegen.doxygen_ctype or codegen.doxygen_type
+		local doc = func(typedef, idl.comments[typedef.name])
 		if doc then
 			return doc .. "\n" .. define
 		else
@@ -50,7 +51,7 @@ end
 
 function typegen.cenums(typedef)
 	if typedef.enum then
-		return codegen.gen_enum_cdefine(typedef)
+		return add_doxygen(typedef, codegen.gen_enum_cdefine(typedef), true)
 	end
 end
 
@@ -62,7 +63,7 @@ end
 
 function typegen.cstructs(typedef)
 	if typedef.struct then
-		return codegen.gen_cstruct_define(typedef)
+		return add_doxygen(typedef, codegen.gen_struct_cdefine(typedef), true)
 	end
 end
 
