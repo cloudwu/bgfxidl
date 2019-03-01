@@ -412,7 +412,7 @@ struct.Stats
 	.rtMemoryUsed            "int64_t"       [[Estimate of render target memory used.]]
 	.transientVbUsed         "int32_t"       [[Amount of transient vertex buffer used.]]
 	.transientIbUsed         "int32_t"       [[Amount of transient index buffer used.]]
---	.numPrims                "uint32_t[Topology::Count]"      [[Number of primitives rendered.]]
+	.numPrims                "uint32_t[Topology::Count]"      [[Number of primitives rendered.]]
 	.gpuMemoryMax            "int64_t"       [[Maximum available GPU memory for application.]]
 	.gpuMemoryUsed           "int64_t"       [[Amount of GPU memory used by the application.]]
 	.width                   "uint16_t"      [[Backbuffer width in pixels.]]

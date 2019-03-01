@@ -24,10 +24,18 @@ local function convert_funcname(name)
 end
 
 local function convert_arg(all_types, arg, what)
-	local fulltype, array = arg.fulltype:match "(.-)%s*(%[%s*[%d%a_]*%s*%])"
+	local fulltype, array = arg.fulltype:match "(.-)%s*(%[%s*[%d%a_:]*%s*%])"
 	if array then
 		arg.fulltype = fulltype
 		arg.array = array
+		local enum, value = array:match "%[%s*([%a%d]+)::([%a%d]+)%]"
+		if enum then
+			local typedef = all_types[ enum .. "::Enum" ]
+			if typedef == nil then
+				error ("Unknown Enum " .. enum)
+			end
+			arg.carray = "[BGFX_" .. camelcase_to_underscorecase(enum):upper() .. "_" .. value:upper() .. "]"
+		end
 	end
 	local t, postfix = arg.fulltype:match "(%a[%a%d_:]*)%s*([*&]+)%s*$"
 	if t then
@@ -133,14 +141,6 @@ local function gen_ret_conversion(all_types, func)
 	end
 end
 
---local function convert_typename(name)
---	if name:match "^%u" then
---		return "bgfx_" .. camelcase_to_underscorecase(name) .. "_t"
---	else
---		return name
---	end
---end
-
 function codegen.nameconversion(all_types, all_funcs)
 	for _,v in ipairs(all_types) do
 		local name = v.name
@@ -149,13 +149,15 @@ function codegen.nameconversion(all_types, all_funcs)
 			if name:match "^%u" then
 				cname = camelcase_to_underscorecase(name)
 			else
-				cname = name
+				v.cname = name
 			end
 		end
-		if v.namespace then
-			cname = camelcase_to_underscorecase(v.namespace) .. "_" .. cname
+		if cname then
+			if v.namespace then
+				cname = camelcase_to_underscorecase(v.namespace) .. "_" .. cname
+			end
+			v.cname = "bgfx_".. cname .. "_t"
 		end
-		v.cname = "bgfx_".. cname .. "_t"
 		if v.enum then
 			v.name = v.name .. "::Enum"
 		end
@@ -232,12 +234,12 @@ end
 
 local function codetemp(func)
 	local conversion = {}
-	local args = {}
+	local cargs = {}
 	local callargs = {}
 	local cppfunc
 	if func.class then
 		-- It's a member function
-		args[1] = func.this
+		cargs[1] = func.this
 		conversion[1] = func.this_conversion
 		cppfunc = "This->" .. func.name
 	else
@@ -247,9 +249,9 @@ local function codetemp(func)
 		conversion[#conversion+1] = arg.conversion
 		local name = arg.ctype .. " " .. arg.name
 		if arg.array then
-			name = name .. arg.array
+			name = name .. (arg.carray or arg.array)
 		end
-		args[#args+1] = name
+		cargs[#cargs+1] = name
 		callargs[#callargs+1] = arg.aname
 	end
 	conversion[#conversion+1] = func.ret_conversion
@@ -257,7 +259,7 @@ local function codetemp(func)
 	return {
 		RET = func.ret.ctype,
 		FUNCNAME = func.cname,
-		ARGS = table.concat(args, ", "),
+		CARGS = table.concat(cargs, ", "),
 		CONVERSION = lines(conversion),
 		PRERET = func.ret_prefix or "",
 		CPPFUNC = cppfunc,
@@ -273,7 +275,7 @@ local function apply_template(func, temp)
 end
 
 local c99temp = [[
-BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
+BGFX_C_API $RET bgfx_$FUNCNAME($CARGS)
 {
 	$CONVERSION
 	$PRERET$CPPFUNC($CALLARGS);
@@ -282,7 +284,7 @@ BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
 ]]
 
 local c99usertemp = [[
-BGFX_C_API $RET bgfx_$FUNCNAME($ARGS)
+BGFX_C_API $RET bgfx_$FUNCNAME($CARGS)
 {
 $CODE
 }
@@ -298,7 +300,7 @@ end
 
 local template_function_declaration = [[
 /**/
-BGFX_C_API $RET bgfx_$FUNCNAME($ARGS);
+BGFX_C_API $RET bgfx_$FUNCNAME($CARGS);
 ]]
 
 function codegen.gen_c99decl(func)
@@ -306,7 +308,7 @@ function codegen.gen_c99decl(func)
 end
 
 function codegen.gen_interface_struct(func)
-	return apply_template(func, "$RET (*$FUNCNAME)($ARGS);")
+	return apply_template(func, "$RET (*$FUNCNAME)($CARGS);")
 end
 
 function codegen.gen_interface_import(func)
@@ -420,7 +422,11 @@ end
 local function text_with_comments(items, item, cstyle)
 	local name = item.name
 	if item.array then
-		name = name .. item.array
+		if cstyle then
+			name = name .. (item.carray or item.array)
+		else
+			name = name .. item.array
+		end
 	end
 	local typename
 	if cstyle then
