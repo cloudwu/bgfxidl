@@ -208,7 +208,7 @@ enum.BackbufferRatio      { comment = "Backbuffer ratios:" }
 enum.OcclusionQueryResult { comment = "Occlusion query results:" }
 	.Invisible [[Query failed test.]]
 	.Visible   [[Query passed test.]]
-	.NoResult  [[Query result is not available yet.]]
+	.NoResult  { cname = "NORESULT" } [[Query result is not available yet.]]
 
 --- Primitive topology.
 enum.Topology { comment = "Primitive topology:" }

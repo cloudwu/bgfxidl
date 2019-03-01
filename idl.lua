@@ -52,11 +52,15 @@ local function enumdef(_, typename)
 	local function new_enum_item(_, itemname)
 		local item = { name = itemname }
 		t.enum[#t.enum + 1] = item
-		local function add_comment(obj , comment)
-			item.comment = comment
+		local function add_attrib_or_comment(obj , attribs)
+			if type(attribs) == "string" then
+				item.comment = attribs
+			elseif attribs then
+				copy_attribs(item, attribs)
+			end
 			return obj
 		end
-		return setmetatable({}, { __index = new_enum_item, __call = add_comment })
+		return setmetatable({}, { __index = new_enum_item, __call = add_attrib_or_comment })
 	end
 
 	return setmetatable({}, { __index = new_enum_item , __call = enum_attrib })

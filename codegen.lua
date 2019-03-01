@@ -387,7 +387,7 @@ function codegen.gen_enum_cdefine(enum)
 		local comment = item.comment or ""
 		items[#items+1] = string.format("%s_%s,%s /* (%2d) %s%s */",
 			uname,
-			item.name:upper(),
+			item.cname or camelcase_to_underscorecase(item.name):upper(),
 			namealign(item.name),
 			index - 1,
 			comment,
