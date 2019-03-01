@@ -326,7 +326,7 @@ struct.UniformInfo
 
 --- Frame buffer texture attachment info.
 struct.Attachment
-	.access  "Access::Enum"
+	.access  "Access::Enum"  [[Attachement access. See `Access::Enum`.]]
 	.handle  "TextureHandle" [[Render target texture handle.]]
 	.mip     "uint16_t"      [[Mip level.]]
 	.layer   "uint16_t"      [[Cubemap side or depth layer/slice.]]
@@ -334,7 +334,7 @@ struct.Attachment
 
 --- Transform data.
 struct.Transform
-	.data "float*"
+	.data "float*"  [[Pointer to first 4x4 matrix.]]
 	.num "uint16_t" [[Number of matrices.]]
 
 --- View stats.
