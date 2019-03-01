@@ -27,47 +27,32 @@ typedef "TransientVertexBuffer"
 typedef "VertexDecl"
 typedef "ViewId"
 
-
---- Platform data.
-struct.PlatformData { ctor }
-	.ndt          "void*"   [[Native display type.]]
-	.nwh          "void*"   [[Native window handle.]]
-	.context      "void*"   [[GL context, or D3D device.]]
-	.backBuffer   "void*"   [[GL backbuffer, or D3D render target view.]]
-	.backBufferDS "void*"   [[Backbuffer depth/stencil.]]
-
---- Memory must be obtained by calling `bgfx::alloc`, `bgfx::copy`, or `bgfx::makeRef`.
----
---- @attention It is illegal to create this structure on stack and pass it to any bgfx API.
-struct.Memory
-	.data "uint8_t *" "Pointer to data."
-	.size "uint32_t"  "Data size."
-
-
---- Backbuffer resolution and reset parameters.
-struct.Resolution { ctor }
-	.format "TextureFormat::Enum" [[Backbuffer format.]]
-	.width	"uint32_t"            [[Backbuffer width.]]
-	.height	"uint32_t"            [[Backbuffer height.]]
-	.reset	"uint32_t"            [[Reset parameters.]]
-	.numBackBuffers	"uint8_t"     [[Number of back buffers.]]
-	.maxFrameLatency "uint8_t"    [[Maximum frame latency.]]
-
-
---- Uniform info.
-struct.UniformInfo
-	.name "char[256]"         [[Uniform name.]]
-	.type "UniformType::Enum" [[Uniform type.]]
-	.num  "uint16_t"          [[Number of elements in array.]]
-
 --- Fatal error enum.
-enum.Fatal                { comment = "" }
+enum.Fatal { comment = "" }
+	.DebugCheck            [[]]
+	.InvalidShader         [[]]
+	.UnableToInitialize    [[]]
+	.UnableToCreateTexture [[]]
+	.DeviceLost            [[]]
 
 --- Renderer backend type enum.
-enum.RendererType         { comment = "" }
+enum.RendererType { comment = "Renderer types:" }
+	.Noop       [[No rendering.]]
+	.Direct3D9  [[Direct3D 9.0]]
+	.Direct3D11 [[Direct3D 11.0]]
+	.Direct3D12 [[Direct3D 12.0]]
+	.Gnm        [[GNM]]
+	.Metal      [[Metal]]
+	.OpenGLES   [[OpenGL ES 2.0+]]
+	.OpenGL     [[OpenGL 2.1+]]
+	.Vulkan     [[Vulkan]]
 
 --- Access mode enum.
-enum.Access               { comment = "" }
+enum.Access { comment = "Access:" }
+	.Read      [[Read]]
+	.Write     [[Write]]
+	.ReadWrite [[Read and write]]
+
 
 --- Vertex attribute enum.
 enum.Attrib { comment = "Corresponds to vertex shader attribute." }
@@ -91,7 +76,12 @@ enum.Attrib { comment = "Corresponds to vertex shader attribute." }
 	.TexCoord7 [[a_texcoord7]]
 
 --- Vertex attribute type enum.
-enum.AttribType           { comment = "" }
+enum.AttribType { comment = "Attribute types:" }
+	.Uint8  [[Uint8]]
+	.Uint10 [[Uint10, availability depends on: `BGFX_CAPS_VERTEX_ATTRIB_UINT10`.]]
+	.Int16  [[Int16]]
+	.Half   [[Half, availability depends on: `BGFX_CAPS_VERTEX_ATTRIB_HALF`.]]
+	.Float  [[Float]]
 
 --- Texture format enum.
 ---
@@ -108,31 +98,190 @@ enum.AttribType           { comment = "" }
 ---       +-------- Components
 ---
 --- @attention Availability depends on Caps (see: formats).
-enum.TextureFormat        { comment = "" }
+enum.TextureFormat { comment = "Texture formats:" }
+	.BC1          [[DXT1]]
+	.BC2          [[DXT3]]
+	.BC3          [[DXT5]]
+	.BC4          [[LATC1/ATI1]]
+	.BC5          [[LATC2/ATI2]]
+	.BC6H         [[BC6H]]
+	.BC7          [[BC7]]
+	.ETC1         [[ETC1 RGB8]]
+	.ETC2         [[ETC2 RGB8]]
+	.ETC2A        [[ETC2 RGBA8]]
+	.ETC2A1       [[ETC2 RGB8A1]]
+	.PTC12        [[PVRTC1 RGB 2BPP]]
+	.PTC14        [[PVRTC1 RGB 4BPP]]
+	.PTC12A       [[PVRTC1 RGBA 2BPP]]
+	.PTC14A       [[PVRTC1 RGBA 4BPP]]
+	.PTC22        [[PVRTC2 RGBA 2BPP]]
+	.PTC24        [[PVRTC2 RGBA 4BPP]]
+	.ATC          [[ATC RGB 4BPP]]
+	.ATCE         [[ATCE RGBA 8 BPP explicit alpha]]
+	.ATCI         [[ATCI RGBA 8 BPP interpolated alpha]]
+	.ASTC4x4      [[ASTC 4x4 8.0 BPP]]
+	.ASTC5x5      [[ASTC 5x5 5.12 BPP]]
+	.ASTC6x6      [[ASTC 6x6 3.56 BPP]]
+	.ASTC8x5      [[ASTC 8x5 3.20 BPP]]
+	.ASTC8x6      [[ASTC 8x6 2.67 BPP]]
+	.ASTC10x5     [[ASTC 10x5 2.56 BPP]]
+	.Unknown      [[Compressed formats above.]]
+	.R1           [[]]
+	.A8           [[]]
+	.R8           [[]]
+	.R8I          [[]]
+	.R8U          [[]]
+	.R8S          [[]]
+	.R16          [[]]
+	.R16I         [[]]
+	.R16U         [[]]
+	.R16F         [[]]
+	.R16S         [[]]
+	.R32I         [[]]
+	.R32U         [[]]
+	.R32F         [[]]
+	.RG8          [[]]
+	.RG8I         [[]]
+	.RG8U         [[]]
+	.RG8S         [[]]
+	.RG16         [[]]
+	.RG16I        [[]]
+	.RG16U        [[]]
+	.RG16F        [[]]
+	.RG16S        [[]]
+	.RG32I        [[]]
+	.RG32U        [[]]
+	.RG32F        [[]]
+	.RGB8         [[]]
+	.RGB8I        [[]]
+	.RGB8U        [[]]
+	.RGB8S        [[]]
+	.RGB9E5F      [[]]
+	.BGRA8        [[]]
+	.RGBA8        [[]]
+	.RGBA8I       [[]]
+	.RGBA8U       [[]]
+	.RGBA8S       [[]]
+	.RGBA16       [[]]
+	.RGBA16I      [[]]
+	.RGBA16U      [[]]
+	.RGBA16F      [[]]
+	.RGBA16S      [[]]
+	.RGBA32I      [[]]
+	.RGBA32U      [[]]
+	.RGBA32F      [[]]
+	.R5G6B5       [[]]
+	.RGBA4        [[]]
+	.RGB5A1       [[]]
+	.RGB10A2      [[]]
+	.RG11B10F     [[]]
+	.UnknownDepth [[Depth formats below.]]
+	.D16          [[]]
+	.D24          [[]]
+	.D24S8        [[]]
+	.D32          [[]]
+	.D16F         [[]]
+	.D24F         [[]]
+	.D32F         [[]]
+	.D0S8         [[]]
 
 --- Uniform type enum.
-enum.UniformType          { comment = "" }
+enum.UniformType          { comment = "Uniform types:" }
+	.Sampler [[Sampler.]]
+	.End     [[Reserved, do not use.]]
+	.Vec4    [[4 floats vector.]]
+	.Mat3    [[3x3 matrix.]]
+	.Mat4    [[4x4 matrix.]]
 
 --- Backbuffer ratio enum.
-enum.BackbufferRatio      { comment = "" }
+enum.BackbufferRatio      { comment = "Backbuffer ratios:" }
+	.Equal     [[Equal to backbuffer.]]
+	.Half      [[One half size of backbuffer.]]
+	.Quarter   [[One quarter size of backbuffer.]]
+	.Eighth    [[One eighth size of backbuffer.]]
+	.Sixteenth [[One sixteenth size of backbuffer.]]
+	.Double    [[Double size of backbuffer.]]
 
 --- Occlusion query result.
-enum.OcclusionQueryResult { comment = "" }
+enum.OcclusionQueryResult { comment = "Occlusion query results:" }
+	.Invisible [[Query failed test.]]
+	.Visible   [[Query passed test.]]
+	.NoResult  [[Query result is not available yet.]]
 
 --- Primitive topology.
-enum.Topology             { comment = "" }
+enum.Topology { comment = "Primitive topology:" }
+	.TriList   [[Triangle list.]]
+	.TriStrip  [[Triangle strip.]]
+	.LineList  [[Line list.]]
+	.LineStrip [[Line strip.]]
+	.PointList [[Point list.]]
 
 --- Topology conversion function.
-enum.TopologyConvert      { comment = "" }
+enum.TopologyConvert { comment = "Topology conversion functions:" }
+	.TriListFlipWinding  [[Flip winding order of triangle list.]]
+	.TriStripFlipWinding [[Flip winding order of trinagle strip.]]
+	.TriListToLineList   [[Convert triangle list to line list.]]
+	.TriStripToTriList   [[Convert triangle strip to triangle list.]]
+	.LineStripToLineList [[Convert line strip to line list.]]
 
 --- Topology sort order.
-enum.TopologySort         { comment = "" }
+enum.TopologySort { comment = "Topology sort order:" }
+	.DirectionFrontToBackMin [[]]
+	.DirectionFrontToBackAvg [[]]
+	.DirectionFrontToBackMax [[]]
+	.DirectionBackToFrontMin [[]]
+	.DirectionBackToFrontAvg [[]]
+	.DirectionBackToFrontMax [[]]
+	.DistanceFrontToBackMin  [[]]
+	.DistanceFrontToBackAvg  [[]]
+	.DistanceFrontToBackMax  [[]]
+	.DistanceBackToFrontMin  [[]]
+	.DistanceBackToFrontAvg  [[]]
+	.DistanceBackToFrontMax  [[]]
 
 --- View mode sets draw call sort order.
-enum.ViewMode             { comment = "" }
+enum.ViewMode { comment = "View modes:" }
+	.Default         [[Default sort order.]]
+	.Sequential      [[Sort in the same order in which submit calls were called.]]
+	.DepthAscending  [[Sort draw call depth in ascending order.]]
+	.DepthDescending [[Sort draw call depth in descending order.]]
 
 --- Render frame enum.
-enum.RenderFrame          { comment = "" }
+enum.RenderFrame { comment = "" }
+	.NoContext [[]]
+	.Render    [[]]
+	.Timeout   [[]]
+	.Exiting   [[]]
+
+--- Platform data.
+struct.PlatformData { ctor }
+	.ndt          "void*" [[Native display type.]]
+	.nwh          "void*" [[Native window handle.]]
+	.context      "void*" [[GL context, or D3D device.]]
+	.backBuffer   "void*" [[GL backbuffer, or D3D render target view.]]
+	.backBufferDS "void*" [[Backbuffer depth/stencil.]]
+
+--- Memory must be obtained by calling `bgfx::alloc`, `bgfx::copy`, or `bgfx::makeRef`.
+---
+--- @attention It is illegal to create this structure on stack and pass it to any bgfx API.
+struct.Memory
+	.data "uint8_t *" "Pointer to data."
+	.size "uint32_t"  "Data size."
+
+--- Backbuffer resolution and reset parameters.
+struct.Resolution { ctor }
+	.format          "TextureFormat::Enum" [[Backbuffer format.]]
+	.width           "uint32_t"            [[Backbuffer width.]]
+	.height          "uint32_t"            [[Backbuffer height.]]
+	.reset           "uint32_t"            [[Reset parameters.]]
+	.numBackBuffers  "uint8_t"             [[Number of back buffers.]]
+	.maxFrameLatency "uint8_t"             [[Maximum frame latency.]]
+
+--- Uniform info.
+struct.UniformInfo
+	.name "char[256]"         [[Uniform name.]]
+	.type "UniformType::Enum" [[Uniform type.]]
+	.num  "uint16_t"          [[Number of elements in array.]]
 
 handle "DynamicIndexBufferHandle"
 handle "DynamicVertexBufferHandle"
