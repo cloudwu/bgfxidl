@@ -195,6 +195,7 @@ function codegen.nameconversion(all_types, all_funcs)
 			if substruct[v.name] then
 				error ( "Duplicate sub struct " .. v.name .. " in " .. v.namespace)
 			end
+			substruct[#substruct+1] = v
 			substruct[v.name] = v
 		end
 	end
@@ -490,9 +491,11 @@ local struct_temp = [[
 struct $NAME
 {
 	$CTOR
+	$SUBSTRUCTS
 	$ITEMS
 };
 ]]
+
 function codegen.gen_struct_define(struct)
 	assert(type(struct.struct) == "table", "Not a struct")
 	local items = {}
@@ -504,8 +507,18 @@ function codegen.gen_struct_define(struct)
 		ctor[1] = struct.name .. "();"
 		ctor[2] = ""
 	end
+	local subs = {}
+	if struct.substruct then
+		for _, v in ipairs(struct.substruct) do
+			local s = codegen.gen_struct_define(v)
+			s = s:gsub("\n", "\n\t")
+			subs[#subs+1] = s
+		end
+	end
+
 	local temp = {
 		NAME = struct.name,
+		SUBSTRUCTS = lines(subs),
 		ITEMS = table.concat(items, "\n\t"),
 		CTOR = lines(ctor),
 	}

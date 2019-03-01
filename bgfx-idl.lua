@@ -56,11 +56,8 @@ function typegen.cenums(typedef)
 end
 
 function typegen.structs(typedef)
-	if typedef.struct then
-		-- todo: nest struct
-		if not typedef.namespace then
-			return add_doxygen(typedef, codegen.gen_struct_define(typedef))
-		end
+	if typedef.struct and not typedef.namespace then
+		return add_doxygen(typedef, codegen.gen_struct_define(typedef))
 	end
 end
 
