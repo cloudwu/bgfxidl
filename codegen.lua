@@ -397,10 +397,10 @@ function codegen.gen_enum_cdefine(enum)
 	local items = {}
 	for index , item in ipairs(enum.enum) do
 		local comment = item.comment or ""
-		items[#items+1] = string.format("%s_%s,%s /** (%2d) %s%s */",
-			uname,
-			item.cname or camelcase_to_underscorecase(item.name):upper(),
-			namealign(item.name),
+		local name = uname .. "_" .. (item.cname or camelcase_to_underscorecase(item.name):upper())
+		items[#items+1] = string.format("%s,%s /** (%2d) %s%s */",
+			name,
+			namealign(name, 40),
 			index - 1,
 			comment,
 			namealign(comment, 30))
@@ -452,7 +452,7 @@ local function text_with_comments(items, item, cstyle)
 		else
 			text = string.format(
 				cstyle and "%s %s/** %s%s */" or "%s %s//!< %s",
-				text, namealign(name),  item.comment, namealign(item.comment, 40))
+				text, namealign(text, 40),  item.comment, namealign(item.comment, 40))
 		end
 	end
 	items[#items+1] = text
