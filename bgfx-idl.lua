@@ -5,13 +5,6 @@ local idl     = require "idl"
 local codegen = require "codegen"
 local doxygen = require "doxygen"
 
-local files = {
-	["bgfx.h"] = "../include/bgfx/c99",
-	["bgfx.idl.inl"] = "../src",
-	-- todo: cpp header path here
-	["bgfx.idl.cpp"] = ".",
-}
-
 local func_actions = {
 	c99 = "\n",
 	c99decl = "\n",
@@ -215,9 +208,8 @@ local function add_path(filename)
 	return path .. "/" .. filename
 end
 
-local function genidl(filename, path)
+local function genidl(filename, outputfile)
 	local tempfile = "temp." .. filename
-	local outputfile = path .. "/" .. filename
 	print ("Generate", outputfile, "from", tempfile)
 	local f = assert(io.open(tempfile, "rb"))
 	local temp = f:read "a"
@@ -228,7 +220,14 @@ local function genidl(filename, path)
 	out:close()
 end
 
+
+local files = {
+	["bgfx.h"] = "../include/bgfx/c99",
+	["bgfx.idl.inl"] = "../src",
+	["bgfx.hpp"] = ".",
+}
+
 for filename, path in pairs (files) do
 	path = (...) or path
-	genidl(filename, path)
+	genidl(filename, path .. "/" .. filename)
 end
