@@ -15,7 +15,6 @@ typedef "uintptr_t"
 typedef "va_list"
 typedef "void"
 
-typedef "Encoder"
 typedef "InternalData"
 typedef "ViewId"
 typedef "CallbackI" { cname = "callback_interface" }
@@ -455,20 +454,27 @@ struct.EncoderStats
 	.cpuTimeEnd   "int64_t" [[Encoder thread CPU submit end time.]]
 
 --- Renderer statistics data.
+---
+--- @remarks All time values are high-resolution timestamps, while
+--- time frequencies define timestamps-per-second for that hardware.
 struct.Stats
 	.cpuTimeFrame            "int64_t"       [[CPU time between two `bgfx::frame` calls.]]
 	.cpuTimeBegin            "int64_t"       [[Render thread CPU submit begin time.]]
 	.cpuTimeEnd              "int64_t"       [[Render thread CPU submit end time.]]
 	.cpuTimerFreq            "int64_t"       [[CPU timer frequency. Timestamps-per-second]]
+
 	.gpuTimeBegin            "int64_t"       [[GPU frame begin time.]]
 	.gpuTimeEnd              "int64_t"       [[GPU frame end time.]]
 	.gpuTimerFreq            "int64_t"       [[GPU timer frequency.]]
+
 	.waitRender              "int64_t"       [[Time spent waiting for render backend thread to finish issuing draw commands to underlying graphics API.]]
 	.waitSubmit              "int64_t"       [[Time spent waiting for submit thread to advance to next frame.]]
+
 	.numDraw                 "uint32_t"      [[Number of draw calls submitted.]]
 	.numCompute              "uint32_t"      [[Number of compute calls submitted.]]
 	.numBlit                 "uint32_t"      [[Number of blit calls submitted.]]
 	.maxGpuLatency           "uint32_t"      [[GPU driver latency.]]
+
 	.numDynamicIndexBuffers  "uint16_t"      [[Number of used dynamic index buffers.]]
 	.numDynamicVertexBuffers "uint16_t"      [[Number of used dynamic vertex buffers.]]
 	.numFrameBuffers         "uint16_t"      [[Number of used frame buffers.]]
@@ -480,19 +486,25 @@ struct.Stats
 	.numUniforms             "uint16_t"      [[Number of used uniforms.]]
 	.numVertexBuffers        "uint16_t"      [[Number of used vertex buffers.]]
 	.numVertexDecls          "uint16_t"      [[Number of used vertex declarations.]]
+
 	.textureMemoryUsed       "int64_t"       [[Estimate of texture memory used.]]
 	.rtMemoryUsed            "int64_t"       [[Estimate of render target memory used.]]
 	.transientVbUsed         "int32_t"       [[Amount of transient vertex buffer used.]]
 	.transientIbUsed         "int32_t"       [[Amount of transient index buffer used.]]
+
 	.numPrims                "uint32_t[Topology::Count]"      [[Number of primitives rendered.]]
+
 	.gpuMemoryMax            "int64_t"       [[Maximum available GPU memory for application.]]
 	.gpuMemoryUsed           "int64_t"       [[Amount of GPU memory used by the application.]]
+
 	.width                   "uint16_t"      [[Backbuffer width in pixels.]]
 	.height                  "uint16_t"      [[Backbuffer height in pixels.]]
 	.textWidth               "uint16_t"      [[Debug text width in characters.]]
 	.textHeight              "uint16_t"      [[Debug text height in characters.]]
+
 	.numViews                "uint16_t"      [[Number of view stats.]]
 	.viewStats               "ViewStats*"    [[Array of View stats.]]
+
 	.numEncoders             "uint8_t"       [[Number of encoders used during frame.]]
 	.encoderStats            "EncoderStats*" [[Array of encoder stats.]]
 
@@ -502,6 +514,10 @@ struct.VertexDecl { ctor }
 	.stride                  "uint16_t"
 	.offset                  "uint16_t[Attrib::Count]"
 	.attributes              "uint16_t[Attrib::Count]"
+
+--- Encoders are used for submitting draw calls from multiple threads. Only one encoder
+--- per thread should be used. Use `bgfx::begin()` to obtain an encoder for a thread.
+struct.Encoder {}
 
 handle "DynamicIndexBufferHandle"
 handle "DynamicVertexBufferHandle"
@@ -516,10 +532,26 @@ handle "UniformHandle"
 handle "VertexBufferHandle"
 handle "VertexDeclHandle"
 
+--- Start VertexDecl.
 func.VertexDecl.begin
 	"void"
 	.rendererType    "RendererType::Enum"
 
+--- Add attribute to VertexDecl.
+---
+--- @param[in] _attrib Attribute semantics. See: `bgfx::Attrib`
+--- @param[in] _num Number of elements 1, 2, 3 or 4.
+--- @param[in] _type Element type.
+--- @param[in] _normalized When using fixed point AttribType (f.e. Uint8)
+---   value will be normalized for vertex shader usage. When normalized
+---   is set to true, AttribType::Uint8 value in range 0-255 will be
+---   in range 0.0-1.0 in vertex shader.
+--- @param[in] _asInt Packaging rule for vertexPack, vertexUnpack, and
+---   vertexConvert for AttribType::Uint8 and AttribType::Int16.
+---   Unpacking code must be implemented inside vertex shader.
+---
+--- @remarks
+---   Must be called between begin/end.
 func.VertexDecl.add
 	"void"
 	.attrib          "Attrib::Enum"
@@ -528,6 +560,7 @@ func.VertexDecl.add
 	.normalized      "bool"
 	.asInt           "bool"
 
+--- Decode attribute.
 func.VertexDecl.decode { const }
 	"void"
 	.attrib     "Attrib::Enum"
@@ -536,15 +569,18 @@ func.VertexDecl.decode { const }
 	.normalized "bool &"             { out }
 	.asInt      "bool &"             { out }
 
+--- Returns true if VertexDecl contains attribute.
 func.VertexDecl.has { const }
 	"bool"
 	.attrib "Attrib::Enum"
 
+--- Skip _num bytes in vertex stream.
 func.VertexDecl.skip
 	"void"
 	.num "uint8_t"
 
 -- Notice: `end` is a keyword in lua
+--- End VertexDecl.
 func.VertexDecl["end"]
 	"void"
 
@@ -652,12 +688,25 @@ func.copy
 	.data "const void*"
 	.size "uint32_t"
 
+--- Make reference to data to pass to bgfx. Unlike `bgfx::alloc`, this call
+--- doesn't allocate memory for data. It just copies the _data pointer. You
+--- can pass `ReleaseFn` function pointer to release this memory after it's
+--- consumed, otherwise you must make sure _data is available for at least 2
+--- `bgfx::frame` calls. `ReleaseFn` function must be able to be called
+--- from any thread.
+---
+--- @param[in] _data Pointer to data.
+--- @param[in] _size Size of data.
+--- @param[in] _releaseFn Callback function to release memory after use.
+--- @param[in] _userData User data to be passed to callback function.
+---
+--- @attention Data passed must be available for at least 2 `bgfx::frame` calls.
 func.makeRef
 	"const Memory*"
 	.data "const void*"
 	.size "uint32_t"
 
-func.makeRef { cname = "make_ref_release" }
+func.makeRef { cname = "make_ref_release" , conly }
 	"const Memory*"
 	.data      "const void*"
 	.size      "uint32_t"
@@ -1057,6 +1106,13 @@ func.setViewName
 	.id   "ViewId"
 	.name "const char*"
 
+--- Set view rectangle. Draw primitive outside view will be clipped.
+---
+--- @param[in] _id View id.
+--- @param[in] _x Position x from the left corner of the window.
+--- @param[in] _y Position y from the top corner of the window.
+--- @param[in] _width Width of view port region.
+--- @param[in] _height Height of view port region.
 func.setViewRect
 	"void"
 	.id     "ViewId"
@@ -1065,6 +1121,13 @@ func.setViewRect
 	.width  "uint16_t"
 	.height "uint16_t"
 
+--- Set view rectangle. Draw primitive outside view will be clipped.
+---
+--- @param[in] _id View id.
+--- @param[in] _x Position x from the left corner of the window.
+--- @param[in] _y Position y from the top corner of the window.
+--- @param[in] _ratio Width and height will be set in respect to back-buffer size. See:
+---   `BackbufferRatio::Enum`.
 func.setViewRect { cname = "set_view_rect_ratio" }
 	"void"
 	.id    "ViewId"

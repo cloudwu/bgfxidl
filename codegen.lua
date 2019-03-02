@@ -233,13 +233,35 @@ function codegen.nameconversion(all_types, all_funcs)
 		end
 	end
 
+	local funcs = {}
+	local funcs_conly = {}
+
 	for _,v in ipairs(all_funcs) do
 		if v.cname == nil then
 			v.cname = convert_funcname(v.name)
+		else
+			-- cusername is for doxygen
+			v.cusername = v.cname
 		end
 		if v.class then
 			v.cname = convert_funcname(v.class) .. "_" .. v.cname
+			local classtype = all_types[v.class]
+			if classtype then
+				local methods = classtype.methods
+				if not methods then
+					methods = {}
+					classtype.methods = methods
+				end
+				methods[#methods+1] = v
+			end
+		elseif not v.conly then
+			funcs[v.name] = v
 		end
+
+		if v.conly then
+			table.insert(funcs_conly, v)
+		end
+
 		for _, arg in ipairs(v.args) do
 			convert_arg(all_types, arg, v)
 			gen_arg_conversion(all_types, arg)
@@ -256,6 +278,14 @@ function codegen.nameconversion(all_types, all_funcs)
 			convert_arg(all_types, classtype, v)
 			v.this = classtype.ctype .. " _this"
 			v.this_conversion = string.format( "%s This = (%s)_this;", classtype.cpptype, classtype.cpptype)
+		end
+	end
+
+	for _, v in ipairs(funcs_conly) do
+		local func = funcs[v.name]
+		if func then
+			func.multicfunc = func.multicfunc or { func.cname }
+			table.insert(func.multicfunc, v.cname)
 		end
 	end
 end
@@ -296,18 +326,32 @@ local function codetemp(func)
 		if arg.array then
 			name = name .. arg.array
 		end
+		if arg.default then
+			name = name .. " = " .. arg.default
+		end
 		cargs[#cargs+1] = cname
 		args[#args+1] = name
 		callargs[#callargs+1] = arg.aname
 	end
 	conversion[#conversion+1] = func.ret_conversion
 
+	local ARGS
+	local args_n = #args
+	if args_n == 0 then
+		ARGS = ""
+	elseif args_n == 1 then
+		ARGS = args[1]
+	else
+		ARGS = "\n\t  " .. table.concat(args, "\n\t, ") .. "\n\t"
+	end
+
 	return {
-		RET = func.ret.ctype,
+		RET = func.ret.fulltype,
+		CRET = func.ret.ctype,
 		CFUNCNAME = func.cname,
 		FUNCNAME = func.name,
 		CARGS = table.concat(cargs, ", "),
-		ARGS = table.concat(args, ", "),
+		ARGS = ARGS,
 		CONVERSION = lines(conversion),
 		PRERET = func.ret_prefix or "",
 		CPPFUNC = cppfunc,
@@ -322,7 +366,7 @@ local function apply_template(func, temp)
 end
 
 local c99temp = [[
-BGFX_C_API $RET bgfx_$CFUNCNAME($CARGS)
+BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS)
 {
 	$CONVERSION
 	$PRERET$CPPFUNC($CALLARGS);
@@ -333,7 +377,7 @@ BGFX_C_API $RET bgfx_$CFUNCNAME($CARGS)
 function codegen.gen_c99(func)
 	if func.cfunc then
 		-- There is an user define c function, don't generate it.
-		return apply_template(func, "/* BGFX_C_API $RET bgfx_$CFUNCNAME($CARGS) */\n")
+		return apply_template(func, "/* BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS) */\n")
 	else
 		return remove_emptylines(apply_template(func, c99temp))
 	end
@@ -341,11 +385,15 @@ end
 
 local template_function_declaration = [[
 /**/
-BGFX_C_API $RET bgfx_$CFUNCNAME($CARGS);
+BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS);
 ]]
 
 function codegen.gen_c99decl(func)
 	return apply_template(func, template_function_declaration)
+end
+
+function codegen.gen_cppdecl(func)
+	return apply_template(func, "$RET $FUNCNAME($ARGS);")
 end
 
 function codegen.gen_funcptr(funcptr)
@@ -353,18 +401,14 @@ function codegen.gen_funcptr(funcptr)
 end
 
 function codegen.gen_cfuncptr(funcptr)
-	return apply_template(funcptr, "typedef $RET (*$CFUNCNAME)($CARGS);")
+	return apply_template(funcptr, "typedef $CRET (*$CFUNCNAME)($CARGS);")
 end
 
 function codegen.gen_interface_struct(func)
-	return apply_template(func, "$RET (*$CFUNCNAME)($CARGS);")
+	return apply_template(func, "$CRET (*$CFUNCNAME)($CARGS);")
 end
 
-function codegen.gen_interface_import(func)
-	return "bgfx_" .. func.cname
-end
-
-function codegen.doxygen_type(typedef, doxygen)
+function codegen.doxygen_type(doxygen, cname)
 	if doxygen == nil then
 		return
 	end
@@ -373,12 +417,20 @@ function codegen.doxygen_type(typedef, doxygen)
 		result[#result+1] = "/// " .. line
 	end
 	result[#result+1] = "///"
-	result[#result+1] = string.format("/// @attention C99 equivalent is `%s`.", typedef.cname)
+	if type(cname) == "string" then
+		result[#result+1] = string.format("/// @attention C99 equivalent is `%s`.", cname)
+	else
+		local names = {}
+		for _, v in ipairs(cname) do
+			names[#names+1] = "`" .. v .. "`"
+		end
+		result[#result+1] = string.format("/// @attention C99 equivalent are %s.", table.concat(names, ","))
+	end
 	result[#result+1] = "///"
 	return table.concat(result, "\n")
 end
 
-function codegen.doxygen_ctype(typedef, doxygen)
+function codegen.doxygen_ctype(doxygen)
 	if doxygen == nil then
 		return
 	end
@@ -477,7 +529,7 @@ local function strip_space(c)
 	return (c:match "(.-)%s*$")
 end
 
-local function text_with_comments(items, item, cstyle)
+local function text_with_comments(items, item, cstyle, is_classmember)
 	local name = item.name
 	if item.array then
 		if cstyle then
@@ -491,6 +543,9 @@ local function text_with_comments(items, item, cstyle)
 		typename = item.ctype
 	else
 		typename = item.fulltype
+	end
+	if is_classmember then
+		name = "m_" .. name
 	end
 	local text = string.format("%s%s %s;", typename, namealign(typename), name)
 	if item.comment then
@@ -519,22 +574,30 @@ end
 local struct_temp = [[
 struct $NAME
 {
-	$CTOR
+	$METHODS
 	$SUBSTRUCTS
 	$ITEMS
 };
 ]]
 
-function codegen.gen_struct_define(struct)
+function codegen.gen_struct_define(struct, methods)
 	assert(type(struct.struct) == "table", "Not a struct")
 	local items = {}
 	for _, item in ipairs(struct.struct) do
-		text_with_comments(items, item)
+		text_with_comments(items, item, false, methods ~= nil)
 	end
 	local ctor = {}
 	if struct.ctor then
 		ctor[1] = struct.name .. "();"
 		ctor[2] = ""
+	end
+	if methods then
+		for _, m in ipairs(methods) do
+			for line in m:gmatch "[^\n]*" do
+				ctor[#ctor+1] = line
+			end
+			ctor[#ctor+1] = ""
+		end
 	end
 	local subs = {}
 	if struct.substruct then
@@ -549,7 +612,7 @@ function codegen.gen_struct_define(struct)
 		NAME = struct.name,
 		SUBSTRUCTS = lines(subs),
 		ITEMS = table.concat(items, "\n\t"),
-		CTOR = lines(ctor),
+		METHODS = lines(ctor),
 	}
 	return remove_emptylines(struct_temp:gsub("$(%u+)", temp))
 end

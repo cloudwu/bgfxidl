@@ -5,3 +5,5 @@ $enums
 $funcptrs
 
 $structs
+
+$cppdecl

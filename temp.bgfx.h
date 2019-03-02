@@ -68,9 +68,6 @@ $cstructs
 $c99decl
 
 /**/
-typedef struct bgfx_encoder_s bgfx_encoder_t;
-
-/**/
 typedef struct bgfx_allocator_interface_s
 {
     const struct bgfx_allocator_vtbl_s* vtbl;

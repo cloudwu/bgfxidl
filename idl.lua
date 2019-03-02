@@ -198,6 +198,7 @@ idl.const = "const"
 idl.ctor = "ctor"
 idl.cfunc = "cfunc"
 idl.underscore = "underscore"
+idl.conly = "conly"
 idl.NULL = "NULL"
 idl.UINT16_MAX = "UINT16_MAX"
 idl.INT32_MAX = "INT32_MAX"
@@ -213,9 +214,20 @@ local function comment(_, what)
 		comments = {}
 		all_comments[what] = comments
 	end
-	return function(comment)
-		assert(type(comment) == "string" , "Doxygen comment should be a string")
-		comments[#comments + 1] = comment
+
+	return function(cname, comment)
+		if comment == nil then
+			assert(type(cname) == "string" , "Doxygen comment should be a string")
+			comments[#comments + 1] = cname
+		else
+			local c = comments[cname]
+			if c == nil then
+				c = {}
+				comments[cname] = c
+			end
+			assert(type(comment) == "string" , "Doxygen comment should be a string")
+			c[#c + 1] = comment
+		end
 	end
 end
 

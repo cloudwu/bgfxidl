@@ -20,8 +20,13 @@ function doxygen.import(filename)
 		else
 			local what, typename = line:match "^%s*(%l+)[. %[]\"?([%a%d]+%.?[%a%d]*)"
 			if typename and idl_defines[what] then
+				local cname = line:match [[{%s*cname%s*=%s*["']([%a%d_]+)]]
 				for _, c in ipairs(doxygen) do
-					idl.comment[typename](c)
+					if cname then
+						idl.comment[typename](cname, c)
+					else
+						idl.comment[typename](c)
+					end
 				end
 				doxygen = {}
 			elseif line:match "%S" and #doxygen > 0 then

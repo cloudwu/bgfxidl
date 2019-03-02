@@ -15,6 +15,7 @@ local files = {
 local func_actions = {
 	c99 = "\n",
 	c99decl = "\n",
+	cppdecl = "\n",
 	interface_struct = "\n\t",
 	interface_import = ",\n\t\t\t",
 }
@@ -35,11 +36,57 @@ assert(loadfile("bgfx.idl" , "t", idl))()
 doxygen.import "bgfx.idl"
 codegen.nameconversion(idl.types, idl.funcs)
 
+local funcgen = {
+	c99 = codegen.gen_c99,
+	c99decl = codegen.gen_c99decl,
+	interface_struct = codegen.gen_interface_struct,
+}
+
+function funcgen.interface_import(func)
+	return "bgfx_" .. func.cname
+end
+
+
+local function cppdecl(func)
+	local doc_key = func.name
+	if func.class then
+		doc_key = func.class .. "." .. doc_key
+	end
+	local doc = idl.comments[doc_key]
+	if doc then
+		local cname
+		if func.multicfunc then
+			cname = {}
+			for _, name in ipairs(func.multicfunc) do
+				cname[#cname+1] = "bgfx_" .. name
+			end
+		else
+			cname = "bgfx_" .. func.cname
+		end
+		if func.cusername then
+			doc = doc[func.cusername]
+		end
+		local text = codegen.doxygen_type(doc, cname)
+		if text then
+			return text .. "\n" .. codegen.gen_cppdecl(func) .. "\n"
+		end
+	else
+		return codegen.gen_cppdecl(func) .. "\n"
+	end
+end
+
+function funcgen.cppdecl(func)
+	-- Don't generate member functions here
+	if not func.class then
+		return cppdecl(func)
+	end
+end
+
 local typegen = {}
 
-local function add_doxygen(typedef, define, cstyle)
+local function add_doxygen(typedef, define, cstyle, cname)
 		local func = cstyle and codegen.doxygen_ctype or codegen.doxygen_type
-		local doc = func(typedef, idl.comments[typedef.name])
+		local doc = func(idl.comments[typedef.name], cname or typedef.cname)
 		if doc then
 			return doc .. "\n" .. define
 		else
@@ -49,7 +96,7 @@ end
 
 function typegen.enums(typedef)
 	if typedef.enum then
-		return add_doxygen(typedef, codegen.gen_enum_define(typedef))
+		return add_doxygen(typedef, codegen.gen_enum_define(typedef), false, "bgfx_" .. typedef.cname)
 	end
 end
 
@@ -61,7 +108,15 @@ end
 
 function typegen.structs(typedef)
 	if typedef.struct and not typedef.namespace then
-		return add_doxygen(typedef, codegen.gen_struct_define(typedef))
+		local methods = typedef.methods
+		if methods then
+			local m = {}
+			for _, func in ipairs(methods) do
+				m[#m+1] = cppdecl(func)
+			end
+			methods = m
+		end
+		return add_doxygen(typedef, codegen.gen_struct_define(typedef, methods))
 	end
 end
 
@@ -108,7 +163,7 @@ local function codes()
 	-- call actions with func
 	for _, f in ipairs(idl.funcs) do
 		for k in pairs(func_actions) do
-			local funcgen = codegen["gen_"..k]
+			local funcgen = funcgen[k]
 			if funcgen then
 				table.insert(temp[k], (funcgen(f)))
 			end
