@@ -142,7 +142,8 @@ local function genidl(filename, path)
 	local temp = f:read "a"
 	f:close()
 	local out = assert(io.open(outputfile, "wb"))
-	out:write(temp:gsub("$([%l%d_]+)", codes_tbl))
+	codes_tbl.source = tempfile
+	out:write((temp:gsub("$([%l%d_]+)", codes_tbl)))
 	out:close()
 end
 

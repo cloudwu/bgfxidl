@@ -7,7 +7,7 @@
 
 /*
  *
- * AUTO GENERATED! DO NOT EDIT!
+ * AUTO GENERATED! DO NOT EDIT! ( source : $source )
  *
  */
 
@@ -66,10 +66,34 @@ typedef void (*bgfx_release_fn_t)(void* _ptr, void* _userData);
 $cstructs
 $c99decl
 /**/
+typedef struct bgfx_encoder_s bgfx_encoder_t;
+
+/**/
+typedef struct bgfx_allocator_interface_s
+{
+    const struct bgfx_allocator_vtbl_s* vtbl;
+
+} bgfx_allocator_interface_t;
+
+/**/
+typedef struct bgfx_allocator_vtbl_s
+{
+    void* (*realloc)(bgfx_allocator_interface_t* _this, void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line);
+
+} bgfx_allocator_vtbl_t;
+
+/**/
 typedef struct bgfx_interface_vtbl
 {
 	$interface_struct
 } bgfx_interface_vtbl_t;
+
+/**/
+typedef struct bgfx_callback_interface_s
+{
+    const struct bgfx_callback_vtbl_s* vtbl;
+
+} bgfx_callback_interface_t;
 
 /**/
 typedef bgfx_interface_vtbl_t* (*PFN_BGFX_GET_INTERFACE)(uint32_t _version);
