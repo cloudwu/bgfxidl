@@ -23,7 +23,7 @@ typedef "CallbackI" { cname = "callback_interface" }
 typedef "bx::AllocatorI" { cname = "allocator_interface" }
 
 --- Fatal error enum.
-enum.Fatal { comment = "" }
+enum.Fatal { underscore, comment = "" }
 	.DebugCheck
 	.InvalidShader
 	.UnableToInitialize
@@ -115,12 +115,13 @@ enum.TextureFormat { comment = "Texture formats:" }
 	.ATC          [[ATC RGB 4BPP]]
 	.ATCE         [[ATCE RGBA 8 BPP explicit alpha]]
 	.ATCI         [[ATCI RGBA 8 BPP interpolated alpha]]
-	.ASTC4x4      [[ASTC 4x4 8.0 BPP]]
-	.ASTC5x5      [[ASTC 5x5 5.12 BPP]]
-	.ASTC6x6      [[ASTC 6x6 3.56 BPP]]
-	.ASTC8x5      [[ASTC 8x5 3.20 BPP]]
-	.ASTC8x6      [[ASTC 8x6 2.67 BPP]]
-	.ASTC10x5     [[ASTC 10x5 2.56 BPP]]
+	-- todo: ASTC4X4 would be better
+	.ASTC4x4      { cname = "ASTC4x4" } [[ASTC 4x4 8.0 BPP]]
+	.ASTC5x5      { cname = "ASTC5x5" } [[ASTC 5x5 5.12 BPP]]
+	.ASTC6x6      { cname = "ASTC6x6" } [[ASTC 6x6 3.56 BPP]]
+	.ASTC8x5      { cname = "ASTC8x5" } [[ASTC 8x5 3.20 BPP]]
+	.ASTC8x6      { cname = "ASTC8x6" } [[ASTC 8x6 2.67 BPP]]
+	.ASTC10x5     { cname = "ASTC10x5" } [[ASTC 10x5 2.56 BPP]]
 	.Unknown      [[Compressed formats above.]]
 	.R1
 	.A8
@@ -200,13 +201,13 @@ enum.BackbufferRatio      { comment = "Backbuffer ratios:" }
 	.Double    [[Double size of backbuffer.]]
 
 --- Occlusion query result.
-enum.OcclusionQueryResult { comment = "Occlusion query results:" }
+enum.OcclusionQueryResult { underscore , comment = "Occlusion query results:" }
 	.Invisible [[Query failed test.]]
 	.Visible   [[Query passed test.]]
 	.NoResult  { cname = "NORESULT" } [[Query result is not available yet.]]
 
 --- Primitive topology.
-enum.Topology { comment = "Primitive topology:" }
+enum.Topology { underscore, comment = "Primitive topology:" }
 	.TriList   [[Triangle list.]]
 	.TriStrip  [[Triangle strip.]]
 	.LineList  [[Line list.]]
@@ -214,7 +215,7 @@ enum.Topology { comment = "Primitive topology:" }
 	.PointList [[Point list.]]
 
 --- Topology conversion function.
-enum.TopologyConvert { comment = "Topology conversion functions:" }
+enum.TopologyConvert { underscore , comment = "Topology conversion functions:" }
 	.TriListFlipWinding  [[Flip winding order of triangle list.]]
 	.TriStripFlipWinding [[Flip winding order of trinagle strip.]]
 	.TriListToLineList   [[Convert triangle list to line list.]]
@@ -222,7 +223,7 @@ enum.TopologyConvert { comment = "Topology conversion functions:" }
 	.LineStripToLineList [[Convert line strip to line list.]]
 
 --- Topology sort order.
-enum.TopologySort { comment = "Topology sort order:" }
+enum.TopologySort { underscore, comment = "Topology sort order:" , }
 	.DirectionFrontToBackMin
 	.DirectionFrontToBackAvg
 	.DirectionFrontToBackMax
@@ -238,14 +239,14 @@ enum.TopologySort { comment = "Topology sort order:" }
 	()
 
 --- View mode sets draw call sort order.
-enum.ViewMode { comment = "View modes:" }
+enum.ViewMode { underscore, comment = "View modes:" }
 	.Default         [[Default sort order.]]
 	.Sequential      [[Sort in the same order in which submit calls were called.]]
-	.DepthAscending  [[Sort draw call depth in ascending order.]]
-	.DepthDescending [[Sort draw call depth in descending order.]]
+	.DepthAscending   [[Sort draw call depth in ascending order.]]
+	.DepthDescending  [[Sort draw call depth in descending order.]]
 
 --- Render frame enum.
-enum.RenderFrame { comment = "" }
+enum.RenderFrame { underscore, comment = "" }
 	.NoContext
 	.Render
 	.Timeout
@@ -310,9 +311,72 @@ struct.Memory
 	.data "uint8_t*" [[Pointer to data.]]
 	.size "uint32_t" [[Data size.]]
 
+--- GPU info.
+struct.GPU  { namespace = "Caps" }
+	.vendorId    "uint16_t"                [[Vendor PCI id. See `BGFX_PCI_ID_*`.]]
+	.deviceId    "uint16_t"                [[Device id.]]
+
+struct.Limits  { namespace = "Caps" }
+	.maxDrawCalls            "uint32_t"    [[Maximum number of draw calls.                       ]]
+	.maxBlits                "uint32_t"    [[Maximum number of blit calls.			     ]]
+	.maxTextureSize          "uint32_t"    [[Maximum texture size.				     ]]
+	.maxTextureLayers        "uint32_t"    [[Maximum texture layers.			     ]]
+	.maxViews                "uint32_t"    [[Maximum number of views.			     ]]
+	.maxFrameBuffers         "uint32_t"    [[Maximum number of frame buffer handles.	     ]]
+	.maxFBAttachments        "uint32_t"    [[Maximum number of frame buffer attachments.	     ]]
+	.maxPrograms             "uint32_t"    [[Maximum number of program handles.		     ]]
+	.maxShaders              "uint32_t"    [[Maximum number of shader handles.		     ]]
+	.maxTextures             "uint32_t"    [[Maximum number of texture handles.		     ]]
+	.maxTextureSamplers      "uint32_t"    [[Maximum number of texture samplers.		     ]]
+	.maxComputeBindings      "uint32_t"    [[Maximum number of compute bindings.		     ]]
+	.maxVertexDecls          "uint32_t"    [[Maximum number of vertex format declarations.	     ]]
+	.maxVertexStreams        "uint32_t"    [[Maximum number of vertex streams.		     ]]
+	.maxIndexBuffers         "uint32_t"    [[Maximum number of index buffer handles.	     ]]
+	.maxVertexBuffers        "uint32_t"    [[Maximum number of vertex buffer handles.	     ]]
+	.maxDynamicIndexBuffers  "uint32_t"    [[Maximum number of dynamic index buffer handles.     ]]
+	.maxDynamicVertexBuffers "uint32_t"    [[Maximum number of dynamic vertex buffer handles.    ]]
+	.maxUniforms             "uint32_t"    [[Maximum number of uniform handles.		     ]]
+	.maxOcclusionQueries     "uint32_t"    [[Maximum number of occlusion query handles.	     ]]
+	.maxEncoders             "uint32_t"    [[Maximum number of encoder threads.		     ]]
+	.transientVbSize         "uint32_t"    [[Maximum transient vertex buffer size.		     ]]
+	.transientIbSize         "uint32_t"    [[Maximum transient index buffer size.		     ]]
+
 --- Renderer capabilities.
 struct.Caps
-	.rendererType "RendererType::Enum"
+	.rendererType "RendererType::Enum"     [[Renderer backend type. See: `bgfx::RendererType`]]
+
+	.supported    "uint64_t"               [[Supported functionality.                                                                      ]]
+	                                       [[                                                                                              ]]
+	                                       [[@attention See BGFX_CAPS_* flags at https://bkaradzic.github.io/bgfx/bgfx.html#available-caps ]]
+	.vendorId     "uint16_t"               [[Selected GPU vendor PCI id.]]
+	.deviceId     "uint16_t"               [[Selected GPU device id.]]
+	.homogeneousDepth "bool"               [[True when NDC depth is in [-1, 1] range, otherwise its [0, 1].]]
+	.originBottomLeft "bool"               [[True when NDC origin is at bottom left.]]
+	.numGPUs      "uint8_t"                [[Number of enumerated GPUs.]]
+	.gpu          "GPU[4]"                 [[Enumerated GPUs.]]
+	.limits       "Limits"
+	.formats      "uint16_t[TextureFormat::Count]"
+		[[Supported texture format capabilities flags:                                               ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_NONE` - Texture format is not supported.		     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_2D` - Texture format is supported.			     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB` - Texture as sRGB format is supported.		     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_2D_EMULATED` - Texture format is emulated.		     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_3D` - Texture format is supported.			     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_3D_SRGB` - Texture as sRGB format is supported.		     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_3D_EMULATED` - Texture format is emulated.		     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_CUBE` - Texture format is supported.			     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_CUBE_SRGB` - Texture as sRGB format is supported.	     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_CUBE_EMULATED` - Texture format is emulated.		     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_VERTEX` - Texture format can be used from vertex shader.     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_IMAGE` - Texture format can be used as image from compute    ]]
+		[[    shader.										     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER` - Texture format can be used as frame	     ]]
+		[[    buffer.										     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA` - Texture format can be used as MSAA	     ]]
+		[[    frame buffer.									     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_MSAA` - Texture can be sampled as MSAA.			     ]]
+		[[  - `BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN` - Texture format supports auto-generated	     ]]
+		[[    mips.										     ]]
 
 --- Transient index buffer.
 struct.TransientIndexBuffer

@@ -5,11 +5,11 @@ local idl     = require "idl"
 local codegen = require "codegen"
 local doxygen = require "doxygen"
 
-local paths = (...) or {
+local files = {
 	["bgfx.idl.h"] = "../include/bgfx/c99",
 	["bgfx.idl.inl"] = "../src",
 	-- todo: cpp header path here
-	["bgfx.types.h"] = ".",
+	["bgfx.idl.cpp"] = ".",
 }
 
 local func_actions = {
@@ -81,66 +81,6 @@ function typegen.chandles(typedef)
 	end
 end
 
--- For bgfx.idl.h
-local code_temp_include = [[
-/*
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
- */
-
-/*
- *
- * AUTO GENERATED! DO NOT EDIT!
- *
- */
-
-$chandles
-$cenums
-$cstructs
-$c99decl
-/**/
-typedef struct bgfx_interface_vtbl
-{
-	$interface_struct
-} bgfx_interface_vtbl_t;
-]]
-
--- For bgfx.idl.inl
-local code_temp_impl = [[
-/*
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
- */
-
-/*
- *
- * AUTO GENERATED! DO NOT EDIT!
- *
- */
-
-$c99
-/**/
-BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
-{
-	if (_version == BGFX_API_VERSION)
-	{
-		static bgfx_interface_vtbl_t s_bgfx_interface =
-		{
-			$interface_import
-		};
-
-		return &s_bgfx_interface;
-	}
-
-	return NULL;
-}
-]]
-
--- For bgfx.types.h
-local code_temp_cpp = [[
-$handles
-$enums
-$structs
-]]
-
 local function codes()
 	local temp = {}
 	for k in pairs(func_actions) do
@@ -194,14 +134,19 @@ local function add_path(filename)
 	return path .. "/" .. filename
 end
 
-for filename, temp in pairs {
-	[add_path "bgfx.idl.h"] = code_temp_include ,
-	[add_path "bgfx.idl.inl"] = code_temp_impl ,
-	[add_path "bgfx.types.h"] = code_temp_cpp ,
-	} do
-
-	print ("Generate " .. filename)
-	local out = assert(io.open(filename, "wb"))
-	out:write((temp:gsub("$([%l%d_]+)", codes_tbl)))
+local function genidl(filename, path)
+	local tempfile = "temp." .. filename
+	local outputfile = path .. "/" .. filename
+	print ("Generate", outputfile, "from", tempfile)
+	local f = assert(io.open(tempfile, "rb"))
+	local temp = f:read "a"
+	f:close()
+	local out = assert(io.open(outputfile, "wb"))
+	out:write(temp:gsub("$([%l%d_]+)", codes_tbl))
 	out:close()
+end
+
+for filename, path in pairs (files) do
+	path = (...) or path
+	genidl(filename, path)
 end

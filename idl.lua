@@ -192,6 +192,7 @@ idl.funcs = all_funcs
 idl.out = "out"
 idl.const = "const"
 idl.ctor = "ctor"
+idl.underscore = "underscore"
 idl.NULL = "NULL"
 idl.UINT16_MAX = "UINT16_MAX"
 idl.INT32_MAX = "INT32_MAX"

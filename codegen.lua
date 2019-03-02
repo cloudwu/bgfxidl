@@ -426,7 +426,16 @@ function codegen.gen_enum_cdefine(enum)
 	local items = {}
 	for index , item in ipairs(enum.enum) do
 		local comment = item.comment or ""
-		local name = uname .. "_" .. (item.cname or camelcase_to_underscorecase(item.name):upper())
+		local ename = item.cname
+		if not ename then
+			if enum.underscore then
+				ename = camelcase_to_underscorecase(item.name)
+			else
+				ename = item.name
+			end
+			ename = ename:upper()
+		end
+		local name = uname .. "_" .. ename
 		items[#items+1] = string.format("%s,%s /** (%2d) %s%s */",
 			name,
 			namealign(name, 40),
