@@ -1,3 +1,7 @@
 $handles
+
 $enums
+
+$funcptrs
+
 $structs

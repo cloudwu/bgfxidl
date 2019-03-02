@@ -26,6 +26,8 @@ local type_actions = {
 	cstructs = "\n",
 	handles = "\n",
 	chandles = "\n",
+	funcptrs = "\n",
+	cfuncptrs = "\n",
 }
 
 assert(loadfile("bgfx.idl" , "t", idl))()
@@ -78,6 +80,18 @@ end
 function typegen.chandles(typedef)
 	if typedef.handle then
 		return codegen.gen_chandle(typedef)
+	end
+end
+
+function typegen.funcptrs(typedef)
+	if typedef.args then
+		return add_doxygen(typedef, codegen.gen_funcptr(typedef))
+	end
+end
+
+function typegen.cfuncptrs(typedef)
+	if typedef.args then
+		return add_doxygen(typedef, codegen.gen_cfuncptr(typedef), true)
 	end
 end
 

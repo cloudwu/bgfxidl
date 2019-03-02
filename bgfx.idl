@@ -17,10 +17,18 @@ typedef "void"
 
 typedef "Encoder"
 typedef "InternalData"
-typedef "ReleaseFn"
 typedef "ViewId"
 typedef "CallbackI" { cname = "callback_interface" }
 typedef "bx::AllocatorI" { cname = "allocator_interface" }
+
+--- Memory release callback.
+---
+--- param[in] _ptr Pointer to allocated data.
+--- param[in] _userData User defined data if needed.
+funcptr.ReleaseFn
+	"void"
+	.ptr        "void*"
+	.userData   "void*"
 
 --- Fatal error enum.
 enum.Fatal { underscore, comment = "" }

@@ -148,6 +148,25 @@ local function gen_ret_conversion(all_types, func)
 	end
 end
 
+local function convert_vararg(v)
+	if v.vararg then
+		local args = v.args
+		local vararg = {
+			name = "",
+			type = "...",
+			ctype = "...",
+			aname = "argList",
+			conversion = string.format(
+				"va_list argList;\n\tva_start(argList, %s);",
+				args[#args].name),
+		}
+		args[#args + 1] = vararg
+		v.implname = v.vararg
+	else
+		v.implname = v.name
+	end
+end
+
 function codegen.nameconversion(all_types, all_funcs)
 	for _,v in ipairs(all_types) do
 		local name = v.name
@@ -205,6 +224,12 @@ function codegen.nameconversion(all_types, all_funcs)
 			for _, item in ipairs(v.struct) do
 				convert_arg(all_types, item, v)
 			end
+		elseif v.args then
+			for _, arg in ipairs(v.args) do
+				convert_arg(all_types, arg, v)
+			end
+			convert_vararg(v)
+			convert_arg(all_types, v.ret, v)
 		end
 	end
 
@@ -219,21 +244,7 @@ function codegen.nameconversion(all_types, all_funcs)
 			convert_arg(all_types, arg, v)
 			gen_arg_conversion(all_types, arg)
 		end
-		if v.vararg then
-			local args = v.args
-			local vararg = {
-				name = "",
-				ctype = "...",
-				aname = "argList",
-				conversion = string.format(
-					"va_list argList;\n\tva_start(argList, %s);",
-					args[#args].name),
-			}
-			args[#args + 1] = vararg
-			v.implname = v.vararg
-		else
-			v.implname = v.name
-		end
+		convert_vararg(v)
 		convert_arg(all_types, v.ret, v)
 		gen_ret_conversion(all_types, v)
 		if namespace then
@@ -250,7 +261,7 @@ function codegen.nameconversion(all_types, all_funcs)
 end
 
 local function lines(tbl)
-	if #tbl == 0 then
+	if not tbl or #tbl == 0 then
 		return "//EMPTYLINE"
 	else
 		return table.concat(tbl, "\n\t")
@@ -263,6 +274,7 @@ end
 
 local function codetemp(func)
 	local conversion = {}
+	local args = {}
 	local cargs = {}
 	local callargs = {}
 	local cppfunc
@@ -272,23 +284,30 @@ local function codetemp(func)
 		conversion[1] = func.this_conversion
 		cppfunc = "This->" .. func.name
 	else
-		cppfunc = "bgfx::" .. func.implname
+		cppfunc = "bgfx::" .. tostring(func.implname)
 	end
 	for _, arg in ipairs(func.args) do
 		conversion[#conversion+1] = arg.conversion
-		local name = arg.ctype .. " " .. arg.name
+		local cname = arg.ctype .. " " .. arg.name
 		if arg.array then
-			name = name .. (arg.carray or arg.array)
+			cname = cname .. (arg.carray or arg.array)
 		end
-		cargs[#cargs+1] = name
+		local name = arg.type .. " " .. arg.name
+		if arg.array then
+			name = name .. arg.array
+		end
+		cargs[#cargs+1] = cname
+		args[#args+1] = name
 		callargs[#callargs+1] = arg.aname
 	end
 	conversion[#conversion+1] = func.ret_conversion
 
 	return {
 		RET = func.ret.ctype,
-		FUNCNAME = func.cname,
+		CFUNCNAME = func.cname,
+		FUNCNAME = func.name,
 		CARGS = table.concat(cargs, ", "),
+		ARGS = table.concat(args, ", "),
 		CONVERSION = lines(conversion),
 		PRERET = func.ret_prefix or "",
 		CPPFUNC = cppfunc,
@@ -304,7 +323,7 @@ local function apply_template(func, temp)
 end
 
 local c99temp = [[
-BGFX_C_API $RET bgfx_$FUNCNAME($CARGS)
+BGFX_C_API $RET bgfx_$CFUNCNAME($CARGS)
 {
 	$CONVERSION
 	$PRERET$CPPFUNC($CALLARGS);
@@ -313,7 +332,7 @@ BGFX_C_API $RET bgfx_$FUNCNAME($CARGS)
 ]]
 
 local c99usertemp = [[
-BGFX_C_API $RET bgfx_$FUNCNAME($CARGS)
+BGFX_C_API $RET bgfx_$CFUNCNAME($CARGS)
 {
 $CODE
 }
@@ -329,15 +348,23 @@ end
 
 local template_function_declaration = [[
 /**/
-BGFX_C_API $RET bgfx_$FUNCNAME($CARGS);
+BGFX_C_API $RET bgfx_$CFUNCNAME($CARGS);
 ]]
 
 function codegen.gen_c99decl(func)
 	return apply_template(func, template_function_declaration)
 end
 
+function codegen.gen_funcptr(funcptr)
+	return apply_template(funcptr, "typedef $RET (*$FUNCNAME)($ARGS);")
+end
+
+function codegen.gen_cfuncptr(funcptr)
+	return apply_template(funcptr, "typedef $RET (*$CFUNCNAME)($CARGS);")
+end
+
 function codegen.gen_interface_struct(func)
-	return apply_template(func, "$RET (*$FUNCNAME)($CARGS);")
+	return apply_template(func, "$RET (*$CFUNCNAME)($CARGS);")
 end
 
 function codegen.gen_interface_import(func)

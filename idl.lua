@@ -145,50 +145,54 @@ local function duplicate_arg_name(name)
 	error ("Duplicate arg name " .. name)
 end
 
-local function funcdef(_, funcname)
-	local f = { name = funcname , args = {} }
-	all_funcs[#all_funcs+1] = f
-	local args
-	local function args_desc(obj, args_name)
-		obj[args_name] = duplicate_arg_name
-		return function (fulltype)
-			local arg = {
-				name = "_" .. args_name,
-				fulltype = fulltype,
-			}
-			f.args[#f.args+1] = arg
-			local function arg_attrib(_, attrib )
-				copy_attribs(arg, attrib)
-				return args
-			end
-			return setmetatable( {} , {
-				__index = function(_, name)
-					return args_desc(obj, name)
+local function func(sets)
+	return function (_, funcname)
+		local f = { name = funcname , args = {} }
+		sets[#sets+1] = f
+		local args
+		local function args_desc(obj, args_name)
+			obj[args_name] = duplicate_arg_name
+			return function (fulltype)
+				local arg = {
+					name = "_" .. args_name,
+					fulltype = fulltype,
+				}
+				f.args[#f.args+1] = arg
+				local function arg_attrib(_, attrib )
+					copy_attribs(arg, attrib)
+					return args
 				end
-				, __call = arg_attrib } )
+				return setmetatable( {} , {
+					__index = function(_, name)
+						return args_desc(obj, name)
+					end
+					, __call = arg_attrib } )
+			end
 		end
-	end
-	args = setmetatable({}, { __index = args_desc })
-	local function rettype(value)
-		assert(type(value) == "string", "Need return type")
-		f.ret = { fulltype = value }
-		return args
-	end
-
-	local function funcdef(value)
-		if type(value) == "table" then
-			copy_attribs(f, value)
-			return rettype
+		args = setmetatable({}, { __index = args_desc })
+		local function rettype(value)
+			assert(type(value) == "string", "Need return type")
+			f.ret = { fulltype = value }
+			return args
 		end
-		return rettype(value)
-	end
 
-	return classdef(f, funcdef)
+		local function funcdef(value)
+			if type(value) == "table" then
+				copy_attribs(f, value)
+				return rettype
+			end
+			return rettype(value)
+		end
+
+		return classdef(f, funcdef)
+	end
 end
 
-idl.func = setmetatable({}, { __index = funcdef })
+idl.funcptr = setmetatable({}, { __index = func(all_types) })
+idl.func = setmetatable({}, { __index = func(all_funcs) })
 idl.funcs = all_funcs
 
+idl.vararg = "vararg"
 idl.out = "out"
 idl.const = "const"
 idl.ctor = "ctor"

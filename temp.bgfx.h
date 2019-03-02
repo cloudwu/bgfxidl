@@ -58,13 +58,15 @@
 #include "../defines.h"
 
 $cenums
+
 $chandles
 
-/**/
-typedef void (*bgfx_release_fn_t)(void* _ptr, void* _userData);
+$cfuncptrs
 
 $cstructs
+
 $c99decl
+
 /**/
 typedef struct bgfx_encoder_s bgfx_encoder_t;
 

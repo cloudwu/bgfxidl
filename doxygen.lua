@@ -8,6 +8,7 @@ local idl_defines = {
 	enum = true,
 	handle = true,
 	struct = true,
+	funcptr = true,
 }
 
 function doxygen.import(filename)
@@ -17,7 +18,7 @@ function doxygen.import(filename)
 		if comment then
 			doxygen[#doxygen+1] = comment
 		else
-			local what, typename = line:match "^%s*(%l+)[. %[]\"?([%a%d]+)"
+			local what, typename = line:match "^%s*(%l+)[. %[]\"?([%a%d]+%.?[%a%d]*)"
 			if typename and idl_defines[what] then
 				for _, c in ipairs(doxygen) do
 					idl.comment[typename](c)
