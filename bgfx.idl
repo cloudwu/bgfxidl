@@ -18,7 +18,6 @@ typedef "void"
 typedef "Encoder"
 typedef "InternalData"
 typedef "ReleaseFn"
-typedef "VertexDecl"
 typedef "ViewId"
 typedef "CallbackI" { cname = "callback_interface" }
 typedef "bx::AllocatorI" { cname = "allocator_interface" }
@@ -488,6 +487,13 @@ struct.Stats
 	.viewStats               "ViewStats*"    [[Array of View stats.]]
 	.numEncoders             "uint8_t"       [[Number of encoders used during frame.]]
 	.encoderStats            "EncoderStats*" [[Array of encoder stats.]]
+
+--- Vertex declaration.
+struct.VertexDecl { ctor }
+	.hash                    "uint32_t"
+	.stride                  "uint16_t"
+	.offset                  "uint16_t[Attrib::Count]"
+	.attributes              "uint16_t[Attrib::Count]"
 
 handle "DynamicIndexBufferHandle"
 handle "DynamicVertexBufferHandle"
