@@ -36,16 +36,23 @@ assert(loadfile("bgfx.idl" , "t", idl))()
 doxygen.import "bgfx.idl"
 codegen.nameconversion(idl.types, idl.funcs)
 
-local funcgen = {
-	c99 = codegen.gen_c99,
-	c99decl = codegen.gen_c99decl,
-	interface_struct = codegen.gen_interface_struct,
-}
-
-function funcgen.interface_import(func)
-	return "bgfx_" .. func.cname
+local function cfunc(f)
+	return function(func)
+		if not func.cpponly then
+			return f(func)
+		end
+	end
 end
 
+local funcgen = {
+	c99 = cfunc(codegen.gen_c99),
+	c99decl = cfunc(codegen.gen_c99decl),
+	interface_struct = cfunc(codegen.gen_interface_struct),
+}
+
+funcgen.interface_import = cfunc(function(func)
+	return "bgfx_" .. func.cname
+end)
 
 local function cppdecl(func)
 	local doc_key = func.name
@@ -53,15 +60,20 @@ local function cppdecl(func)
 		doc_key = func.class .. "." .. doc_key
 	end
 	local doc = idl.comments[doc_key]
+	if not doc and func.comment then
+		doc = { func.comment }
+	end
 	if doc then
 		local cname
-		if func.multicfunc then
-			cname = {}
-			for _, name in ipairs(func.multicfunc) do
-				cname[#cname+1] = "bgfx_" .. name
+		if not func.cpponly then
+			if func.multicfunc then
+				cname = {}
+				for _, name in ipairs(func.multicfunc) do
+					cname[#cname+1] = "bgfx_" .. name
+				end
+			else
+				cname = "bgfx_" .. func.cname
 			end
-		else
-			cname = "bgfx_" .. func.cname
 		end
 		if func.cusername then
 			doc = doc[func.cusername]

@@ -579,10 +579,23 @@ func.VertexDecl.skip
 	"void"
 	.num "uint8_t"
 
--- Notice: `end` is a keyword in lua
---- End VertexDecl.
-func.VertexDecl["end"]
+-- Notice: `end` is a keyword in lua.
+func.VertexDecl["end"] { comment = "End VertexDecl." }
 	"void"
+
+--- Returns relative attribute offset from the vertex.
+func.VertexDecl.getOffset { const , cpponly }
+	"uint16_t"
+	.attrib    "Attrib::Enum"
+
+--- Returns vertex stride.
+func.VertexDecl.getStride { const , cpponly }
+	"uint16_t"
+
+--- Returns size of vertex buffer for number of vertices.
+func.VertexDecl.getSize { const, cpponly }
+	"uint32_t"
+	.num       "uint32_t"
 
 func.vertexPack
 	"void"

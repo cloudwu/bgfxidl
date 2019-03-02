@@ -153,6 +153,7 @@ local function convert_vararg(v)
 		local args = v.args
 		local vararg = {
 			name = "",
+			fulltype = "...",
 			type = "...",
 			ctype = "...",
 			aname = "argList",
@@ -322,7 +323,7 @@ local function codetemp(func)
 		if arg.array then
 			cname = cname .. (arg.carray or arg.array)
 		end
-		local name = arg.type .. " " .. arg.name
+		local name = arg.fulltype .. " " .. arg.name
 		if arg.array then
 			name = name .. arg.array
 		end
@@ -416,17 +417,19 @@ function codegen.doxygen_type(doxygen, cname)
 	for _, line in ipairs(doxygen) do
 		result[#result+1] = "/// " .. line
 	end
-	result[#result+1] = "///"
-	if type(cname) == "string" then
-		result[#result+1] = string.format("/// @attention C99 equivalent is `%s`.", cname)
-	else
-		local names = {}
-		for _, v in ipairs(cname) do
-			names[#names+1] = "`" .. v .. "`"
+	if cname then
+		result[#result+1] = "///"
+		if type(cname) == "string" then
+			result[#result+1] = string.format("/// @attention C99 equivalent is `%s`.", cname)
+		else
+			local names = {}
+			for _, v in ipairs(cname) do
+				names[#names+1] = "`" .. v .. "`"
+			end
+			result[#result+1] = string.format("/// @attention C99 equivalent are %s.", table.concat(names, ","))
 		end
-		result[#result+1] = string.format("/// @attention C99 equivalent are %s.", table.concat(names, ","))
+		result[#result+1] = "///"
 	end
-	result[#result+1] = "///"
 	return table.concat(result, "\n")
 end
 
