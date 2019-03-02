@@ -313,7 +313,6 @@ local function codetemp(func)
 		CPPFUNC = cppfunc,
 		CALLARGS = table.concat(callargs, ", "),
 		POSTRET = lines(func.ret_postfix),
-		CODE = func.cfunc,
 	}
 end
 
@@ -331,16 +330,10 @@ BGFX_C_API $RET bgfx_$CFUNCNAME($CARGS)
 }
 ]]
 
-local c99usertemp = [[
-BGFX_C_API $RET bgfx_$CFUNCNAME($CARGS)
-{
-$CODE
-}
-]]
-
 function codegen.gen_c99(func)
 	if func.cfunc then
-		return apply_template(func, c99usertemp)
+		-- There is an user define c function, don't generate it.
+		return apply_template(func, "/* BGFX_C_API $RET bgfx_$CFUNCNAME($CARGS) */\n")
 	else
 		return remove_emptylines(apply_template(func, c99temp))
 	end
