@@ -6,7 +6,7 @@ local codegen = require "codegen"
 local doxygen = require "doxygen"
 
 local files = {
-	["bgfx.idl.h"] = "../include/bgfx/c99",
+	["bgfx.h"] = "../include/bgfx/c99",
 	["bgfx.idl.inl"] = "../src",
 	-- todo: cpp header path here
 	["bgfx.idl.cpp"] = ".",

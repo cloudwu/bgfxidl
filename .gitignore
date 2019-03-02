@@ -1,2 +1,3 @@
-bgfx.idl.h
+bgfx.h
 bgfx.idl.inl
+bgfx.idl.cpp
