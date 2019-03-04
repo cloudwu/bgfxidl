@@ -12,6 +12,7 @@ local func_actions = {
 	interface_struct = "\n\t",
 	interface_import = ",\n\t\t\t",
 	c99_interface = "\n",
+	cpp_interface = "\n",
 }
 
 local type_actions = {
@@ -60,6 +61,19 @@ for action,temp in pairs(functemp) do
 	end)
 end
 
+funcgen.cpp_interface= cfunc(function(func)
+	if not func.cfunc then
+		return codegen.apply_functemp(func, [[
+$RET $CLASSNAME$FUNCNAME($CPPARGS)$CONST
+{
+	$CONVERSIONCTOCPP
+	$PRERETCPPTOCg_interface->$CFUNCNAME($CALLARGSCPPTOC);
+	$POSTRETCPPTOC
+}
+]])
+	end
+end)
+
 funcgen.c99 = cfunc(function(func)
 	local temp
 	if func.cfunc then
@@ -101,12 +115,13 @@ local function cppdecl(func)
 		if func.cusername then
 			doc = doc[func.cusername]
 		end
-		local text = codegen.doxygen_type(doc, cname)
-		if text then
-			return text .. codegen.apply_functemp(func, "\n$RET $FUNCNAME($ARGS);\n")
-		end
+		doc = codegen.doxygen_type(doc, cname)
+	end
+	local funcdecl = codegen.apply_functemp(func, "$RET $FUNCNAME($ARGS)$CONST;\n")
+	if doc then
+		return doc .. "\n" .. funcdecl
 	else
-		return codegen.apply_functemp(func, "$RET $FUNCNAME($ARGS);\n")
+		return funcdecl
 	end
 end
 

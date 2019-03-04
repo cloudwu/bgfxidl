@@ -84,49 +84,66 @@ end
 local function gen_arg_conversion(all_types, arg)
 	if arg.ctype == arg.fulltype then
 		-- do not need conversion
-		arg.aname = arg.name
 		return
 	end
 	local ctype = all_types[arg.type]
 	if ctype.handle and arg.type == arg.fulltype then
 		local aname = alternative_name(arg.name)
 		arg.aname = aname .. ".cpp"
+		arg.aname_cpp2c = aname .. ".c"
 		arg.conversion = string.format(
 			"union { %s c; bgfx::%s cpp; } %s = { %s };" ,
 			ctype.cname, arg.type, aname, arg.name)
+		arg.conversion_back = string.format(
+			"union { bgfx::%s cpp; %s c; } %s = { %s };" ,
+			arg.type, ctype.cname, aname, arg.name)
 	elseif arg.ref then
 		if ctype.cname == arg.type then
 			arg.aname = "*" .. arg.name
+			arg.aname_cpp2c = "&" .. arg.name
 		elseif arg.out and ctype.enum then
 			local aname = alternative_name(arg.name)
 			local cpptype = arg.cpptype:match "(.-)%s*&"	-- remove &
+			local ctype = arg.ctype:match "(.-)%s*%*"	-- remove *
 			arg.aname = aname
+			arg.aname_cpp2c = "&" .. aname
 			arg.conversion = string.format("%s %s;", cpptype, aname)
+			arg.conversion_back = string.format("%s %s;", ctype, aname);
 			arg.out_conversion = string.format("*%s = (%s)%s;", arg.name, ctype.cname, aname)
+			arg.out_conversion_back = string.format("%s = (%s)%s;", arg.name, ctype, aname)
 		else
 			arg.aname = alternative_name(arg.name)
+			arg.aname_cpp2c = string.format("(%s)&%s" , arg.ctype , arg.name)
 			arg.conversion = string.format(
 				"%s %s = *(%s)%s;",
 				arg.cpptype, arg.aname, arg.ptype, arg.name)
 		end
 	else
 		local cpptype = arg.cpptype
+		local ctype = arg.ctype
 		if arg.array then
 			cpptype = cpptype .. "*"
+			ctype = ctype .. "*"
 		end
 		arg.aname = string.format(
 			"(%s)%s",
 			cpptype, arg.name)
+		arg.aname_cpp2c = string.format(
+			"(%s)%s",
+			ctype, arg.name)
 	end
 end
 
 local function gen_ret_conversion(all_types, func)
 	local postfix = { func.vararg and "va_end(argList);" }
+	local postfix_cpp2c = { postfix[1] }
 	func.ret_postfix = postfix
+	func.ret_postfix_cpp2c = postfix_cpp2c
 
 	for _, arg in ipairs(func.args) do
 		if arg.out_conversion then
 			postfix[#postfix+1] = arg.out_conversion
+			postfix_cpp2c[#postfix_cpp2c+1] = arg.out_conversion_back
 		end
 	end
 
@@ -134,16 +151,26 @@ local function gen_ret_conversion(all_types, func)
 	if ctype.handle then
 		func.ret_conversion = string.format(
 			"union { %s c; bgfx::%s cpp; } handle_ret;" ,
-			ctype.cname, func.ret.type)
+			ctype.cname, ctype.name)
+		func.ret_conversion_cpp2c = string.format(
+			"union { bgfx::%s cpp; %s c; } handle_ret;" ,
+			ctype.name, ctype.cname)
 		func.ret_prefix = "handle_ret.cpp = "
+		func.ret_prefix_cpp2c = "handle_ret.c = "
 		postfix[#postfix+1] = "return handle_ret.c;"
+		postfix_cpp2c[#postfix_cpp2c+1] = "return handle_ret.cpp;"
 	elseif func.ret.fulltype ~= "void" then
-		local ctype_conversion = func.ret.type == func.ret.ctype and "" or ("(" ..  func.ret.ctype .. ")")
+		local ctype_conversion = ctype.name == ctype.cname and "" or ("(" ..  func.ret.ctype .. ")")
+		local conversion_back = ctype.name == ctype.cname and "" or ("(" ..  func.ret.cpptype .. ")")
 		if #postfix > 0 then
 			func.ret_prefix = string.format("%s retValue = %s", func.ret.ctype , ctype_conversion)
-			postfix[#postfix+1] = "return retValue;"
+			func.ret_prefix_cpp2c = string.format("%s retValue = %s", func.ret.cpptype , conversion_back)
+			local ret = "return retValue;"
+			postfix[#postfix+1] = ret
+			postfix_cpp2c[#postfix_cpp2c+1] = ret
 		else
 			func.ret_prefix = string.format("return %s", ctype_conversion)
+			func.ret_prefix_cpp2c = string.format("return %s", conversion_back)
 		end
 	end
 end
@@ -283,6 +310,7 @@ function codegen.nameconversion(all_types, all_funcs)
 			convert_arg(all_types, classtype, v)
 			v.this = classtype.ctype .. " _this"
 			v.this_conversion = string.format( "%s This = (%s)_this;", classtype.cpptype, classtype.cpptype)
+			v.this_to_c = string.format("(%s)this", classtype.ctype)
 		end
 	end
 
@@ -314,22 +342,30 @@ end
 
 local function codetemp(func)
 	local conversion = {}
+	local conversion_c2cpp = {}
 	local args = {}
 	local cargs = {}
-	local callargs_cpp2c = {}
+	local callargs_conversion = {}
+	local callargs_conversion_back = {}
 	local callargs = {}
 	local cppfunc
+	local classname
+
 	if func.class then
 		-- It's a member function
 		cargs[1] = func.this
 		conversion[1] = func.this_conversion
 		cppfunc = "This->" .. func.name
 		callargs[1] = "_this"
+		callargs_conversion_back[1] = func.this_to_c
+		classname = func.class .. "::"
 	else
 		cppfunc = "bgfx::" .. tostring(func.alter_name or func.name)
+		classname = ""
 	end
 	for _, arg in ipairs(func.args) do
 		conversion[#conversion+1] = arg.conversion
+		conversion_c2cpp[#conversion_c2cpp+1] = arg.conversion_back
 		local cname = arg.ctype .. " " .. arg.name
 		if arg.array then
 			cname = cname .. (arg.carray or arg.array)
@@ -343,10 +379,12 @@ local function codetemp(func)
 		end
 		cargs[#cargs+1] = cname
 		args[#args+1] = name
-		callargs_cpp2c[#callargs_cpp2c+1] = arg.aname
+		callargs_conversion[#callargs_conversion+1] = arg.aname or arg.name
+		callargs_conversion_back[#callargs_conversion_back+1] = arg.aname_cpp2c or arg.name
 		callargs[#callargs+1] = arg.name
 	end
 	conversion[#conversion+1] = func.ret_conversion
+	conversion_c2cpp[#conversion_c2cpp+1] = func.ret_conversion_cpp2c
 
 	local ARGS
 	local args_n = #args
@@ -367,13 +405,15 @@ local function codetemp(func)
 		postret_c2c[1] = "va_end(argList);"
 		local vararg = func.args[#func.args]
 		callargs[#callargs] = vararg.aname
+		callargs_conversion_back[#callargs_conversion_back] = vararg.aname
 		conversion_c2c[1] = vararg.conversion
+		conversion_c2cpp[1] = vararg.conversion
 
 		if func.ret.fulltype == "void" then
 			preret_c2c = ""
 		else
-			preret_c2c = func.ret.ctype .. " ret_value = "
-			postret_c2c[#postret_c2c+1] = "return ret_value;"
+			preret_c2c = func.ret.ctype .. " retValue = "
+			postret_c2c[#postret_c2c+1] = "return retValue;"
 		end
 		callfunc_c2c = func.alter_cname or func.cname
 	else
@@ -391,17 +431,24 @@ local function codetemp(func)
 		CFUNCNAME = func.cname,
 		FUNCNAME = func.name,
 		CARGS = table.concat(cargs, ", "),
+		CPPARGS = table.concat(args, ", "),
 		ARGS = ARGS,
 		CONVERSION = lines(conversion),
 		CONVERSIONCTOC = lines(conversion_c2c),
+		CONVERSIONCTOCPP = lines(conversion_c2cpp),
 		PRERET = func.ret_prefix or "",
+		PRERETCPPTOC = func.ret_prefix_cpp2c or "",
 		CPPFUNC = cppfunc,
 		CALLFUNCCTOC = callfunc_c2c,
-		CALLARGSCTOCPP = table.concat(callargs_cpp2c, ", "),
+		CALLARGSCTOCPP = table.concat(callargs_conversion, ", "),
+		CALLARGSCPPTOC = table.concat(callargs_conversion_back, ", "),
 		CALLARGS = table.concat(callargs, ", "),
 		POSTRET = lines(func.ret_postfix),
+		POSTRETCPPTOC = lines(func.ret_postfix_cpp2c),
 		PRERETCTOC = preret_c2c,
 		POSTRETCTOC = lines(postret_c2c),
+		CLASSNAME = classname,
+		CONST = func.const and " const" or "",
 	}
 end
 
