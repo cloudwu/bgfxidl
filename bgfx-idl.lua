@@ -11,6 +11,7 @@ local func_actions = {
 	cppdecl = "\n",
 	interface_struct = "\n\t",
 	interface_import = ",\n\t\t\t",
+	c99_interface = "\n",
 }
 
 local type_actions = {
@@ -44,6 +45,14 @@ local functemp = {}
 functemp.c99decl = "/**/\nBGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS);"
 functemp.interface_struct = "$CRET (*$CFUNCNAME)($CARGS);"
 functemp.interface_import = "bgfx_$CFUNCNAME"
+functemp.c99_interface = [[
+BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS)
+{
+	$CONVERSIONCTOC
+	$PRERETCTOCg_interface->$CFUNCNAME($CALLARGS);
+	$POSTRETCTOC
+}
+]]
 
 for action,temp in pairs(functemp) do
 	funcgen[action] = cfunc(function(func)
@@ -60,7 +69,7 @@ funcgen.c99 = cfunc(function(func)
 BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS)
 {
 	$CONVERSION
-	$PRERET$CPPFUNC($CALLARGS);
+	$PRERET$CPPFUNC($CALLARGSCTOCPP);
 	$POSTRET
 }
 ]]
@@ -246,6 +255,7 @@ local files = {
 	["bgfx.h"] = "../include/bgfx/c99",
 	["bgfx.idl.inl"] = "../src",
 	["bgfx.hpp"] = ".",
+	["bgfx.shim.cpp"] = ".",
 }
 
 for filename, path in pairs (files) do

@@ -162,9 +162,7 @@ local function convert_vararg(v)
 				args[#args].name),
 		}
 		args[#args + 1] = vararg
-		v.implname = v.vararg
-	else
-		v.implname = v.name
+		v.alter_name = v.vararg
 	end
 end
 
@@ -226,6 +224,7 @@ function codegen.nameconversion(all_types, all_funcs)
 				convert_arg(all_types, item, v)
 			end
 		elseif v.args then
+			-- funcptr
 			for _, arg in ipairs(v.args) do
 				convert_arg(all_types, arg, v)
 			end
@@ -236,6 +235,7 @@ function codegen.nameconversion(all_types, all_funcs)
 
 	local funcs = {}
 	local funcs_conly = {}
+	local funcs_alter = {}
 
 	for _,v in ipairs(all_funcs) do
 		if v.cname == nil then
@@ -268,8 +268,12 @@ function codegen.nameconversion(all_types, all_funcs)
 			gen_arg_conversion(all_types, arg)
 		end
 		convert_vararg(v)
+		if v.alter_name then
+			funcs_alter[#funcs_alter+1] = v
+		end
 		convert_arg(all_types, v.ret, v)
 		gen_ret_conversion(all_types, v)
+		local namespace = v.class
 		if namespace then
 			local classname = namespace
 			if v.const then
@@ -289,6 +293,11 @@ function codegen.nameconversion(all_types, all_funcs)
 			table.insert(func.multicfunc, v.cname)
 		end
 	end
+
+	for _, v in ipairs(funcs_alter) do
+		local func = funcs[v.alter_name]
+		v.alter_cname = func.cname
+	end
 end
 
 local function lines(tbl)
@@ -307,6 +316,7 @@ local function codetemp(func)
 	local conversion = {}
 	local args = {}
 	local cargs = {}
+	local callargs_cpp2c = {}
 	local callargs = {}
 	local cppfunc
 	if func.class then
@@ -314,8 +324,9 @@ local function codetemp(func)
 		cargs[1] = func.this
 		conversion[1] = func.this_conversion
 		cppfunc = "This->" .. func.name
+		callargs[1] = "_this"
 	else
-		cppfunc = "bgfx::" .. tostring(func.implname)
+		cppfunc = "bgfx::" .. tostring(func.alter_name or func.name)
 	end
 	for _, arg in ipairs(func.args) do
 		conversion[#conversion+1] = arg.conversion
@@ -332,7 +343,8 @@ local function codetemp(func)
 		end
 		cargs[#cargs+1] = cname
 		args[#args+1] = name
-		callargs[#callargs+1] = arg.aname
+		callargs_cpp2c[#callargs_cpp2c+1] = arg.aname
+		callargs[#callargs+1] = arg.name
 	end
 	conversion[#conversion+1] = func.ret_conversion
 
@@ -346,6 +358,33 @@ local function codetemp(func)
 		ARGS = "\n\t  " .. table.concat(args, "\n\t, ") .. "\n\t"
 	end
 
+	local preret_c2c
+	local postret_c2c = {}
+	local conversion_c2c = {}
+	local callfunc_c2c
+
+	if func.vararg then
+		postret_c2c[1] = "va_end(argList);"
+		local vararg = func.args[#func.args]
+		callargs[#callargs] = vararg.aname
+		conversion_c2c[1] = vararg.conversion
+
+		if func.ret.fulltype == "void" then
+			preret_c2c = ""
+		else
+			preret_c2c = func.ret.ctype .. " ret_value = "
+			postret_c2c[#postret_c2c+1] = "return ret_value;"
+		end
+		callfunc_c2c = func.alter_cname or func.cname
+	else
+		if func.ret.fulltype == "void" then
+			preret_c2c = ""
+		else
+			preret_c2c = "return "
+		end
+		callfunc_c2c = func.cname
+	end
+
 	return {
 		RET = func.ret.fulltype,
 		CRET = func.ret.ctype,
@@ -354,10 +393,15 @@ local function codetemp(func)
 		CARGS = table.concat(cargs, ", "),
 		ARGS = ARGS,
 		CONVERSION = lines(conversion),
+		CONVERSIONCTOC = lines(conversion_c2c),
 		PRERET = func.ret_prefix or "",
 		CPPFUNC = cppfunc,
+		CALLFUNCCTOC = callfunc_c2c,
+		CALLARGSCTOCPP = table.concat(callargs_cpp2c, ", "),
 		CALLARGS = table.concat(callargs, ", "),
 		POSTRET = lines(func.ret_postfix),
+		PRERETCTOC = preret_c2c,
+		POSTRETCTOC = lines(postret_c2c),
 	}
 end
 

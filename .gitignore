@@ -1,3 +1,4 @@
 bgfx.h
 bgfx.idl.inl
 bgfx.hpp
+bgfx.shim.cpp
