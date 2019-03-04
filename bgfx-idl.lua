@@ -26,7 +26,11 @@ local type_actions = {
 	cfuncptrs = "\n",
 }
 
-assert(loadfile("bgfx.idl" , "t", idl))()
+do
+	local source = doxygen.load "bgfx.idl"
+	local f = assert(load(source, "bgfx.idl" , "t", idl))
+	f()
+end
 
 doxygen.import "bgfx.idl"
 codegen.nameconversion(idl.types, idl.funcs)

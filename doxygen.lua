@@ -40,4 +40,13 @@ function doxygen.import(filename)
 	return docs
 end
 
+function doxygen.load(filename)
+	local f = assert(io.open(filename, "rb"))
+	local text = f:read "a"
+	text = text:gsub("([^\n\r])%-%-%-[ \t](.-)\n", "%1[[%2]]\n")
+	f:close()
+	return text
+end
+
+
 return doxygen

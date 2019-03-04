@@ -716,10 +716,10 @@ func.makeRef { conly }
 --- @attention Data passed must be available for at least 2 `bgfx::frame` calls.
 func.makeRef { cname = "make_ref_release" }
 	"const Memory*"
-	.data      "const void*"                       [[Pointer to data.]]
-	.size      "uint32_t"                          [[Size of data.]]
-	.releaseFn "ReleaseFn" { default = NULL }      [[Callback function to release memory after use.]]
-	.userData  "void*" { default = NULL }          [[User data to be passed to callback function.]]
+	.data      "const void*"                       --- Pointer to data.
+	.size      "uint32_t"                          --- Size of data.
+	.releaseFn "ReleaseFn" { default = NULL }      --- Callback function to release memory after use.
+	.userData  "void*" { default = NULL }          --- User data to be passed to callback function.
 
 func.setDebug
 	"void"
@@ -771,19 +771,19 @@ func.destroy { cname = "destroy_index_buffer" }
 
 --- Create static vertex buffer.
 func.createVertexBuffer
-	"VertexBufferHandle"                 [[Static vertex buffer handle.]]
-	.mem   "const Memory*"               [[Vertex buffer data.]]
-	.decl  "const VertexDecl &"          [[Vertex declaration.]]
-	.flags "uint16_t"                    [[Buffer creation flags.]]
-		[[- `BGFX_BUFFER_NONE` - No flags.                                                                      ]]
-		[[- `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.                            ]]
-		[[- `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer            ]]
-		[[    is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.                   ]]
-		[[- `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.            ]]
-		[[- `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of           ]]
-		[[    data is passed. If this flag is not specified, and more data is passed on update, the buffer      ]]
-		[[    will be trimmed to fit the existing buffer size. This flag has effect only on dynamic buffers.    ]]
-		[[- `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on index buffers. ]]
+	"VertexBufferHandle"                 --- Static vertex buffer handle.
+	.mem   "const Memory*"               --- Vertex buffer data.
+	.decl  "const VertexDecl &"          --- Vertex declaration.
+	.flags "uint16_t"                    --- Buffer creation flags.
+		--- - `BGFX_BUFFER_NONE` - No flags.
+		--- - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.
+		--- - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer
+		---     is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.
+		--- - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.
+		--- - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of
+		---     data is passed. If this flag is not specified, and more data is passed on update, the buffer
+		---     will be trimmed to fit the existing buffer size. This flag has effect only on dynamic buffers.
+		--- - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on index buffers.
 
 func.setName { cname = "set_vertex_buffer_name" }
 	"void"
