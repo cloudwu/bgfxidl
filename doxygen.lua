@@ -11,7 +11,7 @@ local idl_defines = {
 	funcptr = true,
 }
 
-function doxygen.import(filename)
+local function import(filename)
 	local doxygen = {}
 	for line in io.lines(filename) do
 		local comment = line:match "^%s*%-%-%-%s*(.*)"
@@ -37,10 +37,10 @@ function doxygen.import(filename)
 	if #doxygen > 0 then
 		error ( "Unknown doxygens :\n" .. table.concat(doxygen, "\n") )
 	end
-	return docs
 end
 
 function doxygen.load(filename)
+	import(filename)
 	local f = assert(io.open(filename, "rb"))
 	local text = f:read "a"
 	text = text:gsub("([^\n\r])%-%-%-[ \t](.-)\n", "%1[[%2]]\n")

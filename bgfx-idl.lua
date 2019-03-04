@@ -32,7 +32,6 @@ do
 	f()
 end
 
-doxygen.import "bgfx.idl"
 codegen.nameconversion(idl.types, idl.funcs)
 
 local function cfunc(f)
