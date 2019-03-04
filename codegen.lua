@@ -366,35 +366,8 @@ local function apply_template(func, temp)
 	return (temp:gsub("$(%u+)", func.codetemp))
 end
 
-local c99temp = [[
-BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS)
-{
-	$CONVERSION
-	$PRERET$CPPFUNC($CALLARGS);
-	$POSTRET
-}
-]]
-
-function codegen.gen_c99(func)
-	if func.cfunc then
-		-- There is an user define c function, don't generate it.
-		return apply_template(func, "/* BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS) */\n")
-	else
-		return remove_emptylines(apply_template(func, c99temp))
-	end
-end
-
-local template_function_declaration = [[
-/**/
-BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS);
-]]
-
-function codegen.gen_c99decl(func)
-	return apply_template(func, template_function_declaration)
-end
-
-function codegen.gen_cppdecl(func)
-	return apply_template(func, "$RET $FUNCNAME($ARGS);")
+function codegen.apply_functemp(func, temp)
+		return remove_emptylines(apply_template(func, temp))
 end
 
 function codegen.gen_funcptr(funcptr)
@@ -403,10 +376,6 @@ end
 
 function codegen.gen_cfuncptr(funcptr)
 	return apply_template(funcptr, "typedef $CRET (*$CFUNCNAME)($CARGS);")
-end
-
-function codegen.gen_interface_struct(func)
-	return apply_template(func, "$CRET (*$CFUNCNAME)($CARGS);")
 end
 
 function codegen.doxygen_type(doxygen, cname)

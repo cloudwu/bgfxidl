@@ -37,14 +37,35 @@ local function cfunc(f)
 	end
 end
 
-local funcgen = {
-	c99 = cfunc(codegen.gen_c99),
-	c99decl = cfunc(codegen.gen_c99decl),
-	interface_struct = cfunc(codegen.gen_interface_struct),
-}
+local funcgen = {}
 
-funcgen.interface_import = cfunc(function(func)
-	return "bgfx_" .. func.cname
+local functemp = {}
+
+functemp.c99decl = "/**/\nBGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS);"
+functemp.interface_struct = "$CRET (*$CFUNCNAME)($CARGS);"
+functemp.interface_import = "bgfx_$CFUNCNAME"
+
+for action,temp in pairs(functemp) do
+	funcgen[action] = cfunc(function(func)
+		return codegen.apply_functemp(func, temp)
+	end)
+end
+
+funcgen.c99 = cfunc(function(func)
+	local temp
+	if func.cfunc then
+		temp = "/* BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS) */\n"
+	else
+		temp = [[
+BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS)
+{
+	$CONVERSION
+	$PRERET$CPPFUNC($CALLARGS);
+	$POSTRET
+}
+]]
+	end
+	return codegen.apply_functemp(func, temp)
 end)
 
 local function cppdecl(func)
@@ -73,10 +94,10 @@ local function cppdecl(func)
 		end
 		local text = codegen.doxygen_type(doc, cname)
 		if text then
-			return text .. "\n" .. codegen.gen_cppdecl(func) .. "\n"
+			return text .. codegen.apply_functemp(func, "\n$RET $FUNCNAME($ARGS);\n")
 		end
 	else
-		return codegen.gen_cppdecl(func) .. "\n"
+		return codegen.apply_functemp(func, "$RET $FUNCNAME($ARGS);\n")
 	end
 end
 
