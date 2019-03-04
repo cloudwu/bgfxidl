@@ -54,6 +54,8 @@ idl.typedef = setmetatable({} , { __index = typedef, __call = typedef })
 idl.types = all_types
 
 local function add_comment(item, comment)
+	-- strip space
+	comment = comment:match "(.-)%s*$"
 	local last = item.comment
 	if last then
 		if type(last) == "string" then
@@ -141,8 +143,27 @@ idl.handle = setmetatable({} , { __index = handledef, __call = handledef })
 
 local all_funcs = {}
 
-local function duplicate_arg_name(name)
+local function duplicate_arg_name(_, name)
 	error ("Duplicate arg name " .. name)
+end
+
+local function attribs_setter(args, arg, args_desc)
+	local attribs_setter
+	local function arg_attrib_or_comment(_, attrib_or_comment )
+		if type(attrib_or_comment) == "string" then
+			add_comment(arg, attrib_or_comment)
+		else
+			copy_attribs(arg, attrib_or_comment)
+		end
+		return attribs_setter
+	end
+	-- next field (__index) or attrib/comment (__call)
+	attribs_setter = setmetatable( {} , {
+		__index = function(_, name)
+			return args_desc(args, name)
+		end
+		, __call = arg_attrib_or_comment } )
+	return attribs_setter
 end
 
 local function func(sets)
@@ -150,30 +171,23 @@ local function func(sets)
 		local f = { name = funcname , args = {} }
 		sets[#sets+1] = f
 		local args
-		local function args_desc(obj, args_name)
-			obj[args_name] = duplicate_arg_name
+		local function args_desc(_, args_name)
+			args[args_name] = duplicate_arg_name
 			return function (fulltype)
 				local arg = {
 					name = "_" .. args_name,
 					fulltype = fulltype,
 				}
 				f.args[#f.args+1] = arg
-				local function arg_attrib(_, attrib )
-					copy_attribs(arg, attrib)
-					return args
-				end
-				return setmetatable( {} , {
-					__index = function(_, name)
-						return args_desc(obj, name)
-					end
-					, __call = arg_attrib } )
+				return attribs_setter(args, arg, args_desc)
 			end
 		end
 		args = setmetatable({}, { __index = args_desc })
 		local function rettype(value)
 			assert(type(value) == "string", "Need return type")
-			f.ret = { fulltype = value }
-			return args
+			local ret = { fulltype = value }
+			f.ret = ret
+			return attribs_setter(args, ret, args_desc)
 		end
 
 		local function funcdef(value)
@@ -194,6 +208,7 @@ idl.funcs = all_funcs
 
 idl.vararg = "vararg"
 idl.out = "out"
+idl.inout = "inout"
 idl.const = "const"
 idl.ctor = "ctor"
 idl.cfunc = "cfunc"

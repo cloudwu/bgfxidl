@@ -62,7 +62,7 @@ for action,temp in pairs(functemp) do
 end
 
 funcgen.cpp_interface= cfunc(function(func)
-	if not func.cfunc then
+	if not func.cfunc and not func.conly then
 		return codegen.apply_functemp(func, [[
 $RET $CLASSNAME$FUNCNAME($CPPARGS)$CONST
 {
@@ -115,7 +115,7 @@ local function cppdecl(func)
 		if func.cusername then
 			doc = doc[func.cusername]
 		end
-		doc = codegen.doxygen_type(doc, cname)
+		doc = codegen.doxygen_type(doc, cname, func)
 	end
 	local funcdecl = codegen.apply_functemp(func, "$RET $FUNCNAME($ARGS)$CONST;\n")
 	if doc then
@@ -127,7 +127,7 @@ end
 
 function funcgen.cppdecl(func)
 	-- Don't generate member functions here
-	if not func.class then
+	if not func.class and not func.conly then
 		return cppdecl(func)
 	end
 end

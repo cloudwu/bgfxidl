@@ -469,7 +469,55 @@ function codegen.gen_cfuncptr(funcptr)
 	return apply_template(funcptr, "typedef $CRET (*$CFUNCNAME)($CARGS);")
 end
 
-function codegen.doxygen_type(doxygen, cname)
+local function doxygen_funcret(r, func, prefix)
+	if not func or func.ret.fulltype == "void" or func.ret.comment == nil then
+		return
+	end
+	r[#r+1] = prefix
+	if type(func.ret.comment) == "string" then
+		r[#r+1] = string.format("%s @returns %s", prefix, func.ret.comment)
+	else
+		r[#r+1] = string.format("%s @returns %s", prefix, func.ret.comment[1])
+		for i = 2,#func.ret.comment do
+			r[#r+1] = string.format("%s  %s", func.ret.comment[i])
+		end
+	end
+	return r
+end
+
+local function doxygen_func(r, func, prefix)
+	if not func or #func.args == 0 then
+		return
+	end
+	r[#r+1] = prefix
+	for _, arg in ipairs(func.args) do
+		local inout
+		if arg.out then
+			inout = "out"
+		elseif arg.inout then
+			inout = "inout"
+		else
+			inout = "in"
+		end
+		local comment = string.format("%s @param[%s] %s", prefix, inout, arg.name)
+		if arg.comment then
+			if type(arg.comment) == "string" then
+				r[#r+1] = comment .. " " .. arg.comment
+			else
+				r[#r+1] = comment .. " " .. arg.comment[1]
+				for i = 2,#arg.comment do
+					r[#r+1] = string.format("%s  %s", prefix, arg.comment[i])
+				end
+			end
+		else
+			r[#r+1] = comment
+		end
+	end
+	doxygen_funcret(r, func, prefix)
+	return r
+end
+
+function codegen.doxygen_type(doxygen, cname, func)
 	if doxygen == nil then
 		return
 	end
@@ -477,6 +525,7 @@ function codegen.doxygen_type(doxygen, cname)
 	for _, line in ipairs(doxygen) do
 		result[#result+1] = "/// " .. line
 	end
+	doxygen_func(result, func, "///")
 	if cname then
 		result[#result+1] = "///"
 		if type(cname) == "string" then
@@ -503,6 +552,7 @@ function codegen.doxygen_ctype(doxygen)
 	for _, line in ipairs(doxygen) do
 		result[#result+1] = " * " .. line
 	end
+	doxygen_func(result, func, " *")
 	result[#result+1] = " */"
 	return table.concat(result, "\n")
 end
@@ -588,10 +638,6 @@ function codegen.gen_enum_cdefine(enum)
 	return (cenum_temp:gsub("$(%u+)", temp))
 end
 
-local function strip_space(c)
-	return (c:match "(.-)%s*$")
-end
-
 local function text_with_comments(items, item, cstyle, is_classmember)
 	local name = item.name
 	if item.array then
@@ -617,12 +663,12 @@ local function text_with_comments(items, item, cstyle, is_classmember)
 			if cstyle then
 				table.insert(items, "/**")
 				for _, c in ipairs(item.comment) do
-					table.insert(items, " * " .. strip_space(c))
+					table.insert(items, " * " .. c)
 				end
 				table.insert(items, " */")
 			else
 				for _, c in ipairs(item.comment) do
-					table.insert(items, "/// " .. strip_space(c))
+					table.insert(items, "/// " .. c)
 				end
 			end
 		else
