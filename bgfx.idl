@@ -21,13 +21,10 @@ typedef "CallbackI" { cname = "callback_interface" }
 typedef "bx::AllocatorI" { cname = "allocator_interface" }
 
 --- Memory release callback.
----
---- param[in] _ptr Pointer to allocated data.
---- param[in] _userData User defined data if needed.
 funcptr.ReleaseFn
 	"void"
-	.ptr        "void*"
-	.userData   "void*"
+	.ptr        "void*" --- Pointer to allocated data.
+	.userData   "void*" --- User defined data if needed.
 
 --- Fatal error enum.
 enum.Fatal { underscore, comment = "" }
@@ -540,42 +537,36 @@ func.VertexDecl.begin
 
 --- Add attribute to VertexDecl.
 ---
---- @param[in] _attrib Attribute semantics. See: `bgfx::Attrib`
---- @param[in] _num Number of elements 1, 2, 3 or 4.
---- @param[in] _type Element type.
---- @param[in] _normalized When using fixed point AttribType (f.e. Uint8)
----   value will be normalized for vertex shader usage. When normalized
----   is set to true, AttribType::Uint8 value in range 0-255 will be
----   in range 0.0-1.0 in vertex shader.
---- @param[in] _asInt Packaging rule for vertexPack, vertexUnpack, and
----   vertexConvert for AttribType::Uint8 and AttribType::Int16.
----   Unpacking code must be implemented inside vertex shader.
+--- @remarks Must be called between begin/end.
 ---
---- @remarks
----   Must be called between begin/end.
 func.VertexDecl.add
 	"void"
-	.attrib          "Attrib::Enum"
-	.num             "uint8_t"
-	.type            "AttribType::Enum"
-	.normalized      "bool"
-	.asInt           "bool"
+	.attrib          "Attrib::Enum"     --- Attribute semantics. See: `bgfx::Attrib`
+	.num             "uint8_t"          --- Number of elements 1, 2, 3 or 4.
+	.type            "AttribType::Enum" --- Element type.
+	.normalized      "bool"             --- When using fixed point AttribType (f.e. Uint8)
+	                                    --- value will be normalized for vertex shader usage. When normalized
+	                                    --- is set to true, AttribType::Uint8 value in range 0-255 will be
+	                                    --- in range 0.0-1.0 in vertex shader.
+	.asInt           "bool"             --- Packaging rule for vertexPack, vertexUnpack, and
+	                                    --- vertexConvert for AttribType::Uint8 and AttribType::Int16.
+	                                    --- Unpacking code must be implemented inside vertex shader.
 
 --- Decode attribute.
 func.VertexDecl.decode { const }
 	"void"
-	.attrib     "Attrib::Enum"
-	.num        "uint8_t &"          { out }
-	.type       "AttribType::Enum &" { out }
+	.attrib     "Attrib::Enum"               --- Attribute semantics. See: `bgfx::Attrib`
+	.num        "uint8_t &"          { out } --- Number of elements.
+	.type       "AttribType::Enum &" { out } --- Element type.
 	.normalized "bool &"             { out }
 	.asInt      "bool &"             { out }
 
 --- Returns true if VertexDecl contains attribute.
 func.VertexDecl.has { const }
 	"bool"
-	.attrib "Attrib::Enum"
+	.attrib "Attrib::Enum" --- Attribute semantics. See: `bgfx::Attrib`
 
---- Skip _num bytes in vertex stream.
+--- Skip `_num` bytes in vertex stream.
 func.VertexDecl.skip
 	"void"
 	.num "uint8_t"
@@ -587,7 +578,7 @@ func.VertexDecl["end"] { comment = "End VertexDecl." }
 --- Returns relative attribute offset from the vertex.
 func.VertexDecl.getOffset { const , cpponly }
 	"uint16_t"
-	.attrib    "Attrib::Enum"
+	.attrib    "Attrib::Enum" --- Attribute semantics. See: `bgfx::Attrib`
 
 --- Returns vertex stride.
 func.VertexDecl.getStride { const , cpponly }
@@ -598,38 +589,43 @@ func.VertexDecl.getSize { const, cpponly }
 	"uint32_t"
 	.num       "uint32_t"
 
+--- Pack vertex attribute into vertex stream format.
 func.vertexPack
 	"void"
-	.input           "const float[4]"
-	.inputNormalized "bool"
-	.attr            "Attrib::Enum"
-	.decl            "const VertexDecl &"
-	.data            "void*"
-	.index           "uint32_t"
+	.input           "const float[4]"     --- Value to be packed into vertex stream.
+	.inputNormalized "bool"               --- `true` if input value is already normalized.
+	.attr            "Attrib::Enum"       --- Attribute to pack.
+	.decl            "const VertexDecl &" --- Vertex stream declaration.
+	.data            "void*"              --- Destination vertex stream where data will be packed.
+	.index           "uint32_t"           --- Vertex index that will be modified.
 
+--- Unpack vertex attribute from vertex stream format.
 func.vertexUnpack
 	"void"
-	.output "float[4]" { out }
-	.attr   "Attrib::Enum"
-	.decl   "const VertexDecl &"
-	.data   "const void*"
-	.index  "uint32_t"
+	.output "float[4]" { out }   --- Result of unpacking.
+	.attr   "Attrib::Enum"       --- Attribute to unpack.
+	.decl   "const VertexDecl &" --- Vertex stream declaration.
+	.data   "const void*"        --- Source vertex stream from where data will be unpacked.
+	.index  "uint32_t"           --- Vertex index that will be unpacked.
 
+--- Converts vertex stream data from one vertex stream format to another.
 func.vertexConvert
 	"void"
-	.dstDecl "const VertexDecl &"
-	.dstData "void*"
-	.srcDecl "const VertexDecl &"
-	.srcData "const void*"
-	.num     "uint32_t"
+	.dstDecl "const VertexDecl &" --- Destination vertex stream declaration.
+	.dstData "void*"              --- Destination vertex stream.
+	.srcDecl "const VertexDecl &" --- Source vertex stream declaration.
+	.srcData "const void*"        --- Source vertex stream data.
+	.num     "uint32_t"           --- Number of vertices to convert from source to destination.
 
+--- Weld vertices.
 func.weldVertices
-	"uint16_t"
-	.output  "uint16_t*"
-	.decl    "const VertexDecl &"
-	.data    "const void*"
-	.num     "uint16_t"
-	.epsilon "float"
+	"uint16_t"                    --- Number of unique vertices after vertex welding.
+	.output  "uint16_t*"          --- Welded vertices remapping table. The size of buffer
+	                              --- must be the same as number of vertices.
+	.decl    "const VertexDecl &" --- Vertex stream declaration.
+	.data    "const void*"        --- Vertex stream.
+	.num     "uint16_t"           --- Number of vertices in vertex stream.
+	.epsilon "float"              --- Error tolerance for vertex position comparison.
 
 func.topologyConvert
 	"uint32_t"
