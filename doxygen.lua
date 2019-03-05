@@ -14,7 +14,7 @@ local idl_defines = {
 local function import(filename)
 	local doxygen = {}
 	for line in io.lines(filename) do
-		local comment = line:match "^%s*%-%-%-%s*(.*)"
+		local comment = line:match "^%-%-%-%s*(.*)"
 		if comment then
 			doxygen[#doxygen+1] = comment
 		else
