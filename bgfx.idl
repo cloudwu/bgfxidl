@@ -1116,92 +1116,117 @@ func.setPaletteColor
 	.index "uint8_t"
 	.rgba  "const float[4]"
 
+--- Set view name.
+---
+--- @remarks
+---   This is debug only feature.
+---
+---   In graphics debugger view name will appear as:
+---
+---       "nnnc <view name>"
+---        ^  ^ ^
+---        |  +--- compute (C)
+---        +------ view id
+---
 func.setViewName
 	"void"
-	.id   "ViewId"
-	.name "const char*"
+	.id   "ViewId"      --- View id.
+	.name "const char*" --- View name.
 
 --- Set view rectangle. Draw primitive outside view will be clipped.
----
---- @param[in] _id View id.
---- @param[in] _x Position x from the left corner of the window.
---- @param[in] _y Position y from the top corner of the window.
---- @param[in] _width Width of view port region.
---- @param[in] _height Height of view port region.
 func.setViewRect
 	"void"
-	.id     "ViewId"
-	.x      "uint16_t"
-	.y      "uint16_t"
-	.width  "uint16_t"
-	.height "uint16_t"
+	.id     "ViewId"   --- View id.
+	.x      "uint16_t" --- Position x from the left corner of the window.
+	.y      "uint16_t" --- Position y from the top corner of the window.
+	.width  "uint16_t" --- Width of view port region.
+	.height "uint16_t" --- Height of view port region.
 
 --- Set view rectangle. Draw primitive outside view will be clipped.
----
---- @param[in] _id View id.
---- @param[in] _x Position x from the left corner of the window.
---- @param[in] _y Position y from the top corner of the window.
---- @param[in] _ratio Width and height will be set in respect to back-buffer size. See:
----   `BackbufferRatio::Enum`.
 func.setViewRect { cname = "set_view_rect_ratio" }
 	"void"
-	.id    "ViewId"
-	.x     "uint16_t"
-	.y     "uint16_t"
-	.ratio "BackbufferRatio::Enum"
+	.id    "ViewId"                --- View id.
+	.x     "uint16_t"              --- Position x from the left corner of the window.
+	.y     "uint16_t"              --- Position y from the top corner of the window.
+	.ratio "BackbufferRatio::Enum" --- Width and height will be set in respect to back-buffer size.
+	                               --- See: `BackbufferRatio::Enum`.
 
+--- Set view scissor. Draw primitive outside view will be clipped. When
+--- _x, _y, _width and _height are set to 0, scissor will be disabled.
 func.setViewScissor
 	"void"
-	.id     "ViewId"
-	.x      "uint16_t"
-	.y      "uint16_t"
-	.width  "uint16_t"
-	.height "uint16_t"
+	.id     "ViewId"   --- View id.
+	.x      "uint16_t" --- Position x from the left corner of the window.
+	.y      "uint16_t" --- Position y from the top corner of the window.
+	.width  "uint16_t" --- Width of view scissor region.
+	.height "uint16_t" --- Height of view scissor region.
 
+--- Set view clear flags.
 func.setViewClear
 	"void"
-	.id      "ViewId"
-	.flags   "uint16_t"
-	.rgba    "uint32_t"
-	.depth   "float"
-	.stencil "uint8_t"
+	.id      "ViewId"   --- View id.
+	.flags   "uint16_t" --- Clear flags. Use `BGFX_CLEAR_NONE` to remove any clear
+	                    --- operation. See: `BGFX_CLEAR_*`.
+	.rgba    "uint32_t" --- Color clear value.
+	.depth   "float"    --- Depth clear value.
+	.stencil "uint8_t"  --- Stencil clear value.
 
+--- Set view clear flags with different clear color for each
+--- frame buffer texture. Must use setClearColor to setup clear color
+--- palette.
 func.setViewClear { cname = "set_view_clear_mrt" }
 	"void"
-	.id      "ViewId"
-	.flags   "uint16_t"
-	.depth   "float"
-	.stencil "uint8_t"
-	.c0      "uint8_t"
-	.c1      "uint8_t"
-	.c2      "uint8_t"
-	.c3      "uint8_t"
-	.c4      "uint8_t"
-	.c5      "uint8_t"
-	.c6      "uint8_t"
-	.c7      "uint8_t"
+	.id      "ViewId"   --- View id.
+	.flags   "uint16_t" --- Clear flags. Use `BGFX_CLEAR_NONE` to remove any clear
+	                    --- operation. See: `BGFX_CLEAR_*`.
+	.depth   "float"    --- Depth clear value.
+	.stencil "uint8_t"  --- Stencil clear value.
+	.c0      "uint8_t"  --- Palette index for frame buffer attachment 0.
+	.c1      "uint8_t"  --- Palette index for frame buffer attachment 1.
+	.c2      "uint8_t"  --- Palette index for frame buffer attachment 2.
+	.c3      "uint8_t"  --- Palette index for frame buffer attachment 3.
+	.c4      "uint8_t"  --- Palette index for frame buffer attachment 4.
+	.c5      "uint8_t"  --- Palette index for frame buffer attachment 5.
+	.c6      "uint8_t"  --- Palette index for frame buffer attachment 6.
+	.c7      "uint8_t"  --- Palette index for frame buffer attachment 7.
 
+--- Set view sorting mode.
+---
+--- @remarks
+---   View mode must be set prior calling `bgfx::submit` for the view.
+---
 func.setViewMode
 	"void"
-	.id   "ViewId"
-	.mode "ViewMode::Enum"
+	.id   "ViewId"         --- View id.
+	.mode "ViewMode::Enum" --- View sort mode. See `ViewMode::Enum`.
 
+--- Set view frame buffer.
+---
+--- @remarks
+---   Not persistent after `bgfx::reset` call.
+---
 func.setViewFrameBuffer
 	"void"
-	.id     "ViewId"
-	.handle "FrameBufferHandle"
+	.id     "ViewId"            --- View id.
+	.handle "FrameBufferHandle" --- Frame buffer handle. Passing `BGFX_INVALID_HANDLE` as
+	                            --- frame buffer handle will draw primitives from this view into
+	                            --- default back buffer.
 
+--- Set view view and projection matrices, all draw primitives in this
+--- view will use these matrices.
 func.setViewTransform
 	"void"
-	.id   "ViewId"
-	.view "const void*"
-	.proj "const void*"
+	.id   "ViewId"      --- View id.
+	.view "const void*" --- View matrix.
+	.proj "const void*" --- Projection matrix.
 
+--- Post submit view reordering.
 func.setViewOrder
 	"void"
-	.id    "ViewId"
-	.num   "uint16_t"
-	.order "const ViewId*"
+	.id    "ViewId"        --- First view id.
+	.num   "uint16_t"      --- Number of views to remap.
+	.order "const ViewId*" --- View remap id table. Passing `NULL` will reset view ids
+	                       --- to default state.
 
 func.begin { cname = "encoder_begin" }
 	"Encoder*"
