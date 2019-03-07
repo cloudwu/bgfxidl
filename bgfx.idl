@@ -797,7 +797,7 @@ func.dbgTextClear
 	.attr  "uint8_t" --- Background color.
 	.small "bool"    --- Default or 8x8 font.
 
---- Print into internal debug text character-buffer (VGA-compatible text mode).
+--- Print formatted data to internal debug text character-buffer (VGA-compatible text mode).
 func.dbgTextPrintf { vararg = "dbgTextPrintfVargs" }
 	"void"
 	.x      "uint16_t"    --- Position x from the left corner of the window.
@@ -806,37 +806,55 @@ func.dbgTextPrintf { vararg = "dbgTextPrintfVargs" }
 	                      --- 4-bits represent foreground color from standard VGA text palette (ANSI escape codes).
 	.format "const char*" --- `printf` style format.
 
+--- Print formatted data from variable argument list to internal debug text character-buffer (VGA-compatible text mode).
 func.dbgTextPrintfVargs { cname = "dbg_text_vprintf" }
 	"void"
-	.x       "uint16_t"
-	.y       "uint16_t"
-	.attr    "uint8_t"
-	.format  "const char*"
-	.argList "va_list"
+	.x       "uint16_t"    --- Position x from the left corner of the window.
+	.y       "uint16_t"    --- Position y from the top corner of the window.
+	.attr    "uint8_t"     --- Color palette. Where top 4-bits represent index of background, and bottom
+                           --- 4-bits represent foreground color from standard VGA text palette (ANSI escape codes).
+	.format  "const char*" --- `printf` style format.
+	.argList "va_list"     --- Variable arguments list for format string.
 
+--- Draw image into internal debug text buffer.
 func.dbgTextImage
 	"void"
-	.x       "uint16_t"
-	.y       "uint16_t"
-	.width   "uint16_t"
-	.height  "uint16_t"
-	.data    "const void*"
-	.pitch   "uint16_t"
+	.x       "uint16_t"    --- Position x from the left corner of the window.
+	.y       "uint16_t"    --- Position y from the top corner of the window.
+	.width   "uint16_t"    --- Image width.
+	.height  "uint16_t"    --- Image height.
+	.data    "const void*" --- Raw image data (character/attribute raw encoding).
+	.pitch   "uint16_t"    --- Image pitch in bytes.
 
+--- Create static index buffer.
 func.createIndexBuffer
 	"IndexBufferHandle"
-	.mem   "const Memory*"
-	.flags "uint16_t"
+	.mem   "const Memory*" --- Index buffer data.
+	.flags "uint16_t"      --- Buffer creation flags.
+	                       ---   - `BGFX_BUFFER_NONE` - No flags.
+	                       ---   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.
+	                       ---   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer
+	                       ---       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.
+	                       ---   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.
+	                       ---   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of
+	                       ---       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+	                       ---       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+	                       ---       buffers.
+	                       ---   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
+	                       ---       index buffers.
 
+--- Set static index buffer debug name.
 func.setName { cname = "set_index_buffer_name" }
 	"void"
-	.handle "IndexBufferHandle"
-	.name   "const char*"
-	.len    "int32_t"
+	.handle "IndexBufferHandle" --- Static index buffer handle.
+	.name   "const char*"       --- Static index buffer name.
+	.len    "int32_t"           --- Static index buffer name length (if length is INT32_MAX, it's expected
+	                            --- that _name is zero terminated string.
 
+--- Destroy static index buffer.
 func.destroy { cname = "destroy_index_buffer" }
 	"void"
-	.handle "IndexBufferHandle"
+	.handle "IndexBufferHandle" --- Static index buffer handle.
 
 --- Create static vertex buffer.
 func.createVertexBuffer
@@ -854,66 +872,123 @@ func.createVertexBuffer
 	                            ---      will be trimmed to fit the existing buffer size. This flag has effect only on dynamic buffers.
 	                            ---  - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on index buffers.
 
+--- Set static vertex buffer debug name.
 func.setName { cname = "set_vertex_buffer_name" }
 	"void"
-	.handle "VertexBufferHandle"
-	.name   "const char*"
-	.len    "int32_t"
+	.handle "VertexBufferHandle" --- Static vertex buffer handle.
+	.name   "const char*"        --- Static vertex buffer name.
+	.len    "int32_t"            --- Static vertex buffer name length (if length is INT32_MAX, it's expected
+	                             --- that _name is zero terminated string.
 
+--- Destroy static vertex buffer.
 func.destroy { cname = "destroy_vertex_buffer" }
 	"void"
-	.handle "VertexBufferHandle"
+	.handle "VertexBufferHandle" --- Static vertex buffer handle.
 
+--- Create empty dynamic index buffer.
 func.createDynamicIndexBuffer
-	"DynamicIndexBufferHandle"
-	.num   "uint32_t"
-	.flags "uint16_t"
+	"DynamicIndexBufferHandle" --- Dynamic index buffer handle.
+	.num   "uint32_t"          --- Number of indices.
+	.flags "uint16_t"          --- Buffer creation flags.
+	                           ---   - `BGFX_BUFFER_NONE` - No flags.
+	                           ---   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.
+	                           ---   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer
+	                           ---       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.
+	                           ---   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.
+	                           ---   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of
+	                           ---       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+	                           ---       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+	                           ---       buffers.
+	                           ---   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
+	                           ---       index buffers.
 
+--- Create dynamic index buffer and initialized it.
 func.createDynamicIndexBuffer { cname = "create_dynamic_index_buffer_mem" }
-	"DynamicIndexBufferHandle"
-	.mem   "const Memory*"
-	.flags "uint16_t"
+	"DynamicIndexBufferHandle" --- Dynamic index buffer handle.
+	.mem   "const Memory*"     --- Index buffer data.
+	.flags "uint16_t"          --- Buffer creation flags.
+	                           ---   - `BGFX_BUFFER_NONE` - No flags.
+	                           ---   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.
+	                           ---   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer
+	                           ---       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.
+	                           ---   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.
+	                           ---   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of
+	                           ---       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+	                           ---       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+	                           ---       buffers.
+	                           ---   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
+	                           ---       index buffers.
 
+--- Update dynamic index buffer.
 func.update { cname = "update_dynamic_index_buffer" }
 	"void"
-	.handle     "DynamicIndexBufferHandle"
-	.startIndex "uint32_t"
-	.mem        "const Memory*"
+	.handle     "DynamicIndexBufferHandle" --- Dynamic index buffer handle.
+	.startIndex "uint32_t"                 --- Start index.
+	.mem        "const Memory*"            --- Index buffer data.
 
+--- Destroy dynamic index buffer.
 func.destroy { cname = "destroy_dynamic_index_buffer" }
 	"void"
-	.handle "DynamicIndexBufferHandle"
+	.handle "DynamicIndexBufferHandle" --- Dynamic index buffer handle.
 
+--- Create empty dynamic vertex buffer.
 func.createDynamicVertexBuffer
-	"DynamicVertexBufferHandle"
-	.num   "uint32_t"
-	.decl  "const VertexDecl &"
-	.flags "uint16_t"
+	"DynamicVertexBufferHandle" --- Dynamic vertex buffer handle.
+	.num   "uint32_t"           --- Number of vertices.
+	.decl  "const VertexDecl&"  --- Vertex declaration.
+	.flags "uint16_t"           --- Buffer creation flags.
+	                            ---   - `BGFX_BUFFER_NONE` - No flags.
+	                            ---   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.
+	                            ---   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer
+	                            ---       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.
+	                            ---   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.
+	                            ---   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of
+	                            ---       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+	                            ---       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+	                            ---       buffers.
+	                            ---   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
+	                            ---       index buffers.
 
+--- Create dynamic vertex buffer and initialize it.
 func.createDynamicVertexBuffer { cname = "create_dynamic_vertex_buffer_mem" }
-	"DynamicVertexBufferHandle"
-	.mem   "const Memory*"
-	.decl  "const VertexDecl &"
-	.flags "uint16_t"
+	"DynamicVertexBufferHandle" --- Dynamic vertex buffer handle.
+	.mem   "const Memory*"      --- Vertex buffer data.
+	.decl  "const VertexDecl&"  --- Vertex declaration.
+	.flags "uint16_t"           --- Buffer creation flags.
+	                            ---   - `BGFX_BUFFER_NONE` - No flags.
+	                            ---   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.
+	                            ---   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer
+	                            ---       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.
+	                            ---   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.
+	                            ---   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of
+	                            ---       data is passed. If this flag is not specified, and more data is passed on update, the buffer
+	                            ---       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic
+	                            ---       buffers.
+	                            ---   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
+	                            ---       index buffers.
 
+--- Update dynamic vertex buffer.
 func.update { cname = "update_dynamic_vertex_buffer" }
 	"void"
-	.handle      "DynamicVertexBufferHandle"
-	.startVertex "uint32_t"
-	.mem         "const Memory*"
+	.handle      "DynamicVertexBufferHandle" --- Dynamic vertex buffer handle.
+	.startVertex "uint32_t"                  --- Start vertex.
+	.mem         "const Memory*"             --- Vertex buffer data.
 
+--- Destroy dynamic vertex buffer.
 func.destroy { cname = "destroy_dynamic_vertex_buffer" }
 	"void"
-	.handle "DynamicVertexBufferHandle"
+	.handle "DynamicVertexBufferHandle" --- Dynamic vertex buffer handle.
 
+--- Returns number of requested or maximum available indices.
 func.getAvailTransientIndexBuffer
-	"uint32_t"
-	.num "uint32_t"
+	"uint32_t"      --- Number of requested or maximum available indices.
+	.num "uint32_t" --- Number of required indices.
 
+--- Returns number of requested or maximum available vertices.
 func.getAvailTransientVertexBuffer
-	"uint32_t"
-	.num "uint32_t"
-	.decl  "const VertexDecl &"
+	"uint32_t"                  --- Number of requested or maximum available vertices.
+	.num "uint32_t"             --- Number of required vertices.
+	.decl  "const VertexDecl &" --- Vertex declaration.
 
 func.getAvailInstanceDataBuffer
 	"uint32_t"
