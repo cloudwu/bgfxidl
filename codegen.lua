@@ -479,7 +479,7 @@ local function doxygen_funcret(r, func, prefix)
 	else
 		r[#r+1] = string.format("%s @returns %s", prefix, func.ret.comment[1])
 		for i = 2,#func.ret.comment do
-			r[#r+1] = string.format("%s  %s", func.ret.comment[i])
+			r[#r+1] = string.format("%s  %s", prefix, func.ret.comment[i])
 		end
 	end
 	return r
