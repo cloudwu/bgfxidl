@@ -702,7 +702,10 @@ function codegen.gen_struct_define(struct, methods)
 	end
 	if methods then
 		for _, m in ipairs(methods) do
-			for line in m:gmatch "[^\n]*" do
+			if m:sub(-1) ~= "\n" then
+				m = m .. "\n"
+			end
+			for line in m:gmatch "(.-)\n" do
 				ctor[#ctor+1] = line
 			end
 			ctor[#ctor+1] = ""
