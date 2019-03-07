@@ -1385,35 +1385,72 @@ func["end"] { cname = "encoder_end" }
 	"void"
 	.encoder "Encoder*" --- Encoder.
 
+--- Sets a debug marker. This allows you to group graphics calls together for easy browsing in
+--- graphics debugging tools.
 func.Encoder.setMarker
 	"void"
-	.marker "const char*"
+	.marker "const char*" --- Marker string.
 
+--- Set render states for draw primitive.
+---
+--- @remarks
+---   1. To setup more complex states use:
+---      `BGFX_STATE_ALPHA_REF(_ref)`,
+---      `BGFX_STATE_POINT_SIZE(_size)`,
+---      `BGFX_STATE_BLEND_FUNC(_src, _dst)`,
+---      `BGFX_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA)`,
+---      `BGFX_STATE_BLEND_EQUATION(_equation)`,
+---      `BGFX_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, _equationA)`
+---   2. `BGFX_STATE_BLEND_EQUATION_ADD` is set when no other blend
+---      equation is specified.
+---
 func.Encoder.setState
 	"void"
-	.state "uint64_t"
-	.rgba  "uint32_t"
+	.state "uint64_t" --- State flags. Default state for primitive type is
+	                  ---   triangles. See: `BGFX_STATE_DEFAULT`.
+	                  ---   - `BGFX_STATE_DEPTH_TEST_*` - Depth test function.
+	                  ---   - `BGFX_STATE_BLEND_*` - See remark 1 about BGFX_STATE_BLEND_FUNC.
+	                  ---   - `BGFX_STATE_BLEND_EQUATION_*` - See remark 2.
+	                  ---   - `BGFX_STATE_CULL_*` - Backface culling mode.
+	                  ---   - `BGFX_STATE_WRITE_*` - Enable R, G, B, A or Z write.
+	                  ---   - `BGFX_STATE_MSAA` - Enable hardware multisample antialiasing.
+	                  ---   - `BGFX_STATE_PT_[TRISTRIP/LINES/POINTS]` - Primitive type.
+	.rgba  "uint32_t" --- Sets blend factor used by `BGFX_STATE_BLEND_FACTOR` and
+	                  ---   `BGFX_STATE_BLEND_INV_FACTOR` blend modes.
 
+--- Set condition for rendering.
 func.Encoder.setCondition
 	"void"
-	.handle  "OcclusionQueryHandle"
-	.visible "bool"
+	.handle  "OcclusionQueryHandle" --- Occlusion query handle.
+	.visible "bool"                 --- Render if occlusion query is visible.
 
+--- Set stencil test state.
 func.Encoder.setStencil
 	"void"
-	.fstencil "uint32_t"
-	.bstencil "uint32_t"
+	.fstencil "uint32_t" --- Front stencil state.
+	.bstencil "uint32_t" --- Back stencil state. If back is set to `BGFX_STENCIL_NONE`
+	                     --- _fstencil is applied to both front and back facing primitives.
 
+--- Set scissor for draw primitive.
+---
+--- @remark
+---   To scissor for all primitives in view see `bgfx::setViewScissor`.
+---
 func.Encoder.setScissor
-	"uint16_t"
-	.x      "uint16_t"
-	.y      "uint16_t"
-	.width  "uint16_t"
-	.height "uint16_t"
+	"uint16_t"         --- Scissor cache index.
+	.x      "uint16_t" --- Position x from the left corner of the window.
+	.y      "uint16_t" --- Position y from the top corner of the window.
+	.width  "uint16_t" --- Width of view scissor region.
+	.height "uint16_t" --- Height of view scissor region.
 
+--- Set scissor from cache for draw primitive.
+---
+--- @remark
+---   To scissor for all primitives in view see `bgfx::setViewScissor`.
+---
 func.Encoder.setScissor { cname = "set_scissor_cached" }
 	"void"
-	.cache "uint16_t"
+	.cache "uint16_t" --- Index in scissor cache.
 
 func.Encoder.setTransform
 	"uint32_t"
@@ -1664,16 +1701,26 @@ func.setStencil
 	.fstencil "uint32_t"
 	.bstencil "uint32_t"
 
+--- Set scissor for draw primitive.
+---
+--- @remark
+---   To scissor for all primitives in view see `bgfx::setViewScissor`.
+---
 func.setScissor
-	"uint16_t"
-	.x      "uint16_t"
-	.y      "uint16_t"
-	.width  "uint16_t"
-	.height "uint16_t"
+	"uint16_t"         --- Scissor cache index.
+	.x      "uint16_t" --- Position x from the left corner of the window.
+	.y      "uint16_t" --- Position y from the top corner of the window.
+	.width  "uint16_t" --- Width of view scissor region.
+	.height "uint16_t" --- Height of view scissor region.
 
+--- Set scissor from cache for draw primitive.
+---
+--- @remark
+---   To scissor for all primitives in view see `bgfx::setViewScissor`.
+---
 func.setScissor { cname = "set_scissor_cached" }
 	"void"
-	.cache "uint16_t"
+	.cache "uint16_t" --- Index in scissor cache.
 
 func.setTransform
 	"uint32_t"
