@@ -3,6 +3,12 @@
 
 local idl = {}
 
+local comments = {}
+
+function idl.comment(c)
+	comments[#comments+1] = c
+end
+
 local all_types = {}
 
 local function copy_attribs(to, from)
@@ -28,6 +34,10 @@ end
 
 local function new_type(typename)
 	local t = { name = typename }
+	if #comments > 0 then
+		t.comments = comments
+		comments = {}
+	end
 	all_types[#all_types+1] = t
 	return t
 end
@@ -169,6 +179,10 @@ end
 local function func(sets)
 	return function (_, funcname)
 		local f = { name = funcname , args = {} }
+		if #comments > 0 then
+			f.comments = comments
+			comments = {}
+		end
 		sets[#sets+1] = f
 		local args
 		local function args_desc(_, args_name)
@@ -220,34 +234,6 @@ idl.UINT16_MAX = "UINT16_MAX"
 idl.INT32_MAX = "INT32_MAX"
 idl.UINT32_MAX = "UINT32_MAX"
 idl.UINT8_MAX = "UINT8_MAX"
-
-local all_comments = {}
-idl.comments = all_comments
-
-local function comment(_, what)
-	local comments = all_comments[what]
-	if comments == nil then
-		comments = {}
-		all_comments[what] = comments
-	end
-
-	return function(cname, comment)
-		if comment == nil then
-			assert(type(cname) == "string" , "Doxygen comment should be a string")
-			comments[#comments + 1] = cname
-		else
-			local c = comments[cname]
-			if c == nil then
-				c = {}
-				comments[cname] = c
-			end
-			assert(type(comment) == "string" , "Doxygen comment should be a string")
-			c[#c + 1] = comment
-		end
-	end
-end
-
-idl.comment = setmetatable({} , { __index = comment })
 
 return setmetatable(idl , { __index = function (_, keyword)
 	error (tostring(keyword) .. " is invalid")

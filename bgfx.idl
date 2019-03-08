@@ -572,7 +572,8 @@ func.VertexDecl.skip
 	.num "uint8_t"
 
 -- Notice: `end` is a keyword in lua.
-func.VertexDecl["end"] { comment = "End VertexDecl." }
+--- End VertexDecl.
+func.VertexDecl["end"]
 	"void"
 
 --- Returns relative attribute offset from the vertex.

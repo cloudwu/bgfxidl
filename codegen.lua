@@ -537,8 +537,8 @@ function codegen.doxygen_type(doxygen, cname, func)
 			end
 			result[#result+1] = string.format("/// @attention C99 equivalent are %s.", table.concat(names, ","))
 		end
-		result[#result+1] = "///"
 	end
+	result[#result+1] = "///"
 	return table.concat(result, "\n")
 end
 

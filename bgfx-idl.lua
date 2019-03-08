@@ -95,11 +95,7 @@ BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS)
 end)
 
 local function cppdecl(func)
-	local doc_key = func.name
-	if func.class then
-		doc_key = func.class .. "." .. doc_key
-	end
-	local doc = idl.comments[doc_key]
+	local doc = func.comments
 	if not doc and func.comment then
 		doc = { func.comment }
 	end
@@ -139,7 +135,7 @@ local typegen = {}
 
 local function add_doxygen(typedef, define, cstyle, cname)
 		local func = cstyle and codegen.doxygen_ctype or codegen.doxygen_type
-		local doc = func(idl.comments[typedef.name], cname or typedef.cname)
+		local doc = func(typedef.comments, cname or typedef.cname)
 		if doc then
 			return doc .. "\n" .. define
 		else
