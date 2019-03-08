@@ -1856,24 +1856,51 @@ func.overrideInternal { cname = "override_internal_texture" }
 
 -- Legacy API:
 
+--- Sets a debug marker. This allows you to group graphics calls together for easy browsing in
+--- graphics debugging tools.
 func.setMarker
 	"void"
-	.marker "const char*"
+	.marker "const char*" --- Marker string.
 
+--- Set render states for draw primitive.
+---
+--- @remarks
+---   1. To setup more complex states use:
+---      `BGFX_STATE_ALPHA_REF(_ref)`,
+---      `BGFX_STATE_POINT_SIZE(_size)`,
+---      `BGFX_STATE_BLEND_FUNC(_src, _dst)`,
+---      `BGFX_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA)`,
+---      `BGFX_STATE_BLEND_EQUATION(_equation)`,
+---      `BGFX_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, _equationA)`
+---   2. `BGFX_STATE_BLEND_EQUATION_ADD` is set when no other blend
+---      equation is specified.
+---
 func.setState
 	"void"
-	.state "uint64_t"
-	.rgba  "uint32_t"
+	.state "uint64_t" --- State flags. Default state for primitive type is
+	                  ---   triangles. See: `BGFX_STATE_DEFAULT`.
+	                  ---   - `BGFX_STATE_DEPTH_TEST_*` - Depth test function.
+	                  ---   - `BGFX_STATE_BLEND_*` - See remark 1 about BGFX_STATE_BLEND_FUNC.
+	                  ---   - `BGFX_STATE_BLEND_EQUATION_*` - See remark 2.
+	                  ---   - `BGFX_STATE_CULL_*` - Backface culling mode.
+	                  ---   - `BGFX_STATE_WRITE_*` - Enable R, G, B, A or Z write.
+	                  ---   - `BGFX_STATE_MSAA` - Enable hardware multisample antialiasing.
+	                  ---   - `BGFX_STATE_PT_[TRISTRIP/LINES/POINTS]` - Primitive type.
+	.rgba  "uint32_t" --- Sets blend factor used by `BGFX_STATE_BLEND_FACTOR` and
+	                  ---   `BGFX_STATE_BLEND_INV_FACTOR` blend modes.
 
+--- Set condition for rendering.
 func.setCondition
 	"void"
-	.handle  "OcclusionQueryHandle"
-	.visible "bool"
+	.handle  "OcclusionQueryHandle" --- Occlusion query handle.
+	.visible "bool"                 --- Render if occlusion query is visible.
 
+--- Set stencil test state.
 func.setStencil
 	"void"
-	.fstencil "uint32_t"
-	.bstencil "uint32_t"
+	.fstencil "uint32_t" --- Front stencil state.
+	.bstencil "uint32_t" --- Back stencil state. If back is set to `BGFX_STENCIL_NONE`
+	                     --- _fstencil is applied to both front and back facing primitives.
 
 --- Set scissor for draw primitive.
 ---
@@ -1896,198 +1923,339 @@ func.setScissor { cname = "set_scissor_cached" }
 	"void"
 	.cache "uint16_t" --- Index in scissor cache.
 
+--- Set model matrix for draw primitive. If it is not called,
+--- the model will be rendered with an identity model matrix.
 func.setTransform
-	"uint32_t"
-	.mtx "const void*"
-	.num "uint16_t"
+	"uint32_t"         --- Index into matrix cache in case the same model matrix has
+	                   --- to be used for other draw primitive call.
+	.mtx "const void*" --- Pointer to first matrix in array.
+	.num "uint16_t"    --- Number of matrices in array.
 
+---  Set model matrix from matrix cache for draw primitive.
 func.setTransform { cname = "set_transform_cached" }
 	"void"
-	.cache "uint32_t"
-	.num   "uint16_t"
+	.cache "uint32_t" --- Index in matrix cache.
+	.num   "uint16_t" --- Number of matrices from cache.
 
+--- Reserve matrices in internal matrix cache.
+---
+--- @attention Pointer returned can be modifed until `bgfx::frame` is called.
+---
 func.allocTransform
-	"uint32_t"
-	.transform "Transform*" { out }
-	.num       "uint16_t"
+	"uint32_t"                      --- Index in matrix cache.
+	.transform "Transform*" { out } --- Pointer to `Transform` structure.
+	.num       "uint16_t"           --- Number of matrices.
 
+--- Set shader uniform parameter for draw primitive.
 func.setUniform
 	"void"
-	.handle "UniformHandle"
-	.value  "const void*"
-	.num    "uint16_t"
+	.handle "UniformHandle" --- Uniform.
+	.value  "const void*"   --- Pointer to uniform data.
+	.num    "uint16_t"      --- Number of elements. Passing `UINT16_MAX` will
+	                        --- use the _num passed on uniform creation.
 
+--- Set index buffer for draw primitive.
+func.setIndexBuffer { cpponly }
+	"void"
+	.handle     "IndexBufferHandle" --- Index buffer.
+
+--- Set index buffer for draw primitive.
 func.setIndexBuffer
 	"void"
-	.handle     "IndexBufferHandle"
-	.firstIndex "uint32_t"
-	.numIndices "uint32_t"
+	.handle     "IndexBufferHandle" --- Index buffer.
+	.firstIndex "uint32_t"          --- First index to render.
+	.numIndices "uint32_t"          --- Number of indices to render.
 
+--- Set index buffer for draw primitive.
+func.setIndexBuffer { cpponly }
+	"void"
+	.handle     "DynamicIndexBufferHandle" --- Dynamic index buffer.
+
+--- Set index buffer for draw primitive.
 func.setIndexBuffer { cname = "set_dynamic_index_buffer" }
 	"void"
-	.handle     "DynamicIndexBufferHandle"
-	.firstIndex "uint32_t"
-	.numIndices "uint32_t"
+	.handle     "DynamicIndexBufferHandle" --- Dynamic index buffer.
+	.firstIndex "uint32_t"                 --- First index to render.
+	.numIndices "uint32_t"                 --- Number of indices to render.
 
+--- Set index buffer for draw primitive.
+func.setIndexBuffer { cpponly }
+	"void"
+	.tib        "const TransientIndexBuffer*" --- Transient index buffer.
+
+--- Set index buffer for draw primitive.
 func.setIndexBuffer { cname = "set_transient_index_buffer" }
 	"void"
-	.tib        "const TransientIndexBuffer*"
-	.firstIndex "uint32_t"
-	.numIndices "uint32_t"
+	.tib        "const TransientIndexBuffer*" --- Transient index buffer.
+	.firstIndex "uint32_t"                    --- First index to render.
+	.numIndices "uint32_t"                    --- Number of indices to render.
 
+--- Set vertex buffer for draw primitive.
+func.setVertexBuffer { cpponly }
+	"void"
+	.stream      "uint8_t"            --- Vertex stream.
+	.handle      "VertexBufferHandle" --- Vertex buffer.
+
+--- Set vertex buffer for draw primitive.
 func.setVertexBuffer
 	"void"
-	.stream      "uint8_t"
-	.handle      "VertexBufferHandle"
-	.startVertex "uint32_t"
-	.numVertices "uint32_t"
+	.stream      "uint8_t"            --- Vertex stream.
+	.handle      "VertexBufferHandle" --- Vertex buffer.
+	.startVertex "uint32_t"           --- First vertex to render.
+	.numVertices "uint32_t"           --- Number of vertices to render.
 
+--- Set vertex buffer for draw primitive.
+func.setVertexBuffer { cpponly }
+	"void"
+	.stream      "uint8_t"                   --- Vertex stream.
+	.handle      "DynamicVertexBufferHandle" --- Dynamic vertex buffer.
+
+--- Set vertex buffer for draw primitive.
 func.setVertexBuffer { cname = "set_dynamic_vertex_buffer" }
 	"void"
-	.stream      "uint8_t"
-	.handle      "DynamicVertexBufferHandle"
-	.startVertex "uint32_t"
-	.numVertices "uint32_t"
+	.stream      "uint8_t"                   --- Vertex stream.
+	.handle      "DynamicVertexBufferHandle" --- Dynamic vertex buffer.
+	.startVertex "uint32_t"                  --- First vertex to render.
+	.numVertices "uint32_t"                  --- Number of vertices to render.
 
+--- Set vertex buffer for draw primitive.
+func.setVertexBuffer { cpponly }
+	"void"
+	.stream      "uint8_t"                      --- Vertex stream.
+	.tvb         "const TransientVertexBuffer*" --- Transient vertex buffer.
+
+--- Set vertex buffer for draw primitive.
 func.setVertexBuffer { cname = "set_transient_vertex_buffer" }
 	"void"
-	.stream      "uint8_t"
-	.tvb         "const TransientVertexBuffer*"
-	.startVertex "uint32_t"
-	.numVertices "uint32_t"
+	.stream      "uint8_t"                      --- Vertex stream.
+	.tvb         "const TransientVertexBuffer*" --- Transient vertex buffer.
+	.startVertex "uint32_t"                     --- First vertex to render.
+	.numVertices "uint32_t"                     --- Number of vertices to render.
 
+--- Set number of vertices for auto generated vertices use in conjuction
+--- with gl_VertexID.
+---
+--- @attention Availability depends on: `BGFX_CAPS_VERTEX_ID`.
+---
 func.setVertexCount
 	"void"
-	.numVertices "uint32_t"
+	.numVertices "uint32_t" --- Number of vertices.
 
+--- Set instance data buffer for draw primitive.
+func.setInstanceDataBuffer { cpponly }
+	"void"
+	.idb   "const InstanceDataBuffer*" --- Transient instance data buffer.
+
+--- Set instance data buffer for draw primitive.
 func.setInstanceDataBuffer
 	"void"
-	.idb   "const InstanceDataBuffer*"
-	.start "uint32_t"
-	.num   "uint32_t"
+	.idb   "const InstanceDataBuffer*" --- Transient instance data buffer.
+	.start "uint32_t"                  --- First instance data.
+	.num   "uint32_t"                  --- Number of data instances.
 
+--- Set instance data buffer for draw primitive.
+func.setInstanceDataBuffer { cpponly }
+	"void"
+	.handle      "VertexBufferHandle" --- Vertex buffer.
+
+--- Set instance data buffer for draw primitive.
 func.setInstanceDataBuffer { cname = "set_instance_data_from_vertex_buffer" }
 	"void"
-	.handle      "VertexBufferHandle"
-	.startVertex "uint32_t"
-	.num         "uint32_t"
+	.handle      "VertexBufferHandle" --- Vertex buffer.
+	.startVertex "uint32_t"           --- First instance data.
+	.num         "uint32_t"           --- Number of data instances.
 
+ --- Set instance data buffer for draw primitive.
+func.setInstanceDataBuffer { cpponly }
+	"void"
+	.handle      "DynamicVertexBufferHandle" --- Dynamic vertex buffer.
+
+--- Set instance data buffer for draw primitive.
 func.setInstanceDataBuffer { cname = "set_instance_data_from_dynamic_vertex_buffer" }
 	"void"
-	.handle      "DynamicVertexBufferHandle"
-	.startVertex "uint32_t"
-	.num         "uint32_t"
+	.handle      "DynamicVertexBufferHandle" --- Dynamic vertex buffer.
+	.startVertex "uint32_t"                  --- First instance data.
+	.num         "uint32_t"                  --- Number of data instances.
 
+--- Set number of instances for auto generated instances use in conjuction
+--- with gl_InstanceID.
+---
+--- @attention Availability depends on: `BGFX_CAPS_VERTEX_ID`.
+---
 func.setInstanceCount
 	"void"
-	.numInstances "uint32_t"
+	.numInstances "uint32_t" -- Number of instances.
 
+--- Set texture stage for draw primitive.
 func.setTexture
 	"void"
-	.stage   "uint8_t"
-	.sampler "UniformHandle"
-	.handle  "TextureHandle"
-	.flags   "uint32_t"
+	.stage   "uint8_t"       --- Texture unit.
+	.sampler "UniformHandle" --- Program sampler.
+	.handle  "TextureHandle" --- Texture handle.
+	.flags   "uint32_t"      --- Texture sampling mode. Default value UINT32_MAX uses
+	                         ---   texture sampling settings from the texture.
+	                         ---   - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
+	                         ---     mode.
+	                         ---   - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
+	                         ---     sampling.
 
+--- Submit an empty primitive for rendering. Uniforms and draw state
+--- will be applied but no geometry will be submitted.
+---
+--- @remark
+---   These empty draw calls will sort before ordinary draw calls.
+---
 func.touch
 	"void"
-	.id "ViewId"
+	.id "ViewId" --- View id.
 
+--- Submit primitive for rendering.
 func.submit
 	"void"
-	.id            "ViewId"
-	.program       "ProgramHandle"
-	.depth         "uint32_t"
-	.preserveState "bool"
+	.id            "ViewId"        --- View id.
+	.program       "ProgramHandle" --- Program.
+	.depth         "uint32_t"      --- Depth for sorting.
+	.preserveState "bool"          --- Preserve internal draw state for next draw call submit.
 
+--- Submit primitive with occlusion query for rendering.
 func.submit { cname = "submit_occlusion_query" }
 	"void"
-	.id             "ViewId"
-	.program        "ProgramHandle"
-	.occlusionQuery "OcclusionQueryHandle"
-	.depth          "uint32_t"
-	.preserveState  "bool"
+	.id             "ViewId"               --- View id.
+	.program        "ProgramHandle"        --- Program.
+	.occlusionQuery "OcclusionQueryHandle" --- Occlusion query.
+	.depth          "uint32_t"             --- Depth for sorting.
+	.preserveState  "bool"                 --- Preserve internal draw state for next draw call submit.
 
+--- Submit primitive for rendering with index and instance data info from
+--- indirect buffer.
 func.submit { cname = "submit_indirect" }
 	"void"
-	.id             "ViewId"
-	.program        "ProgramHandle"
-	.indirectHandle "IndirectBufferHandle"
-	.start          "uint16_t"
-	.num            "uint16_t"
-	.depth          "uint32_t"
-	.preserveState  "bool"
+	.id             "ViewId"               --- View id.
+	.program        "ProgramHandle"        --- Program.
+	.indirectHandle "IndirectBufferHandle" --- Indirect buffer.
+	.start          "uint16_t"             --- First element in indirect buffer.
+	.num            "uint16_t"             --- Number of dispatches.
+	.depth          "uint32_t"             --- Depth for sorting.
+	.preserveState  "bool"                 --- Preserve internal draw state for next draw call submit.
 
+--- Set compute index buffer.
 func.setBuffer { cname = "set_compute_index_buffer" }
 	"void"
-	.stage  "uint8_t"
-	.handle "IndexBufferHandle"
-	.access "Access::Enum"
+	.stage  "uint8_t"           --- Compute stage.
+	.handle "IndexBufferHandle" --- Index buffer handle.
+	.access "Access::Enum"      --- Buffer access. See `Access::Enum`.
 
+--- Set compute vertex buffer.
 func.setBuffer { cname = "set_compute_vertex_buffer" }
 	"void"
-	.stage  "uint8_t"
-	.handle "VertexBufferHandle"
-	.access "Access::Enum"
+	.stage  "uint8_t"            --- Compute stage.
+	.handle "VertexBufferHandle" --- Vertex buffer handle.
+	.access "Access::Enum"       --- Buffer access. See `Access::Enum`.
 
+--- Set compute dynamic index buffer.
 func.setBuffer { cname = "set_compute_dynamic_index_buffer" }
 	"void"
-	.stage  "uint8_t"
-	.handle "DynamicIndexBufferHandle"
-	.access "Access::Enum"
+	.stage  "uint8_t"                  --- Compute stage.
+	.handle "DynamicIndexBufferHandle" --- Dynamic index buffer handle.
+	.access "Access::Enum"             --- Buffer access. See `Access::Enum`.
 
+--- Set compute dynamic vertex buffer.
 func.setBuffer { cname = "set_compute_dynamic_vertex_buffer" }
 	"void"
-	.stage  "uint8_t"
-	.handle "DynamicVertexBufferHandle"
-	.access "Access::Enum"
+	.stage  "uint8_t"                   --- Compute stage.
+	.handle "DynamicVertexBufferHandle" --- Dynamic vertex buffer handle.
+	.access "Access::Enum"              --- Buffer access. See `Access::Enum`.
 
+--- Set compute indirect buffer.
 func.setBuffer { cname = "set_compute_indirect_buffer" }
 	"void"
-	.stage  "uint8_t"
-	.handle "IndirectBufferHandle"
-	.access "Access::Enum"
+	.stage  "uint8_t"              --- Compute stage.
+	.handle "IndirectBufferHandle" --- Indirect buffer handle.
+	.access "Access::Enum"         --- Buffer access. See `Access::Enum`.
 
+--- Set compute image from texture.
 func.setImage
 	"void"
-	.stage  "uint8_t"
-	.handle "TextureHandle"
-	.mip    "uint8_t"
-	.access "Access::Enum"
-	.format "TextureFormat::Enum"
+	.stage  "uint8_t"       --- Compute stage.
+	.handle "TextureHandle" --- Texture handle.
+	.mip    "uint8_t"       --- Mip level.
+	.access "Access::Enum"  --- Image access. See `Access::Enum`.
+	.format "TextureFormat::Enum" { default = "TextureFormat::Count" } --- Texture format. See: `TextureFormat::Enum`.
 
+--- Dispatch compute.
 func.dispatch
 	"void"
-	.id      "ViewId"
-	.program "ProgramHandle"
-	.numX    "uint32_t"
-	.numY    "uint32_t"
-	.numZ    "uint32_t"
+	.id      "ViewId"        --- View id.
+	.program "ProgramHandle" --- Compute program.
+	.numX    "uint32_t"      --- Number of groups X.
+	.numY    "uint32_t"      --- Number of groups Y.
+	.numZ    "uint32_t"      --- Number of groups Z.
 
+--- Dispatch compute indirect.
 func.dispatch { cname = "dispatch_indirect" }
 	"void"
-	.id             "ViewId"
-	.program        "ProgramHandle"
-	.indirectHandle "IndirectBufferHandle"
-	.start          "uint16_t"
-	.num            "uint16_t"
+	.id             "ViewId"               --- View id.
+	.program        "ProgramHandle"        --- Compute program.
+	.indirectHandle "IndirectBufferHandle" --- Indirect buffer.
+	.start          "uint16_t"             --- First element in indirect buffer.
+	.num            "uint16_t"             --- Number of dispatches.
 
+--- Discard all previously set state for draw or compute call.
 func.discard
 	"void"
 
+--- Blit 2D texture region between two 2D textures.
+---
+--- @attention Destination texture must be created with `BGFX_TEXTURE_BLIT_DST` flag.
+--- @attention Availability depends on: `BGFX_CAPS_TEXTURE_BLIT`.
+---
+func.blit { cpponly }
+	"void"
+	.id     "ViewId"        --- View id.
+	.dst    "TextureHandle" --- Destination texture handle.
+	.dstX   "uint16_t"      --- Destination texture X position.
+	.dstY   "uint16_t"      --- Destination texture Y position.
+	.src    "TextureHandle" --- Source texture handle.
+	 { default = 0 }
+	.srcX   "uint16_t"      --- Source texture X position.
+	 { default = 0 }
+	.srcY   "uint16_t"      --- Source texture Y position.
+	 { default = 0 }
+	.width  "uint16_t"      --- Width of region.
+	 { default = UINT16_MAX }
+	.height "uint16_t"      --- Height of region.
+	 { default = UINT16_MAX }
+
+--- Blit 2D texture region between two 2D textures.
+---
+--- @attention Destination texture must be created with `BGFX_TEXTURE_BLIT_DST` flag.
+--- @attention Availability depends on: `BGFX_CAPS_TEXTURE_BLIT`.
+---
 func.blit
 	"void"
-	.id     "ViewId"
-	.dst    "TextureHandle"
-	.dstMip "uint8_t"
-	.dstX   "uint16_t"
-	.dstY   "uint16_t"
-	.dstZ   "uint16_t"
-	.src    "TextureHandle"
-	.srcMip "uint8_t"      { default = 0 }
-	.srcX   "uint16_t"     { default = 0 }
-	.srcY   "uint16_t"     { default = 0 }
-	.srcZ   "uint16_t"     { default = 0 }
-	.width  "uint16_t"     { default = UINT16_MAX }
-	.height "uint16_t"     { default = UINT16_MAX }
-	.depth  "uint16_t"     { default = UINT16_MAX }
+	.id     "ViewId"        --- View id.
+	.dst    "TextureHandle" --- Destination texture handle.
+	.dstMip "uint8_t"       --- Destination texture mip level.
+	.dstX   "uint16_t"      --- Destination texture X position.
+	.dstY   "uint16_t"      --- Destination texture Y position.
+	.dstZ   "uint16_t"      --- If texture is 2D this argument should be 0. If destination texture is cube
+	                        --- this argument represents destination texture cube face. For 3D texture this argument
+	                        --- represents destination texture Z position.
+	.src    "TextureHandle" --- Source texture handle.
+	.srcMip "uint8_t"       --- Source texture mip level.
+	 { default = 0 }
+	.srcX   "uint16_t"      --- Source texture X position.
+	 { default = 0 }
+	.srcY   "uint16_t"      --- Source texture Y position.
+	 { default = 0 }
+	.srcZ   "uint16_t"      --- If texture is 2D this argument should be 0. If source texture is cube
+	                        --- this argument represents source texture cube face. For 3D texture this argument
+	                        --- represents source texture Z position.
+	 { default = 0 }
+	.width  "uint16_t"      --- Width of region.
+	 { default = UINT16_MAX }
+	.height "uint16_t"      --- Height of region.
+	 { default = UINT16_MAX }
+	.depth  "uint16_t"      --- If texture is 3D this argument represents depth of region, otherwise it's
+	                        --- unused.
+	 { default = UINT16_MAX }
