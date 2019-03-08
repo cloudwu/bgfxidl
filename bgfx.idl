@@ -1509,11 +1509,21 @@ func.Encoder.setUniform
 	                        --- use the _num passed on uniform creation.
 
 --- Set index buffer for draw primitive.
+func.Encoder.setIndexBuffer { cpponly }
+	"void"
+	.handle     "IndexBufferHandle" --- Index buffer.
+
+--- Set index buffer for draw primitive.
 func.Encoder.setIndexBuffer
 	"void"
 	.handle     "IndexBufferHandle" --- Index buffer.
 	.firstIndex "uint32_t"          --- First index to render.
 	.numIndices "uint32_t"          --- Number of indices to render.
+
+--- Set index buffer for draw primitive.
+func.Encoder.setIndexBuffer { cpponly }
+	"void"
+	.handle     "DynamicIndexBufferHandle" --- Dynamic index buffer.
 
 --- Set index buffer for draw primitive.
 func.Encoder.setIndexBuffer { cname = "set_dynamic_index_buffer" }
@@ -1523,11 +1533,22 @@ func.Encoder.setIndexBuffer { cname = "set_dynamic_index_buffer" }
 	.numIndices "uint32_t"                 --- Number of indices to render.
 
 --- Set index buffer for draw primitive.
+func.Encoder.setIndexBuffer { cpponly }
+	"void"
+	.tib        "const TransientIndexBuffer*" --- Transient index buffer.
+
+--- Set index buffer for draw primitive.
 func.Encoder.setIndexBuffer { cname = "set_transient_index_buffer" }
 	"void"
 	.tib        "const TransientIndexBuffer*" --- Transient index buffer.
 	.firstIndex "uint32_t"                    --- First index to render.
 	.numIndices "uint32_t"                    --- Number of indices to render.
+
+--- Set vertex buffer for draw primitive.
+func.Encoder.setVertexBuffer { cpponly }
+	"void"
+	.stream      "uint8_t"            --- Vertex stream.
+	.handle      "VertexBufferHandle" --- Vertex buffer.
 
 --- Set vertex buffer for draw primitive.
 func.Encoder.setVertexBuffer
@@ -1538,12 +1559,24 @@ func.Encoder.setVertexBuffer
 	.numVertices "uint32_t"           --- Number of vertices to render.
 
 --- Set vertex buffer for draw primitive.
+func.Encoder.setVertexBuffer { cpponly }
+	"void"
+	.stream      "uint8_t"                   --- Vertex stream.
+	.handle      "DynamicVertexBufferHandle" --- Dynamic vertex buffer.
+
+--- Set vertex buffer for draw primitive.
 func.Encoder.setVertexBuffer { cname = "set_dynamic_vertex_buffer" }
 	"void"
 	.stream      "uint8_t"                   --- Vertex stream.
 	.handle      "DynamicVertexBufferHandle" --- Dynamic vertex buffer.
 	.startVertex "uint32_t"                  --- First vertex to render.
 	.numVertices "uint32_t"                  --- Number of vertices to render.
+
+--- Set vertex buffer for draw primitive.
+func.Encoder.setVertexBuffer { cpponly }
+	"void"
+	.stream      "uint8_t"                      --- Vertex stream.
+	.tvb         "const TransientVertexBuffer*" --- Transient vertex buffer.
 
 --- Set vertex buffer for draw primitive.
 func.Encoder.setVertexBuffer { cname = "set_transient_vertex_buffer" }
@@ -1563,6 +1596,11 @@ func.Encoder.setVertexCount
 	.numVertices "uint32_t" --- Number of vertices.
 
 --- Set instance data buffer for draw primitive.
+func.Encoder.setInstanceDataBuffer { cpponly }
+	"void"
+	.idb   "const InstanceDataBuffer*" --- Transient instance data buffer.
+
+--- Set instance data buffer for draw primitive.
 func.Encoder.setInstanceDataBuffer
 	"void"
 	.idb   "const InstanceDataBuffer*" --- Transient instance data buffer.
@@ -1570,11 +1608,21 @@ func.Encoder.setInstanceDataBuffer
 	.num   "uint32_t"                  --- Number of data instances.
 
 --- Set instance data buffer for draw primitive.
+func.Encoder.setInstanceDataBuffer { cpponly }
+	"void"
+	.handle      "VertexBufferHandle" --- Vertex buffer.
+
+--- Set instance data buffer for draw primitive.
 func.Encoder.setInstanceDataBuffer { cname = "set_instance_data_from_vertex_buffer" }
 	"void"
 	.handle      "VertexBufferHandle" --- Vertex buffer.
 	.startVertex "uint32_t"           --- First instance data.
 	.num         "uint32_t"           --- Number of data instances.
+
+ --- Set instance data buffer for draw primitive.
+func.Encoder.setInstanceDataBuffer { cpponly }
+	"void"
+	.handle      "DynamicVertexBufferHandle" --- Dynamic vertex buffer.
 
 --- Set instance data buffer for draw primitive.
 func.Encoder.setInstanceDataBuffer { cname = "set_instance_data_from_dynamic_vertex_buffer" }
