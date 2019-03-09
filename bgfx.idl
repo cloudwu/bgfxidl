@@ -54,7 +54,6 @@ enum.Access { comment = "Access:" }
 	.Write     [[Write]]
 	.ReadWrite [[Read and write]]
 
-
 --- Vertex attribute enum.
 enum.Attrib { comment = "Corresponds to vertex shader attribute." }
 	.Position  [[a_position]]
@@ -260,11 +259,11 @@ enum.RenderFrame { underscore, comment = "" }
 
 --- Platform data.
 struct.PlatformData { ctor }
-	.ndt          "void*" [[Native display type.]]
-	.nwh          "void*" [[Native window handle.]]
-	.context      "void*" [[GL context, or D3D device.]]
-	.backBuffer   "void*" [[GL backbuffer, or D3D render target view.]]
-	.backBufferDS "void*" [[Backbuffer depth/stencil.]]
+	.ndt          "void*" --- Native display type.
+	.nwh          "void*" --- Native window handle.
+	.context      "void*" --- GL context, or D3D device.
+	.backBuffer   "void*" --- GL backbuffer, or D3D render target view.
+	.backBufferDS "void*" --- Backbuffer depth/stencil.
 
 --- Backbuffer resolution and reset parameters.
 struct.Resolution { ctor }
@@ -321,6 +320,7 @@ struct.GPU  { namespace = "Caps" }
 	.vendorId    "uint16_t"                [[Vendor PCI id. See `BGFX_PCI_ID_*`.]]
 	.deviceId    "uint16_t"                [[Device id.]]
 
+--- Renderer capabilities limits.
 struct.Limits  { namespace = "Caps" }
 	.maxDrawCalls            "uint32_t"    [[Maximum number of draw calls.                       ]]
 	.maxBlits                "uint32_t"    [[Maximum number of blit calls.			     ]]
@@ -1054,41 +1054,50 @@ func.destroy { cname = "destroy_indirect_buffer" }
 	"void"
 	.handle "IndirectBufferHandle"
 
+--- Create shader from memory buffer.
 func.createShader
 	"ShaderHandle"
 	.mem "const Memory*"
 
+--- Returns the number of uniforms and uniform handles used inside a shader.
 func.getShaderUniforms
 	"uint16_t"
 	.handle   "ShaderHandle"
 	.uniforms "UniformHandle*" { out }
 	.max      "uint16_t"
 
+--- Set shader debug name.
 func.setName { cname = "set_shader_name" }
 	"void"
 	.handle "ShaderHandle"
 	.name   "const char*"
 	.len    "int32_t"
 
+--- Destroy shader. Once a shader program is created with _handle,
+--- it is safe to destroy that shader.
 func.destroy { cname = "destroy_shader" }
 	"void"
 	.handle "ShaderHandle"
 
+--- Create program with vertex and fragment shaders.
 func.createProgram
 	"ProgramHandle"
 	.vsh "ShaderHandle"
 	.fsh "ShaderHandle"
 	.destroyShaders "bool"
 
+--- Create program with compute shader.
 func.createProgram { cname = "create_compute_program" }
 	"ProgramHandle"
 	.csh "ShaderHandle"
 	.destroyShaders "bool"
 
+--- Destroy program.
 func.destroy { cname = "destroy_program" }
 	"void"
 	.handle "ProgramHandle"
 
+--- Validate texture parameters.
 func.isTextureValid
 	"bool"
 	.depth     "uint16_t"
@@ -1097,6 +1106,7 @@ func.isTextureValid
 	.format    "TextureFormat::Enum"
 	.flags     "uint64_t"
 
+--- Calculate amount of memory required for texture.
 func.calcTextureSize
 	"void"
 	.info      "TextureInfo &" { out }
@@ -1108,6 +1118,7 @@ func.calcTextureSize
 	.numLayers "uint16_t"
 	.format    "TextureFormat::Enum"
 
+--- Create texture from memory buffer.
 func.createTexture
 	"TextureHandle"
 	.mem   "const Memory*"
@@ -1115,6 +1126,7 @@ func.createTexture
 	.skip  "uint8_t"
 	.info  "TextureInfo*" { out }
 
+--- Create 2D texture.
 func.createTexture2D
 	"TextureHandle"
 	.width     "uint16_t"
@@ -1125,6 +1137,8 @@ func.createTexture2D
 	.flags     "uint64_t"
 	.mem       "const Memory*"
 
+--- Create texture with size based on backbuffer ratio. Texture will maintain ratio
+--- if back buffer resolution changes.
 func.createTexture2D { cname = "create_texture_2d_scaled" }
 	"TextureHandle"
 	.ratio     "BackbufferRatio::Enum"
@@ -1133,6 +1147,7 @@ func.createTexture2D { cname = "create_texture_2d_scaled" }
 	.format    "TextureFormat::Enum"
 	.flags     "uint64_t"
 
+--- Create 3D texture.
 func.createTexture3D
 	"TextureHandle"
 	.width     "uint16_t"
@@ -1143,6 +1158,7 @@ func.createTexture3D
 	.flags     "uint64_t"
 	.mem       "const Memory*"
 
+--- Create Cube texture.
 func.createTextureCube
 	"TextureHandle"
 	.size      "uint16_t"
@@ -1152,6 +1168,7 @@ func.createTextureCube
 	.flags     "uint64_t"
 	.mem       "const Memory*"
 
+--- Update 2D texture.
 func.updateTexture2D
 	"void"
 	.handle "TextureHandle"
@@ -1164,6 +1181,7 @@ func.updateTexture2D
 	.mem    "const Memory*"
 	.pitch  "uint16_t"
 
+--- Update 3D texture.
 func.updateTexture3D
 	"void"
 	.handle "TextureHandle"
@@ -1176,6 +1194,7 @@ func.updateTexture3D
 	.depth  "uint16_t"
 	.mem    "const Memory*"
 
+--- Update Cube texture.
 func.updateTextureCube
 	"void"
 	.handle "TextureHandle"
@@ -1189,26 +1208,31 @@ func.updateTextureCube
 	.mem    "const Memory*"
 	.pitch  "uint16_t"
 
+--- Read back texture content.
 func.readTexture
 	"uint32_t"
 	.handle "TextureHandle"
 	.data   "void*"
 	.mip    "uint8_t"
 
+--- Set texture debug name.
 func.setName { cname = "set_texture_name" }
 	"void"
 	.handle "TextureHandle"
 	.name   "const char*"
 	.len    "int32_t"
 
+--- Returns texture direct access pointer.
 func.getDirectAccessPtr
 	"void*"
 	.handle "TextureHandle"
 
+--- Destroy texture.
 func.destroy { cname = "destroy_texture" }
 	"void"
 	.handle "TextureHandle"
 
+--- Create frame buffer (simple).
 func.createFrameBuffer
 	"FrameBufferHandle"
 	.width        "uint16_t"
@@ -1216,24 +1240,30 @@ func.createFrameBuffer
 	.format       "TextureFormat::Enum"
 	.textureFlags "uint64_t"
 
+--- Create frame buffer with size based on backbuffer ratio. Frame buffer will maintain ratio
+--- if back buffer resolution changes.
 func.createFrameBuffer { cname = "create_frame_buffer_scaled" }
 	"FrameBufferHandle"
 	.ratio        "BackbufferRatio::Enum"
 	.format       "TextureFormat::Enum"
 	.textureFlags "uint64_t"
 
+--- Create MRT frame buffer from texture handles (simple).
 func.createFrameBuffer { cname = "create_frame_buffer_from_handles" }
 	"FrameBufferHandle"
 	.num            "uint8_t"
 	.handles        "const TextureHandle*"
 	.destroyTexture "bool"
 
+--- Create MRT frame buffer from texture handles with specific layer and
+--- mip level.
 func.createFrameBuffer { cname = "create_frame_buffer_from_attachment" }
 	"FrameBufferHandle"
 	.num            "uint8_t"
 	.handles        "const Attachment*"
 	.destroyTexture "bool"
 
+--- Create frame buffer for multiple window rendering.
 func.createFrameBuffer { cname = "create_frame_buffer_from_nwh" }
 	"FrameBufferHandle"
 	.nwh         "void*"
@@ -1242,52 +1272,94 @@ func.createFrameBuffer { cname = "create_frame_buffer_from_nwh" }
 	.format      "TextureFormat::Enum"
 	.depthFormat "TextureFormat::Enum"
 
+--- Set frame buffer debug name.
 func.setName { cname = "set_frame_buffer_name" }
 	"void"
 	.handle "FrameBufferHandle"
 	.name   "const char*"
 	.len    "int32_t"
 
+--- Obtain texture handle of frame buffer attachment.
 func.getTexture
 	"TextureHandle"
 	.handle     "FrameBufferHandle"
 	.attachment "uint8_t"
 
+--- Destroy frame buffer.
 func.destroy { cname = "destroy_frame_buffer" }
 	"void"
 	.handle "FrameBufferHandle"
 
+--- Create shader uniform parameter.
+---
+--- @remarks
+---   1. Uniform names are unique. It's valid to call `bgfx::createUniform`
+---      multiple times with the same uniform name. The library will always
+---      return the same handle, but the handle reference count will be
+---      incremented. This means that the same number of `bgfx::destroyUniform`
+---      must be called to properly destroy the uniform.
+---
+---   2. Predefined uniforms (declared in `bgfx_shader.sh`):
+---      - `u_viewRect vec4(x, y, width, height)` - view rectangle for current
+---        view, in pixels.
+---      - `u_viewTexel vec4(1.0/width, 1.0/height, undef, undef)` - inverse
+---        width and height
+---      - `u_view mat4` - view matrix
+---      - `u_invView mat4` - inverted view matrix
+---      - `u_proj mat4` - projection matrix
+---      - `u_invProj mat4` - inverted projection matrix
+---      - `u_viewProj mat4` - concatenated view projection matrix
+---      - `u_invViewProj mat4` - concatenated inverted view projection matrix
+---      - `u_model mat4[BGFX_CONFIG_MAX_BONES]` - array of model matrices.
+---      - `u_modelView mat4` - concatenated model view matrix, only first
+---        model matrix from array is used.
+---      - `u_modelViewProj mat4` - concatenated model view projection matrix.
+---      - `u_alphaRef float` - alpha reference value for alpha test.
+---
 func.createUniform
 	"UniformHandle"
 	.name "const char*"
 	.type "UniformType::Enum"
 	.num  "uint16_t"
 
+--- Retrieve uniform info.
 func.getUniformInfo
 	"void"
 	.handle "UniformHandle"
 	.info   "UniformInfo &" { out }
 
+--- Destroy shader uniform parameter.
 func.destroy { cname = "destroy_uniform" }
 	"void"
 	.handle "UniformHandle"
 
+--- Create occlusion query.
 func.createOcclusionQuery
-	"OcclusionQueryHandle"
+	"OcclusionQueryHandle" --- Handle to occlusion query object.
 
+--- Retrieve occlusion query result from previous frame.
 func.getResult
-	"OcclusionQueryResult::Enum"
-	.handle "OcclusionQueryHandle"
-	.result "int32_t*" { out }
+	"OcclusionQueryResult::Enum"   --- Occlusion query result.
+	.handle "OcclusionQueryHandle" --- Handle to occlusion query object.
+	.result "int32_t*" { out }     --- Number of pixels that passed test. This argument
+	                               --- can be `NULL` if result of occlusion query is not needed.
 
+--- Destroy occlusion query.
 func.destroy { cname = "destroy_occlusion_query" }
 	"void"
-	.handle "OcclusionQueryHandle"
+	.handle "OcclusionQueryHandle" --- Handle to occlusion query object.
 
+--- Set palette color value.
 func.setPaletteColor
 	"void"
-	.index "uint8_t"
-	.rgba  "const float[4]"
+	.index "uint8_t"        --- Index into palette.
+	.rgba  "const float[4]" --- RGBA floating point values.
+
+--- Set palette color value.
+func.setPaletteColor { cname = "set_palette_color_rgba8" }
+	"void"
+	.index "uint8_t"  --- Index into palette.
+	.rgba  "uint32_t" --- Packed 32-bit RGBA value.
 
 --- Set view name.
 ---
@@ -1345,7 +1417,7 @@ func.setViewClear
 	.stencil "uint8_t"  --- Stencil clear value.
 
 --- Set view clear flags with different clear color for each
---- frame buffer texture. Must use setClearColor to setup clear color
+--- frame buffer texture. Must use `bgfx::setPaletteColor` to setup clear color
 --- palette.
 func.setViewClear { cname = "set_view_clear_mrt" }
 	"void"
