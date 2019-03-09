@@ -1044,96 +1044,124 @@ func.allocInstanceDataBuffer
 	.num    "uint32_t"                    --- Number of instances.
 	.stride "uint16_t"                    --- Instance stride. Must be multiple of 16.
 
+--- Create draw indirect buffer.
 func.createIndirectBuffer
-	"IndirectBufferHandle"
-	.num "uint32_t"
+	"IndirectBufferHandle" --- Indirect buffer handle.
+	.num "uint32_t"        --- Number of indirect calls.
 
+--- Destroy draw indirect buffer.
 func.destroy { cname = "destroy_indirect_buffer" }
 	"void"
-	.handle "IndirectBufferHandle"
+	.handle "IndirectBufferHandle" --- Indirect buffer handle.
 
 --- Create shader from memory buffer.
 func.createShader
-	"ShaderHandle"
-	.mem "const Memory*"
+	"ShaderHandle"       --- Shader handle.
+	.mem "const Memory*" --- Shader binary.
 
 --- Returns the number of uniforms and uniform handles used inside a shader.
+---
+--- @remarks
+---   Only non-predefined uniforms are returned.
+---
 func.getShaderUniforms
-	"uint16_t"
-	.handle   "ShaderHandle"
-	.uniforms "UniformHandle*" { out }
-	.max      "uint16_t"
+	"uint16_t"                         --- Number of uniforms used by shader.
+	.handle   "ShaderHandle"           --- Shader handle.
+	.uniforms "UniformHandle*" { out } --- UniformHandle array where data will be stored.
+	 { default = NULL }
+	.max      "uint16_t"               --- Maximum capacity of array.
+	 { default = 0 }
 
 --- Set shader debug name.
 func.setName { cname = "set_shader_name" }
 	"void"
-	.handle "ShaderHandle"
-	.name   "const char*"
-	.len    "int32_t"
+	.handle "ShaderHandle"   --- Shader handle.
+	.name   "const char*"    --- Shader name.
+	.len    "int32_t"        --- Shader name length (if length is INT32_MAX, it's expected
+	 { default = INT32_MAX } --- that _name is zero terminated string).
 
---- Destroy shader. Once a shader program is created with _handle,
---- it is safe to destroy that shader.
+--- Destroy shader.
+---
+--- @remark Once a shader program is created with _handle,
+---   it is safe to destroy that shader.
+---
 func.destroy { cname = "destroy_shader" }
 	"void"
-	.handle "ShaderHandle"
+	.handle "ShaderHandle" --- Shader handle.
 
 --- Create program with vertex and fragment shaders.
 func.createProgram
-	"ProgramHandle"
-	.vsh "ShaderHandle"
-	.fsh "ShaderHandle"
-	.destroyShaders "bool"
+	"ProgramHandle"        --- Program handle if vertex shader output and fragment shader
+	                       --- input are matching, otherwise returns invalid program handle.
+	.vsh "ShaderHandle"    --- Vertex shader.
+	.fsh "ShaderHandle"    --- Fragment shader.
+	.destroyShaders "bool" --- If true, shaders will be destroyed when program is destroyed.
+	 { default = false }
 
 --- Create program with compute shader.
 func.createProgram { cname = "create_compute_program" }
-	"ProgramHandle"
-	.csh "ShaderHandle"
-	.destroyShaders "bool"
+	"ProgramHandle"        --- Program handle.
+	.csh "ShaderHandle"    --- Compute shader.
+	.destroyShaders "bool" --- If true, shaders will be destroyed when program is destroyed.
+	 { default = false }
 
 --- Destroy program.
 func.destroy { cname = "destroy_program" }
 	"void"
-	.handle "ProgramHandle"
+	.handle "ProgramHandle" --- Program handle.
 
 --- Validate texture parameters.
 func.isTextureValid
-	"bool"
-	.depth     "uint16_t"
-	.cubeMap   "bool"
-	.numLayers "uint16_t"
-	.format    "TextureFormat::Enum"
-	.flags     "uint64_t"
+	"bool"                           --- True if texture can be successfully created.
+	.depth     "uint16_t"            --- Depth dimension of volume texture.
+	.cubeMap   "bool"                --- Indicates that texture contains cubemap.
+	.numLayers "uint16_t"            --- Number of layers in texture array.
+	.format    "TextureFormat::Enum" --- Texture format. See: `TextureFormat::Enum`.
+	.flags     "uint64_t"            --- Texture flags. See `BGFX_TEXTURE_*`.
 
 --- Calculate amount of memory required for texture.
 func.calcTextureSize
 	"void"
-	.info      "TextureInfo &" { out }
-	.width     "uint16_t"
-	.height    "uint16_t"
-	.depth     "uint16_t"
-	.cubeMap   "bool"
-	.hasMips   "bool"
-	.numLayers "uint16_t"
-	.format    "TextureFormat::Enum"
+	.info      "TextureInfo &" { out } --- Resulting texture info structure. See: `TextureInfo`.
+	.width     "uint16_t"              --- Width.
+	.height    "uint16_t"              --- Height.
+	.depth     "uint16_t"              --- Depth dimension of volume texture.
+	.cubeMap   "bool"                  --- Indicates that texture contains cubemap.
+	.hasMips   "bool"                  --- Indicates that texture contains full mip-map chain.
+	.numLayers "uint16_t"              --- Number of layers in texture array.
+	.format    "TextureFormat::Enum"   --- Texture format. See: `TextureFormat::Enum`.
 
 --- Create texture from memory buffer.
 func.createTexture
-	"TextureHandle"
-	.mem   "const Memory*"
-	.flags "uint64_t"
-	.skip  "uint8_t"
-	.info  "TextureInfo*" { out }
+	"TextureHandle"               --- Texture handle.
+	.mem   "const Memory*"        --- DDS, KTX or PVR texture binary data.
+	.flags "uint64_t"             --- Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`)
+	                              --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
+	                              --- - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
+	                              ---   mode.
+	                              --- - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
+	                              ---   sampling.
+	.skip  "uint8_t"              --- Skip top level mips when parsing texture.
+	.info  "TextureInfo*" { out } --- When non-`NULL` is specified it returns parsed texture information.
 
 --- Create 2D texture.
 func.createTexture2D
-	"TextureHandle"
-	.width     "uint16_t"
-	.height    "uint16_t"
-	.hasMips   "bool"
-	.numLayers "uint16_t"
-	.format    "TextureFormat::Enum"
-	.flags     "uint64_t"
-	.mem       "const Memory*"
+	"TextureHandle"                  --- Texture handle.
+	.width     "uint16_t"            --- Width.
+	.height    "uint16_t"            --- Height.
+	.hasMips   "bool"                --- Indicates that texture contains full mip-map chain.
+	.numLayers "uint16_t"            --- Number of layers in texture array. Must be 1 if caps
+	                                 --- `BGFX_CAPS_TEXTURE_2D_ARRAY` flag is not set.
+	.format    "TextureFormat::Enum" --- Texture format. See: `TextureFormat::Enum`.
+	.flags     "uint64_t"            --- Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`)
+	                                 --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
+	                                 --- - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
+	                                 ---   mode.
+	                                 --- - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
+	                                 ---   sampling.
+	.mem       "const Memory*"       --- Texture data. If `_mem` is non-NULL, created texture will be immutable. If
+	                                 --- `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than
+	                                 --- 1, expected memory layout is texture and all mips together for each array element.
 
 --- Create texture with size based on backbuffer ratio. Texture will maintain ratio
 --- if back buffer resolution changes.
