@@ -15,9 +15,8 @@ typedef "uintptr_t"
 typedef "va_list"
 typedef "void"
 
-typedef "InternalData"
 typedef "ViewId"
-typedef "CallbackI" { cname = "callback_interface" }
+typedef "CallbackI"      { cname = "callback_interface" }
 typedef "bx::AllocatorI" { cname = "allocator_interface" }
 
 --- Memory release callback.
@@ -50,39 +49,38 @@ enum.RendererType { comment = "Renderer types:" }
 
 --- Access mode enum.
 enum.Access { comment = "Access:" }
-	.Read      [[Read]]
-	.Write     [[Write]]
-	.ReadWrite [[Read and write]]
-
+	.Read      --- Read.
+	.Write     --- Write.
+	.ReadWrite --- Read and write.
 
 --- Vertex attribute enum.
 enum.Attrib { comment = "Corresponds to vertex shader attribute." }
-	.Position  [[a_position]]
-	.Normal    [[a_normal]]
-	.Tangent   [[a_tangent]]
-	.Bitangent [[a_bitangent]]
-	.Color0    [[a_color0]]
-	.Color1    [[a_color1]]
-	.Color2    [[a_color2]]
-	.Color3    [[a_color3]]
-	.Indices   [[a_indices]]
-	.Weight    [[a_weight]]
-	.TexCoord0 [[a_texcoord0]]
-	.TexCoord1 [[a_texcoord1]]
-	.TexCoord2 [[a_texcoord2]]
-	.TexCoord3 [[a_texcoord3]]
-	.TexCoord4 [[a_texcoord4]]
-	.TexCoord5 [[a_texcoord5]]
-	.TexCoord6 [[a_texcoord6]]
-	.TexCoord7 [[a_texcoord7]]
+	.Position  --- a_position
+	.Normal    --- a_normal
+	.Tangent   --- a_tangent
+	.Bitangent --- a_bitangent
+	.Color0    --- a_color0
+	.Color1    --- a_color1
+	.Color2    --- a_color2
+	.Color3    --- a_color3
+	.Indices   --- a_indices
+	.Weight    --- a_weight
+	.TexCoord0 --- a_texcoord0
+	.TexCoord1 --- a_texcoord1
+	.TexCoord2 --- a_texcoord2
+	.TexCoord3 --- a_texcoord3
+	.TexCoord4 --- a_texcoord4
+	.TexCoord5 --- a_texcoord5
+	.TexCoord6 --- a_texcoord6
+	.TexCoord7 --- a_texcoord7
 
 --- Vertex attribute type enum.
 enum.AttribType { comment = "Attribute types:" }
-	.Uint8  [[Uint8]]
-	.Uint10 [[Uint10, availability depends on: `BGFX_CAPS_VERTEX_ATTRIB_UINT10`.]]
-	.Int16  [[Int16]]
-	.Half   [[Half, availability depends on: `BGFX_CAPS_VERTEX_ATTRIB_HALF`.]]
-	.Float  [[Float]]
+	.Uint8  --- Uint8
+	.Uint10 --- Uint10, availability depends on: `BGFX_CAPS_VERTEX_ATTRIB_UINT10`.
+	.Int16  --- Int16
+	.Half   --- Half, availability depends on: `BGFX_CAPS_VERTEX_ATTRIB_HALF`.
+	.Float  --- Float
 
 --- Texture format enum.
 ---
@@ -100,34 +98,33 @@ enum.AttribType { comment = "Attribute types:" }
 ---
 --- @attention Availability depends on Caps (see: formats).
 enum.TextureFormat { comment = "Texture formats:" }
-	.BC1          [[DXT1]]
-	.BC2          [[DXT3]]
-	.BC3          [[DXT5]]
-	.BC4          [[LATC1/ATI1]]
-	.BC5          [[LATC2/ATI2]]
-	.BC6H         [[BC6H]]
-	.BC7          [[BC7]]
-	.ETC1         [[ETC1 RGB8]]
-	.ETC2         [[ETC2 RGB8]]
-	.ETC2A        [[ETC2 RGBA8]]
-	.ETC2A1       [[ETC2 RGB8A1]]
-	.PTC12        [[PVRTC1 RGB 2BPP]]
-	.PTC14        [[PVRTC1 RGB 4BPP]]
-	.PTC12A       [[PVRTC1 RGBA 2BPP]]
-	.PTC14A       [[PVRTC1 RGBA 4BPP]]
-	.PTC22        [[PVRTC2 RGBA 2BPP]]
-	.PTC24        [[PVRTC2 RGBA 4BPP]]
-	.ATC          [[ATC RGB 4BPP]]
-	.ATCE         [[ATCE RGBA 8 BPP explicit alpha]]
-	.ATCI         [[ATCI RGBA 8 BPP interpolated alpha]]
-	-- todo: ASTC4X4 would be better
-	.ASTC4x4      { cname = "ASTC4x4" } [[ASTC 4x4 8.0 BPP]]
-	.ASTC5x5      { cname = "ASTC5x5" } [[ASTC 5x5 5.12 BPP]]
-	.ASTC6x6      { cname = "ASTC6x6" } [[ASTC 6x6 3.56 BPP]]
-	.ASTC8x5      { cname = "ASTC8x5" } [[ASTC 8x5 3.20 BPP]]
-	.ASTC8x6      { cname = "ASTC8x6" } [[ASTC 8x6 2.67 BPP]]
-	.ASTC10x5     { cname = "ASTC10x5" } [[ASTC 10x5 2.56 BPP]]
-	.Unknown      [[Compressed formats above.]]
+	.BC1                             --- DXT1
+	.BC2                             --- DXT3
+	.BC3                             --- DXT5
+	.BC4                             --- LATC1/ATI1
+	.BC5                             --- LATC2/ATI2
+	.BC6H                            --- BC6H
+	.BC7                             --- BC7
+	.ETC1                            --- ETC1 RGB8
+	.ETC2                            --- ETC2 RGB8
+	.ETC2A                           --- ETC2 RGBA8
+	.ETC2A1                          --- ETC2 RGB8A1
+	.PTC12                           --- PVRTC1 RGB 2BPP
+	.PTC14                           --- PVRTC1 RGB 4BPP
+	.PTC12A                          --- PVRTC1 RGBA 2BPP
+	.PTC14A                          --- PVRTC1 RGBA 4BPP
+	.PTC22                           --- PVRTC2 RGBA 2BPP
+	.PTC24                           --- PVRTC2 RGBA 4BPP
+	.ATC                             --- ATC RGB 4BPP
+	.ATCE                            --- ATCE RGBA 8 BPP explicit alpha
+	.ATCI                            --- ATCI RGBA 8 BPP interpolated alpha
+	.ASTC4x4  { cname = "ASTC4x4"  } --- ASTC 4x4 8.0 BPP
+	.ASTC5x5  { cname = "ASTC5x5"  } --- ASTC 5x5 5.12 BPP
+	.ASTC6x6  { cname = "ASTC6x6"  } --- ASTC 6x6 3.56 BPP
+	.ASTC8x5  { cname = "ASTC8x5"  } --- ASTC 8x5 3.20 BPP
+	.ASTC8x6  { cname = "ASTC8x6"  } --- ASTC 8x6 2.67 BPP
+	.ASTC10x5 { cname = "ASTC10x5" } --- ASTC 10x5 2.56 BPP
+	.Unknown                         --- Compressed formats above.
 	.R1
 	.A8
 	.R8
@@ -177,7 +174,7 @@ enum.TextureFormat { comment = "Texture formats:" }
 	.RGB5A1
 	.RGB10A2
 	.RG11B10F
-	.UnknownDepth [[Depth formats below.]]
+	.UnknownDepth --- Depth formats below.
 	.D16
 	.D24
 	.D24S8
@@ -252,62 +249,67 @@ enum.ViewMode { underscore, comment = "View modes:" }
 
 --- Render frame enum.
 enum.RenderFrame { underscore, comment = "" }
-	.NoContext
-	.Render
-	.Timeout
-	.Exiting
+	.NoContext --- Renderer context is not created yet.
+	.Render    --- Renderer context is created and rendering.
+	.Timeout   --- Renderer context wait for main thread signal timed out without rendering.
+	.Exiting   --- Renderer context is getting destroyed.
 	()
+
+--- Internal data.
+struct.InternalData
+	.caps    "const struct Caps*" --- Renderer capabilities.
+	.context "void*"              --- GL context, or D3D device.
 
 --- Platform data.
 struct.PlatformData { ctor }
-	.ndt          "void*" [[Native display type.]]
-	.nwh          "void*" [[Native window handle.]]
-	.context      "void*" [[GL context, or D3D device.]]
-	.backBuffer   "void*" [[GL backbuffer, or D3D render target view.]]
-	.backBufferDS "void*" [[Backbuffer depth/stencil.]]
+	.ndt          "void*" --- Native display type.
+	.nwh          "void*" --- Native window handle.
+	.context      "void*" --- GL context, or D3D device.
+	.backBuffer   "void*" --- GL backbuffer, or D3D render target view.
+	.backBufferDS "void*" --- Backbuffer depth/stencil.
 
 --- Backbuffer resolution and reset parameters.
 struct.Resolution { ctor }
-	.format          "TextureFormat::Enum" [[Backbuffer format.]]
-	.width           "uint32_t"            [[Backbuffer width.]]
-	.height          "uint32_t"            [[Backbuffer height.]]
-	.reset           "uint32_t"            [[Reset parameters.]]
-	.numBackBuffers  "uint8_t"             [[Number of back buffers.]]
-	.maxFrameLatency "uint8_t"             [[Maximum frame latency.]]
+	.format          "TextureFormat::Enum" --- Backbuffer format.
+	.width           "uint32_t"            --- Backbuffer width.
+	.height          "uint32_t"            --- Backbuffer height.
+	.reset           "uint32_t"            --- Reset parameters.
+	.numBackBuffers  "uint8_t"             --- Number of back buffers.
+	.maxFrameLatency "uint8_t"             --- Maximum frame latency.
 
 struct.Limits { namespace = "Init" }
-	.maxEncoders    "uint16_t"             [[Maximum number of encoder threads.]]
-	.transientVbSize "uint32_t"            [[Maximum transient vertex buffer size.]]
-	.transientIbSize "uint32_t"            [[Maximum transient index buffer size.]]
+	.maxEncoders    "uint16_t"             --- Maximum number of encoder threads.
+	.transientVbSize "uint32_t"            --- Maximum transient vertex buffer size.
+	.transientIbSize "uint32_t"            --- Maximum transient index buffer size.
 
 --- Initialization parameters used by `bgfx::init`.
 struct.Init { ctor }
-	.type            "RendererType::Enum"  [[Select rendering backend. When set to RendererType::Count]]
-	                                       [[a default rendering backend will be selected appropriate to the platform.]]
-	                                       [[See: `bgfx::RendererType`]]
+	.type            "RendererType::Enum"  --- Select rendering backend. When set to RendererType::Count
+	                                       --- a default rendering backend will be selected appropriate to the platform.
+	                                       --- See: `bgfx::RendererType`
 
-	.vendorId       "uint16_t"             [[Vendor PCI id. If set to `BGFX_PCI_ID_NONE` it will select the first]]
-	                                       [[device.                                                             ]]
-	                                       [[  - `BGFX_PCI_ID_NONE` - Autoselect adapter.                        ]]
-	                                       [[  - `BGFX_PCI_ID_SOFTWARE_RASTERIZER` - Software rasterizer.        ]]
-	                                       [[  - `BGFX_PCI_ID_AMD` - AMD adapter.                                ]]
-	                                       [[  - `BGFX_PCI_ID_INTEL` - Intel adapter.                            ]]
-	                                       [[  - `BGFX_PCI_ID_NVIDIA` - nVidia adapter.                          ]]
+	.vendorId       "uint16_t"             --- Vendor PCI id. If set to `BGFX_PCI_ID_NONE` it will select the first
+	                                       --- device.
+	                                       ---   - `BGFX_PCI_ID_NONE` - Autoselect adapter.
+	                                       ---   - `BGFX_PCI_ID_SOFTWARE_RASTERIZER` - Software rasterizer.
+	                                       ---   - `BGFX_PCI_ID_AMD` - AMD adapter.
+	                                       ---   - `BGFX_PCI_ID_INTEL` - Intel adapter.
+	                                       ---   - `BGFX_PCI_ID_NVIDIA` - nVidia adapter.
 
-	.deviceId       "uint16_t"             [[Device id. If set to 0 it will select first device, or device with ]]
-	                                       [[matching id. ]]
+	.deviceId       "uint16_t"             --- Device id. If set to 0 it will select first device, or device with
+	                                       --- matching id.
 
-	.debug          "bool"                 [[Enable device for debuging.]]
-	.profile        "bool"                 [[Enable device for profiling.]]
-	.platformData   "PlatformData"         [[Platform data.]]
-	.resolution     "Resolution"           [[Backbuffer resolution and reset parameters. See: `bgfx::Resolution`.]]
+	.debug          "bool"                 --- Enable device for debuging.
+	.profile        "bool"                 --- Enable device for profiling.
+	.platformData   "PlatformData"         --- Platform data.
+	.resolution     "Resolution"           --- Backbuffer resolution and reset parameters. See: `bgfx::Resolution`.
 	.limits         "Limits"
-	.callback       "CallbackI*"           [[Provide application specific callback interface.]]
-	                                       [[See: `bgfx::CallbackI`]]
+	.callback       "CallbackI*"           --- Provide application specific callback interface.
+	                                       --- See: `bgfx::CallbackI`
 
-	.allocator      "bx::AllocatorI*"      [[Custom allocator. When a custom allocator is not    ]]
-	                                       [[specified, bgfx uses the CRT allocator. Bgfx assumes]]
-	                                       [[custom allocator is thread safe.                    ]]
+	.allocator      "bx::AllocatorI*"      --- Custom allocator. When a custom allocator is not
+	                                       --- specified, bgfx uses the CRT allocator. Bgfx assumes
+	                                       --- custom allocator is thread safe.
 
 --- Memory must be obtained by calling `bgfx::alloc`, `bgfx::copy`, or `bgfx::makeRef`.
 ---
@@ -318,193 +320,192 @@ struct.Memory
 
 --- GPU info.
 struct.GPU  { namespace = "Caps" }
-	.vendorId    "uint16_t"                [[Vendor PCI id. See `BGFX_PCI_ID_*`.]]
-	.deviceId    "uint16_t"                [[Device id.]]
+	.vendorId    "uint16_t"                --- Vendor PCI id. See `BGFX_PCI_ID_*`.
+	.deviceId    "uint16_t"                --- Device id.
 
+--- Renderer capabilities limits.
 struct.Limits  { namespace = "Caps" }
-	.maxDrawCalls            "uint32_t"    [[Maximum number of draw calls.                       ]]
-	.maxBlits                "uint32_t"    [[Maximum number of blit calls.			     ]]
-	.maxTextureSize          "uint32_t"    [[Maximum texture size.				     ]]
-	.maxTextureLayers        "uint32_t"    [[Maximum texture layers.			     ]]
-	.maxViews                "uint32_t"    [[Maximum number of views.			     ]]
-	.maxFrameBuffers         "uint32_t"    [[Maximum number of frame buffer handles.	     ]]
-	.maxFBAttachments        "uint32_t"    [[Maximum number of frame buffer attachments.	     ]]
-	.maxPrograms             "uint32_t"    [[Maximum number of program handles.		     ]]
-	.maxShaders              "uint32_t"    [[Maximum number of shader handles.		     ]]
-	.maxTextures             "uint32_t"    [[Maximum number of texture handles.		     ]]
-	.maxTextureSamplers      "uint32_t"    [[Maximum number of texture samplers.		     ]]
-	.maxComputeBindings      "uint32_t"    [[Maximum number of compute bindings.		     ]]
-	.maxVertexDecls          "uint32_t"    [[Maximum number of vertex format declarations.	     ]]
-	.maxVertexStreams        "uint32_t"    [[Maximum number of vertex streams.		     ]]
-	.maxIndexBuffers         "uint32_t"    [[Maximum number of index buffer handles.	     ]]
-	.maxVertexBuffers        "uint32_t"    [[Maximum number of vertex buffer handles.	     ]]
-	.maxDynamicIndexBuffers  "uint32_t"    [[Maximum number of dynamic index buffer handles.     ]]
-	.maxDynamicVertexBuffers "uint32_t"    [[Maximum number of dynamic vertex buffer handles.    ]]
-	.maxUniforms             "uint32_t"    [[Maximum number of uniform handles.		     ]]
-	.maxOcclusionQueries     "uint32_t"    [[Maximum number of occlusion query handles.	     ]]
-	.maxEncoders             "uint32_t"    [[Maximum number of encoder threads.		     ]]
-	.transientVbSize         "uint32_t"    [[Maximum transient vertex buffer size.		     ]]
-	.transientIbSize         "uint32_t"    [[Maximum transient index buffer size.		     ]]
+	.maxDrawCalls            "uint32_t"    --- Maximum number of draw calls.
+	.maxBlits                "uint32_t"    --- Maximum number of blit calls.
+	.maxTextureSize          "uint32_t"    --- Maximum texture size.
+	.maxTextureLayers        "uint32_t"    --- Maximum texture layers.
+	.maxViews                "uint32_t"    --- Maximum number of views.
+	.maxFrameBuffers         "uint32_t"    --- Maximum number of frame buffer handles.
+	.maxFBAttachments        "uint32_t"    --- Maximum number of frame buffer attachments.
+	.maxPrograms             "uint32_t"    --- Maximum number of program handles.
+	.maxShaders              "uint32_t"    --- Maximum number of shader handles.
+	.maxTextures             "uint32_t"    --- Maximum number of texture handles.
+	.maxTextureSamplers      "uint32_t"    --- Maximum number of texture samplers.
+	.maxComputeBindings      "uint32_t"    --- Maximum number of compute bindings.
+	.maxVertexDecls          "uint32_t"    --- Maximum number of vertex format declarations.
+	.maxVertexStreams        "uint32_t"    --- Maximum number of vertex streams.
+	.maxIndexBuffers         "uint32_t"    --- Maximum number of index buffer handles.
+	.maxVertexBuffers        "uint32_t"    --- Maximum number of vertex buffer handles.
+	.maxDynamicIndexBuffers  "uint32_t"    --- Maximum number of dynamic index buffer handles.
+	.maxDynamicVertexBuffers "uint32_t"    --- Maximum number of dynamic vertex buffer handles.
+	.maxUniforms             "uint32_t"    --- Maximum number of uniform handles.
+	.maxOcclusionQueries     "uint32_t"    --- Maximum number of occlusion query handles.
+	.maxEncoders             "uint32_t"    --- Maximum number of encoder threads.
+	.transientVbSize         "uint32_t"    --- Maximum transient vertex buffer size.
+	.transientIbSize         "uint32_t"    --- Maximum transient index buffer size.
 
 --- Renderer capabilities.
 struct.Caps
-	.rendererType "RendererType::Enum"     [[Renderer backend type. See: `bgfx::RendererType`]]
-
-	.supported    "uint64_t"               [[Supported functionality.                                                                      ]]
-	                                       [[                                                                                              ]]
-	                                       [[@attention See BGFX_CAPS_* flags at https://bkaradzic.github.io/bgfx/bgfx.html#available-caps ]]
-	.vendorId     "uint16_t"               [[Selected GPU vendor PCI id.]]
-	.deviceId     "uint16_t"               [[Selected GPU device id.]]
-	.homogeneousDepth "bool"               [[True when NDC depth is in [-1, 1] range, otherwise its [0, 1].]]
-	.originBottomLeft "bool"               [[True when NDC origin is at bottom left.]]
-	.numGPUs      "uint8_t"                [[Number of enumerated GPUs.]]
-	.gpu          "GPU[4]"                 [[Enumerated GPUs.]]
+	.rendererType "RendererType::Enum" --- Renderer backend type. See: `bgfx::RendererType`
+	.supported    "uint64_t"           --- Supported functionality.
+	                                   ---   @attention See BGFX_CAPS_* flags at https://bkaradzic.github.io/bgfx/bgfx.html#available-caps
+	.vendorId     "uint16_t"           --- Selected GPU vendor PCI id.
+	.deviceId     "uint16_t"           --- Selected GPU device id.
+	.homogeneousDepth "bool"           --- True when NDC depth is in [-1, 1] range, otherwise its [0, 1].
+	.originBottomLeft "bool"           --- True when NDC origin is at bottom left.
+	.numGPUs      "uint8_t"            --- Number of enumerated GPUs.
+	.gpu          "GPU[4]"             --- Enumerated GPUs.
 	.limits       "Limits"
 	.formats      "uint16_t[TextureFormat::Count]"
-		[[Supported texture format capabilities flags:                                               ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_NONE` - Texture format is not supported.		     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_2D` - Texture format is supported.			     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB` - Texture as sRGB format is supported.		     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_2D_EMULATED` - Texture format is emulated.		     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_3D` - Texture format is supported.			     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_3D_SRGB` - Texture as sRGB format is supported.		     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_3D_EMULATED` - Texture format is emulated.		     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_CUBE` - Texture format is supported.			     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_CUBE_SRGB` - Texture as sRGB format is supported.	     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_CUBE_EMULATED` - Texture format is emulated.		     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_VERTEX` - Texture format can be used from vertex shader.     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_IMAGE` - Texture format can be used as image from compute    ]]
-		[[    shader.										     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER` - Texture format can be used as frame	     ]]
-		[[    buffer.										     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA` - Texture format can be used as MSAA	     ]]
-		[[    frame buffer.									     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_MSAA` - Texture can be sampled as MSAA.			     ]]
-		[[  - `BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN` - Texture format supports auto-generated	     ]]
-		[[    mips.										     ]]
+		--- Supported texture format capabilities flags:
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_NONE` - Texture format is not supported.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_2D` - Texture format is supported.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB` - Texture as sRGB format is supported.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_2D_EMULATED` - Texture format is emulated.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_3D` - Texture format is supported.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_3D_SRGB` - Texture as sRGB format is supported.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_3D_EMULATED` - Texture format is emulated.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_CUBE` - Texture format is supported.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_CUBE_SRGB` - Texture as sRGB format is supported.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_CUBE_EMULATED` - Texture format is emulated.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_VERTEX` - Texture format can be used from vertex shader.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_IMAGE` - Texture format can be used as image from compute
+		---     shader.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER` - Texture format can be used as frame
+		---     buffer.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA` - Texture format can be used as MSAA
+		---     frame buffer.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_MSAA` - Texture can be sampled as MSAA.
+		---   - `BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN` - Texture format supports auto-generated
+		---     mips.
 
 --- Transient index buffer.
 struct.TransientIndexBuffer
-	.data       "int8_t*"           [[Pointer to data.]]
-	.size       "uint32_t"          [[Data size.]]
-	.startIndex "uint32_t"          [[First index.]]
-	.handle     "IndexBufferHandle" [[Index buffer handle.]]
+	.data       "int8_t*"           --- Pointer to data.
+	.size       "uint32_t"          --- Data size.
+	.startIndex "uint32_t"          --- First index.
+	.handle     "IndexBufferHandle" --- Index buffer handle.
 
 --- Transient vertex buffer.
 struct.TransientVertexBuffer
-	.data        "int8_t*"            [[Pointer to data.]]
-	.size        "uint32_t"           [[Data size.]]
-	.startVertex "uint32_t"           [[First vertex.]]
-	.stride      "uint16_t"           [[Vertex stride.]]
-	.handle      "VertexBufferHandle" [[Vertex buffer handle.]]
-	.decl        "VertexDeclHandle"   [[Vertex declaration handle.]]
+	.data        "int8_t*"            --- Pointer to data.
+	.size        "uint32_t"           --- Data size.
+	.startVertex "uint32_t"           --- First vertex.
+	.stride      "uint16_t"           --- Vertex stride.
+	.handle      "VertexBufferHandle" --- Vertex buffer handle.
+	.decl        "VertexDeclHandle"   --- Vertex declaration handle.
 
 --- Instance data buffer info.
 struct.InstanceDataBuffer
-	.data   "int8_t*"            [[Pointer to data.]]
-	.size   "uint32_t"           [[Data size.]]
-	.offset "uint32_t"           [[Offset in vertex buffer.]]
-	.num    "uint32_t"           [[Number of instances.]]
-	.stride "uint16_t"           [[Vertex buffer stride.]]
-	.handle "VertexBufferHandle" [[Vertex buffer object handle.]]
+	.data   "int8_t*"            --- Pointer to data.
+	.size   "uint32_t"           --- Data size.
+	.offset "uint32_t"           --- Offset in vertex buffer.
+	.num    "uint32_t"           --- Number of instances.
+	.stride "uint16_t"           --- Vertex buffer stride.
+	.handle "VertexBufferHandle" --- Vertex buffer object handle.
 
 --- Texture info.
 struct.TextureInfo
-	.format       "TextureFormat::Enum" [[Texture format.]]
-	.storageSize  "uint32_t"            [[Total amount of bytes required to store texture.]]
-	.width        "uint16_t"            [[Texture width.]]
-	.height       "uint16_t"            [[Texture height.]]
-	.depth        "uint16_t"            [[Texture depth.]]
-	.numLayers    "uint16_t"            [[Number of layers in texture array.]]
-	.numMips      "uint8_t"             [[Number of MIP maps.]]
-	.bitsPerPixel "uint8_t"             [[Format bits per pixel.]]
-	.cubeMap      "bool"                [[Texture is cubemap.]]
+	.format       "TextureFormat::Enum" --- Texture format.
+	.storageSize  "uint32_t"            --- Total amount of bytes required to store texture.
+	.width        "uint16_t"            --- Texture width.
+	.height       "uint16_t"            --- Texture height.
+	.depth        "uint16_t"            --- Texture depth.
+	.numLayers    "uint16_t"            --- Number of layers in texture array.
+	.numMips      "uint8_t"             --- Number of MIP maps.
+	.bitsPerPixel "uint8_t"             --- Format bits per pixel.
+	.cubeMap      "bool"                --- Texture is cubemap.
 
 --- Uniform info.
 struct.UniformInfo
-	.name "char[256]"         [[Uniform name.]]
-	.type "UniformType::Enum" [[Uniform type.]]
-	.num  "uint16_t"          [[Number of elements in array.]]
+	.name "char[256]"         --- Uniform name.
+	.type "UniformType::Enum" --- Uniform type.
+	.num  "uint16_t"          --- Number of elements in array.
 
 --- Frame buffer texture attachment info.
 struct.Attachment
-	.access  "Access::Enum"  [[Attachement access. See `Access::Enum`.]]
-	.handle  "TextureHandle" [[Render target texture handle.]]
-	.mip     "uint16_t"      [[Mip level.]]
-	.layer   "uint16_t"      [[Cubemap side or depth layer/slice.]]
-	.resolve "uint8_t"       [[Resolve flags. See: `BGFX_RESOLVE_*`]]
+	.access  "Access::Enum"  --- Attachement access. See `Access::Enum`.
+	.handle  "TextureHandle" --- Render target texture handle.
+	.mip     "uint16_t"      --- Mip level.
+	.layer   "uint16_t"      --- Cubemap side or depth layer/slice.
+	.resolve "uint8_t"       --- Resolve flags. See: `BGFX_RESOLVE_*`
 
 --- Transform data.
 struct.Transform
-	.data "float*"  [[Pointer to first 4x4 matrix.]]
-	.num "uint16_t" [[Number of matrices.]]
+	.data "float*"  --- Pointer to first 4x4 matrix.
+	.num "uint16_t" --- Number of matrices.
 
 --- View stats.
 struct.ViewStats
-	.name           "char[256]" [[View name.]]
-	.view           "ViewId"    [[View id.]]
-	.cpuTimeElapsed "int64_t"   [[CPU (submit) time elapsed.]]
-	.gpuTimeElapsed "int64_t"   [[GPU time elapsed.]]
+	.name           "char[256]" --- View name.
+	.view           "ViewId"    --- View id.
+	.cpuTimeElapsed "int64_t"   --- CPU (submit) time elapsed.
+	.gpuTimeElapsed "int64_t"   --- GPU time elapsed.
 
 --- Encoder stats.
 struct.EncoderStats
-	.cpuTimeBegin "int64_t" [[Encoder thread CPU submit begin time.]]
-	.cpuTimeEnd   "int64_t" [[Encoder thread CPU submit end time.]]
+	.cpuTimeBegin "int64_t" --- Encoder thread CPU submit begin time.
+	.cpuTimeEnd   "int64_t" --- Encoder thread CPU submit end time.
 
 --- Renderer statistics data.
 ---
 --- @remarks All time values are high-resolution timestamps, while
 --- time frequencies define timestamps-per-second for that hardware.
 struct.Stats
-	.cpuTimeFrame            "int64_t"       [[CPU time between two `bgfx::frame` calls.]]
-	.cpuTimeBegin            "int64_t"       [[Render thread CPU submit begin time.]]
-	.cpuTimeEnd              "int64_t"       [[Render thread CPU submit end time.]]
-	.cpuTimerFreq            "int64_t"       [[CPU timer frequency. Timestamps-per-second]]
+	.cpuTimeFrame            "int64_t"       --- CPU time between two `bgfx::frame` calls.
+	.cpuTimeBegin            "int64_t"       --- Render thread CPU submit begin time.
+	.cpuTimeEnd              "int64_t"       --- Render thread CPU submit end time.
+	.cpuTimerFreq            "int64_t"       --- CPU timer frequency. Timestamps-per-second
 
-	.gpuTimeBegin            "int64_t"       [[GPU frame begin time.]]
-	.gpuTimeEnd              "int64_t"       [[GPU frame end time.]]
-	.gpuTimerFreq            "int64_t"       [[GPU timer frequency.]]
+	.gpuTimeBegin            "int64_t"       --- GPU frame begin time.
+	.gpuTimeEnd              "int64_t"       --- GPU frame end time.
+	.gpuTimerFreq            "int64_t"       --- GPU timer frequency.
 
-	.waitRender              "int64_t"       [[Time spent waiting for render backend thread to finish issuing draw commands to underlying graphics API.]]
-	.waitSubmit              "int64_t"       [[Time spent waiting for submit thread to advance to next frame.]]
+	.waitRender              "int64_t"       --- Time spent waiting for render backend thread to finish issuing draw commands to underlying graphics API.
+	.waitSubmit              "int64_t"       --- Time spent waiting for submit thread to advance to next frame.
 
-	.numDraw                 "uint32_t"      [[Number of draw calls submitted.]]
-	.numCompute              "uint32_t"      [[Number of compute calls submitted.]]
-	.numBlit                 "uint32_t"      [[Number of blit calls submitted.]]
-	.maxGpuLatency           "uint32_t"      [[GPU driver latency.]]
+	.numDraw                 "uint32_t"      --- Number of draw calls submitted.
+	.numCompute              "uint32_t"      --- Number of compute calls submitted.
+	.numBlit                 "uint32_t"      --- Number of blit calls submitted.
+	.maxGpuLatency           "uint32_t"      --- GPU driver latency.
 
-	.numDynamicIndexBuffers  "uint16_t"      [[Number of used dynamic index buffers.]]
-	.numDynamicVertexBuffers "uint16_t"      [[Number of used dynamic vertex buffers.]]
-	.numFrameBuffers         "uint16_t"      [[Number of used frame buffers.]]
-	.numIndexBuffers         "uint16_t"      [[Number of used index buffers.]]
-	.numOcclusionQueries     "uint16_t"      [[Number of used occlusion queries.]]
-	.numPrograms             "uint16_t"      [[Number of used programs.]]
-	.numShaders              "uint16_t"      [[Number of used shaders.]]
-	.numTextures             "uint16_t"      [[Number of used textures.]]
-	.numUniforms             "uint16_t"      [[Number of used uniforms.]]
-	.numVertexBuffers        "uint16_t"      [[Number of used vertex buffers.]]
-	.numVertexDecls          "uint16_t"      [[Number of used vertex declarations.]]
+	.numDynamicIndexBuffers  "uint16_t"      --- Number of used dynamic index buffers.
+	.numDynamicVertexBuffers "uint16_t"      --- Number of used dynamic vertex buffers.
+	.numFrameBuffers         "uint16_t"      --- Number of used frame buffers.
+	.numIndexBuffers         "uint16_t"      --- Number of used index buffers.
+	.numOcclusionQueries     "uint16_t"      --- Number of used occlusion queries.
+	.numPrograms             "uint16_t"      --- Number of used programs.
+	.numShaders              "uint16_t"      --- Number of used shaders.
+	.numTextures             "uint16_t"      --- Number of used textures.
+	.numUniforms             "uint16_t"      --- Number of used uniforms.
+	.numVertexBuffers        "uint16_t"      --- Number of used vertex buffers.
+	.numVertexDecls          "uint16_t"      --- Number of used vertex declarations.
 
-	.textureMemoryUsed       "int64_t"       [[Estimate of texture memory used.]]
-	.rtMemoryUsed            "int64_t"       [[Estimate of render target memory used.]]
-	.transientVbUsed         "int32_t"       [[Amount of transient vertex buffer used.]]
-	.transientIbUsed         "int32_t"       [[Amount of transient index buffer used.]]
+	.textureMemoryUsed       "int64_t"       --- Estimate of texture memory used.
+	.rtMemoryUsed            "int64_t"       --- Estimate of render target memory used.
+	.transientVbUsed         "int32_t"       --- Amount of transient vertex buffer used.
+	.transientIbUsed         "int32_t"       --- Amount of transient index buffer used.
 
-	.numPrims                "uint32_t[Topology::Count]"      [[Number of primitives rendered.]]
+	.numPrims                "uint32_t[Topology::Count]" --- Number of primitives rendered.
 
-	.gpuMemoryMax            "int64_t"       [[Maximum available GPU memory for application.]]
-	.gpuMemoryUsed           "int64_t"       [[Amount of GPU memory used by the application.]]
+	.gpuMemoryMax            "int64_t"       --- Maximum available GPU memory for application.
+	.gpuMemoryUsed           "int64_t"       --- Amount of GPU memory used by the application.
 
-	.width                   "uint16_t"      [[Backbuffer width in pixels.]]
-	.height                  "uint16_t"      [[Backbuffer height in pixels.]]
-	.textWidth               "uint16_t"      [[Debug text width in characters.]]
-	.textHeight              "uint16_t"      [[Debug text height in characters.]]
+	.width                   "uint16_t"      --- Backbuffer width in pixels.
+	.height                  "uint16_t"      --- Backbuffer height in pixels.
+	.textWidth               "uint16_t"      --- Debug text width in characters.
+	.textHeight              "uint16_t"      --- Debug text height in characters.
 
-	.numViews                "uint16_t"      [[Number of view stats.]]
-	.viewStats               "ViewStats*"    [[Array of View stats.]]
+	.numViews                "uint16_t"      --- Number of view stats.
+	.viewStats               "ViewStats*"    --- Array of View stats.
 
-	.numEncoders             "uint8_t"       [[Number of encoders used during frame.]]
-	.encoderStats            "EncoderStats*" [[Array of encoder stats.]]
+	.numEncoders             "uint8_t"       --- Number of encoders used during frame.
+	.encoderStats            "EncoderStats*" --- Array of encoder stats.
 
 --- Vertex declaration.
 struct.VertexDecl { ctor }
@@ -1046,85 +1047,127 @@ func.allocInstanceDataBuffer
 	.num    "uint32_t"                    --- Number of instances.
 	.stride "uint16_t"                    --- Instance stride. Must be multiple of 16.
 
+--- Create draw indirect buffer.
 func.createIndirectBuffer
-	"IndirectBufferHandle"
-	.num "uint32_t"
+	"IndirectBufferHandle" --- Indirect buffer handle.
+	.num "uint32_t"        --- Number of indirect calls.
 
+--- Destroy draw indirect buffer.
 func.destroy { cname = "destroy_indirect_buffer" }
 	"void"
-	.handle "IndirectBufferHandle"
+	.handle "IndirectBufferHandle" --- Indirect buffer handle.
 
+--- Create shader from memory buffer.
 func.createShader
-	"ShaderHandle"
-	.mem "const Memory*"
+	"ShaderHandle"       --- Shader handle.
+	.mem "const Memory*" --- Shader binary.
 
+--- Returns the number of uniforms and uniform handles used inside a shader.
+---
+--- @remarks
+---   Only non-predefined uniforms are returned.
+---
 func.getShaderUniforms
-	"uint16_t"
-	.handle   "ShaderHandle"
-	.uniforms "UniformHandle*" { out }
-	.max      "uint16_t"
+	"uint16_t"                         --- Number of uniforms used by shader.
+	.handle   "ShaderHandle"           --- Shader handle.
+	.uniforms "UniformHandle*" { out } --- UniformHandle array where data will be stored.
+	 { default = NULL }
+	.max      "uint16_t"               --- Maximum capacity of array.
+	 { default = 0 }
 
+--- Set shader debug name.
 func.setName { cname = "set_shader_name" }
 	"void"
-	.handle "ShaderHandle"
-	.name   "const char*"
-	.len    "int32_t"
+	.handle "ShaderHandle"   --- Shader handle.
+	.name   "const char*"    --- Shader name.
+	.len    "int32_t"        --- Shader name length (if length is INT32_MAX, it's expected
+	 { default = INT32_MAX } --- that _name is zero terminated string).
 
+--- Destroy shader.
+---
+--- @remark Once a shader program is created with _handle,
+---   it is safe to destroy that shader.
+---
 func.destroy { cname = "destroy_shader" }
 	"void"
-	.handle "ShaderHandle"
+	.handle "ShaderHandle" --- Shader handle.
 
+--- Create program with vertex and fragment shaders.
 func.createProgram
-	"ProgramHandle"
-	.vsh "ShaderHandle"
-	.fsh "ShaderHandle"
-	.destroyShaders "bool"
+	"ProgramHandle"        --- Program handle if vertex shader output and fragment shader
+	                       --- input are matching, otherwise returns invalid program handle.
+	.vsh "ShaderHandle"    --- Vertex shader.
+	.fsh "ShaderHandle"    --- Fragment shader.
+	.destroyShaders "bool" --- If true, shaders will be destroyed when program is destroyed.
+	 { default = false }
 
+--- Create program with compute shader.
 func.createProgram { cname = "create_compute_program" }
-	"ProgramHandle"
-	.csh "ShaderHandle"
-	.destroyShaders "bool"
+	"ProgramHandle"        --- Program handle.
+	.csh "ShaderHandle"    --- Compute shader.
+	.destroyShaders "bool" --- If true, shaders will be destroyed when program is destroyed.
+	 { default = false }
 
+--- Destroy program.
 func.destroy { cname = "destroy_program" }
 	"void"
-	.handle "ProgramHandle"
+	.handle "ProgramHandle" --- Program handle.
 
+--- Validate texture parameters.
 func.isTextureValid
-	"bool"
-	.depth     "uint16_t"
-	.cubeMap   "bool"
-	.numLayers "uint16_t"
-	.format    "TextureFormat::Enum"
-	.flags     "uint64_t"
+	"bool"                           --- True if texture can be successfully created.
+	.depth     "uint16_t"            --- Depth dimension of volume texture.
+	.cubeMap   "bool"                --- Indicates that texture contains cubemap.
+	.numLayers "uint16_t"            --- Number of layers in texture array.
+	.format    "TextureFormat::Enum" --- Texture format. See: `TextureFormat::Enum`.
+	.flags     "uint64_t"            --- Texture flags. See `BGFX_TEXTURE_*`.
 
+--- Calculate amount of memory required for texture.
 func.calcTextureSize
 	"void"
-	.info      "TextureInfo &" { out }
-	.width     "uint16_t"
-	.height    "uint16_t"
-	.depth     "uint16_t"
-	.cubeMap   "bool"
-	.hasMips   "bool"
-	.numLayers "uint16_t"
-	.format    "TextureFormat::Enum"
+	.info      "TextureInfo &" { out } --- Resulting texture info structure. See: `TextureInfo`.
+	.width     "uint16_t"              --- Width.
+	.height    "uint16_t"              --- Height.
+	.depth     "uint16_t"              --- Depth dimension of volume texture.
+	.cubeMap   "bool"                  --- Indicates that texture contains cubemap.
+	.hasMips   "bool"                  --- Indicates that texture contains full mip-map chain.
+	.numLayers "uint16_t"              --- Number of layers in texture array.
+	.format    "TextureFormat::Enum"   --- Texture format. See: `TextureFormat::Enum`.
 
+--- Create texture from memory buffer.
 func.createTexture
-	"TextureHandle"
-	.mem   "const Memory*"
-	.flags "uint64_t"
-	.skip  "uint8_t"
-	.info  "TextureInfo*" { out }
+	"TextureHandle"               --- Texture handle.
+	.mem   "const Memory*"        --- DDS, KTX or PVR texture binary data.
+	.flags "uint64_t"             --- Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`)
+	                              --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
+	                              --- - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
+	                              ---   mode.
+	                              --- - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
+	                              ---   sampling.
+	.skip  "uint8_t"              --- Skip top level mips when parsing texture.
+	.info  "TextureInfo*" { out } --- When non-`NULL` is specified it returns parsed texture information.
 
+--- Create 2D texture.
 func.createTexture2D
-	"TextureHandle"
-	.width     "uint16_t"
-	.height    "uint16_t"
-	.hasMips   "bool"
-	.numLayers "uint16_t"
-	.format    "TextureFormat::Enum"
-	.flags     "uint64_t"
-	.mem       "const Memory*"
+	"TextureHandle"                  --- Texture handle.
+	.width     "uint16_t"            --- Width.
+	.height    "uint16_t"            --- Height.
+	.hasMips   "bool"                --- Indicates that texture contains full mip-map chain.
+	.numLayers "uint16_t"            --- Number of layers in texture array. Must be 1 if caps
+	                                 --- `BGFX_CAPS_TEXTURE_2D_ARRAY` flag is not set.
+	.format    "TextureFormat::Enum" --- Texture format. See: `TextureFormat::Enum`.
+	.flags     "uint64_t"            --- Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`)
+	                                 --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
+	                                 --- - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
+	                                 ---   mode.
+	                                 --- - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
+	                                 ---   sampling.
+	.mem       "const Memory*"       --- Texture data. If `_mem` is non-NULL, created texture will be immutable. If
+	                                 --- `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than
+	                                 --- 1, expected memory layout is texture and all mips together for each array element.
 
+--- Create texture with size based on backbuffer ratio. Texture will maintain ratio
+--- if back buffer resolution changes.
 func.createTexture2D { cname = "create_texture_2d_scaled" }
 	"TextureHandle"
 	.ratio     "BackbufferRatio::Enum"
@@ -1133,6 +1176,7 @@ func.createTexture2D { cname = "create_texture_2d_scaled" }
 	.format    "TextureFormat::Enum"
 	.flags     "uint64_t"
 
+--- Create 3D texture.
 func.createTexture3D
 	"TextureHandle"
 	.width     "uint16_t"
@@ -1143,6 +1187,7 @@ func.createTexture3D
 	.flags     "uint64_t"
 	.mem       "const Memory*"
 
+--- Create Cube texture.
 func.createTextureCube
 	"TextureHandle"
 	.size      "uint16_t"
@@ -1152,6 +1197,7 @@ func.createTextureCube
 	.flags     "uint64_t"
 	.mem       "const Memory*"
 
+--- Update 2D texture.
 func.updateTexture2D
 	"void"
 	.handle "TextureHandle"
@@ -1164,6 +1210,7 @@ func.updateTexture2D
 	.mem    "const Memory*"
 	.pitch  "uint16_t"
 
+--- Update 3D texture.
 func.updateTexture3D
 	"void"
 	.handle "TextureHandle"
@@ -1176,6 +1223,7 @@ func.updateTexture3D
 	.depth  "uint16_t"
 	.mem    "const Memory*"
 
+--- Update Cube texture.
 func.updateTextureCube
 	"void"
 	.handle "TextureHandle"
@@ -1189,26 +1237,31 @@ func.updateTextureCube
 	.mem    "const Memory*"
 	.pitch  "uint16_t"
 
+--- Read back texture content.
 func.readTexture
 	"uint32_t"
 	.handle "TextureHandle"
 	.data   "void*"
 	.mip    "uint8_t"
 
+--- Set texture debug name.
 func.setName { cname = "set_texture_name" }
 	"void"
 	.handle "TextureHandle"
 	.name   "const char*"
 	.len    "int32_t"
 
+--- Returns texture direct access pointer.
 func.getDirectAccessPtr
 	"void*"
 	.handle "TextureHandle"
 
+--- Destroy texture.
 func.destroy { cname = "destroy_texture" }
 	"void"
 	.handle "TextureHandle"
 
+--- Create frame buffer (simple).
 func.createFrameBuffer
 	"FrameBufferHandle"
 	.width        "uint16_t"
@@ -1216,24 +1269,30 @@ func.createFrameBuffer
 	.format       "TextureFormat::Enum"
 	.textureFlags "uint64_t"
 
+--- Create frame buffer with size based on backbuffer ratio. Frame buffer will maintain ratio
+--- if back buffer resolution changes.
 func.createFrameBuffer { cname = "create_frame_buffer_scaled" }
 	"FrameBufferHandle"
 	.ratio        "BackbufferRatio::Enum"
 	.format       "TextureFormat::Enum"
 	.textureFlags "uint64_t"
 
+--- Create MRT frame buffer from texture handles (simple).
 func.createFrameBuffer { cname = "create_frame_buffer_from_handles" }
 	"FrameBufferHandle"
 	.num            "uint8_t"
 	.handles        "const TextureHandle*"
 	.destroyTexture "bool"
 
+--- Create MRT frame buffer from texture handles with specific layer and
+--- mip level.
 func.createFrameBuffer { cname = "create_frame_buffer_from_attachment" }
 	"FrameBufferHandle"
 	.num            "uint8_t"
 	.handles        "const Attachment*"
 	.destroyTexture "bool"
 
+--- Create frame buffer for multiple window rendering.
 func.createFrameBuffer { cname = "create_frame_buffer_from_nwh" }
 	"FrameBufferHandle"
 	.nwh         "void*"
@@ -1242,52 +1301,94 @@ func.createFrameBuffer { cname = "create_frame_buffer_from_nwh" }
 	.format      "TextureFormat::Enum"
 	.depthFormat "TextureFormat::Enum"
 
+--- Set frame buffer debug name.
 func.setName { cname = "set_frame_buffer_name" }
 	"void"
 	.handle "FrameBufferHandle"
 	.name   "const char*"
 	.len    "int32_t"
 
+--- Obtain texture handle of frame buffer attachment.
 func.getTexture
 	"TextureHandle"
 	.handle     "FrameBufferHandle"
 	.attachment "uint8_t"
 
+--- Destroy frame buffer.
 func.destroy { cname = "destroy_frame_buffer" }
 	"void"
 	.handle "FrameBufferHandle"
 
+--- Create shader uniform parameter.
+---
+--- @remarks
+---   1. Uniform names are unique. It's valid to call `bgfx::createUniform`
+---      multiple times with the same uniform name. The library will always
+---      return the same handle, but the handle reference count will be
+---      incremented. This means that the same number of `bgfx::destroyUniform`
+---      must be called to properly destroy the uniform.
+---
+---   2. Predefined uniforms (declared in `bgfx_shader.sh`):
+---      - `u_viewRect vec4(x, y, width, height)` - view rectangle for current
+---        view, in pixels.
+---      - `u_viewTexel vec4(1.0/width, 1.0/height, undef, undef)` - inverse
+---        width and height
+---      - `u_view mat4` - view matrix
+---      - `u_invView mat4` - inverted view matrix
+---      - `u_proj mat4` - projection matrix
+---      - `u_invProj mat4` - inverted projection matrix
+---      - `u_viewProj mat4` - concatenated view projection matrix
+---      - `u_invViewProj mat4` - concatenated inverted view projection matrix
+---      - `u_model mat4[BGFX_CONFIG_MAX_BONES]` - array of model matrices.
+---      - `u_modelView mat4` - concatenated model view matrix, only first
+---        model matrix from array is used.
+---      - `u_modelViewProj mat4` - concatenated model view projection matrix.
+---      - `u_alphaRef float` - alpha reference value for alpha test.
+---
 func.createUniform
 	"UniformHandle"
 	.name "const char*"
 	.type "UniformType::Enum"
 	.num  "uint16_t"
 
+--- Retrieve uniform info.
 func.getUniformInfo
 	"void"
 	.handle "UniformHandle"
 	.info   "UniformInfo &" { out }
 
+--- Destroy shader uniform parameter.
 func.destroy { cname = "destroy_uniform" }
 	"void"
 	.handle "UniformHandle"
 
+--- Create occlusion query.
 func.createOcclusionQuery
-	"OcclusionQueryHandle"
+	"OcclusionQueryHandle" --- Handle to occlusion query object.
 
+--- Retrieve occlusion query result from previous frame.
 func.getResult
-	"OcclusionQueryResult::Enum"
-	.handle "OcclusionQueryHandle"
-	.result "int32_t*" { out }
+	"OcclusionQueryResult::Enum"   --- Occlusion query result.
+	.handle "OcclusionQueryHandle" --- Handle to occlusion query object.
+	.result "int32_t*" { out }     --- Number of pixels that passed test. This argument
+	                               --- can be `NULL` if result of occlusion query is not needed.
 
+--- Destroy occlusion query.
 func.destroy { cname = "destroy_occlusion_query" }
 	"void"
-	.handle "OcclusionQueryHandle"
+	.handle "OcclusionQueryHandle" --- Handle to occlusion query object.
 
+--- Set palette color value.
 func.setPaletteColor
 	"void"
-	.index "uint8_t"
-	.rgba  "const float[4]"
+	.index "uint8_t"        --- Index into palette.
+	.rgba  "const float[4]" --- RGBA floating point values.
+
+--- Set palette color value.
+func.setPaletteColor { cname = "set_palette_color_rgba8" }
+	"void"
+	.index "uint8_t"  --- Index into palette.
+	.rgba  "uint32_t" --- Packed 32-bit RGBA value.
 
 --- Set view name.
 ---
@@ -1345,7 +1446,7 @@ func.setViewClear
 	.stencil "uint8_t"  --- Stencil clear value.
 
 --- Set view clear flags with different clear color for each
---- frame buffer texture. Must use setClearColor to setup clear color
+--- frame buffer texture. Must use `bgfx::setPaletteColor` to setup clear color
 --- palette.
 func.setViewClear { cname = "set_view_clear_mrt" }
 	"void"
@@ -1827,31 +1928,90 @@ func.requestScreenShot
 	                              --- made for main window back buffer.
 	.filePath "const char*"       --- Will be passed to `bgfx::CallbackI::screenShot` callback.
 
+--- Render frame.
+---
+--- @attention `bgfx::renderFrame` is blocking call. It waits for
+---   `bgfx::frame` to be called from API thread to process frame.
+---   If timeout value is passed call will timeout and return even
+---   if `bgfx::frame` is not called.
+---
+--- @warning This call should be only used on platforms that don't
+---   allow creating separate rendering thread. If it is called before
+---   to bgfx::init, render thread won't be created by bgfx::init call.
+---
 func.renderFrame
-	"RenderFrame::Enum"
-	.msecs "int32_t"
+	"RenderFrame::Enum" --- Current renderer context state. See: `bgfx::RenderFrame`.
+	.msecs "int32_t"    --- Timeout in milliseconds.
 
+--- Set platform data.
+---
+--- @warning Must be called before `bgfx::init`.
+---
 func.setPlatformData
 	"void"
-	.data "const PlatformData &"
+	.data "const PlatformData &" --- Platform data.
 
+--- Get internal data for interop.
+---
+--- @attention It's expected you understand some bgfx internals before you
+---   use this call.
+---
+--- @warning Must be called only on render thread.
+---
 func.getInternalData
-	"const InternalData*"
+	"const InternalData*" --- Internal data.
 
+--- Override internal texture with externally created texture. Previously
+--- created internal texture will released.
+---
+--- @attention It's expected you understand some bgfx internals before you
+---   use this call.
+---
+--- @warning Must be called only on render thread.
+---
 func.overrideInternal { cname = "override_internal_texture_ptr" }
-	"uintptr_t"
-	.handle "TextureHandle"
-	.ptr    "uintptr_t"
+	"uintptr_t"             --- Native API pointer to texture. If result is 0, texture is not created
+	                        --- yet from the main thread.
+	.handle "TextureHandle" --- Texture handle.
+	.ptr    "uintptr_t"     --- Native API pointer to texture.
 
+--- Override internal texture by creating new texture. Previously created
+--- internal texture will released.
+---
+--- @attention It's expected you understand some bgfx internals before you
+---   use this call.
+---
+--- @param[in] _handle Texture handle.
+--- @param[in] _width Width.
+--- @param[in] _height Height.
+--- @param[in] _numMips Number of mip-maps.
+--- @param[in] _format Texture format. See: `TextureFormat::Enum`.
+--- @param[in] _flags Default texture sampling mode is linear, and wrap mode
+---   is repeat.
+---   - `BGFX_TEXTURE_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
+---     mode.
+---   - `BGFX_TEXTURE_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
+---     sampling.
+---
+--- @returns Native API pointer to texture. If result is 0, texture is not created yet from the
+---   main thread.
+---
+--- @warning Must be called only on render thread.
+---
 func.overrideInternal { cname = "override_internal_texture" }
-	"uintptr_t"
-	.handle  "TextureHandle"
-	.width   "uint16_t"
-	.height  "uint16_t"
-	.numMips "uint8_t"
-	.format  "TextureFormat::Enum"
-	.flags   "uint32_t"
-
+	"uintptr_t"                    --- Native API pointer to texture. If result is 0, texture is not created
+	                               --- yet from the main thread.
+	.handle  "TextureHandle"       --- Texture handle.
+	.width   "uint16_t"            --- Width.
+	.height  "uint16_t"            --- Height.
+	.numMips "uint8_t"             --- Number of mip-maps.
+	.format  "TextureFormat::Enum" --- Texture format. See: `TextureFormat::Enum`.
+	.flags   "uint64_t"            --- Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`)
+	                               --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
+	                               --- - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
+	                               ---   mode.
+	                               --- - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
+	                               ---   sampling.
 
 
 -- Legacy API:
