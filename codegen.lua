@@ -267,9 +267,6 @@ function codegen.nameconversion(all_types, all_funcs)
 	for _,v in ipairs(all_funcs) do
 		if v.cname == nil then
 			v.cname = convert_funcname(v.name)
-		else
-			-- cusername is for doxygen
-			v.cusername = v.cname
 		end
 		if v.class then
 			v.cname = convert_funcname(v.class) .. "_" .. v.cname

@@ -111,9 +111,6 @@ local function cppdecl(func)
 				cname = "bgfx_" .. func.cname
 			end
 		end
-		if func.cusername then
-			doc = doc[func.cusername]
-		end
 		doc = codegen.doxygen_type(doc, cname, func)
 	end
 	local funcdecl = codegen.apply_functemp(func, "$RET $FUNCNAME($ARGS)$CONST;\n")
