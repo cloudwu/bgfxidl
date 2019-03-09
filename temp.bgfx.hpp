@@ -26,6 +26,9 @@ namespace bx { struct AllocatorI; }
 namespace bgfx
 {
 
+/// View id.
+typedef uint16_t ViewId;
+
 $handles
 
 $enums
