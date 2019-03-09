@@ -483,7 +483,7 @@ local function doxygen_funcret(r, func, prefix)
 end
 
 local function doxygen_func(r, func, prefix)
-	if not func or #func.args == 0 then
+	if not func or not func.args or #func.args == 0 then
 		return
 	end
 	r[#r+1] = prefix

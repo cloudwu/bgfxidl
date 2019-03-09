@@ -132,7 +132,7 @@ local typegen = {}
 
 local function add_doxygen(typedef, define, cstyle, cname)
 		local func = cstyle and codegen.doxygen_ctype or codegen.doxygen_type
-		local doc = func(typedef.comments, cname or typedef.cname)
+		local doc = func(typedef.comments, cname or typedef.cname, typedef)
 		if doc then
 			return doc .. "\n" .. define
 		else
