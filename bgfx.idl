@@ -52,6 +52,7 @@ enum.Access { comment = "Access:" }
 	.Read      --- Read.
 	.Write     --- Write.
 	.ReadWrite --- Read and write.
+	()
 
 --- Vertex attribute enum.
 enum.Attrib { comment = "Corresponds to vertex shader attribute." }
@@ -73,6 +74,7 @@ enum.Attrib { comment = "Corresponds to vertex shader attribute." }
 	.TexCoord5 --- a_texcoord5
 	.TexCoord6 --- a_texcoord6
 	.TexCoord7 --- a_texcoord7
+	()
 
 --- Vertex attribute type enum.
 enum.AttribType { comment = "Attribute types:" }
@@ -81,6 +83,7 @@ enum.AttribType { comment = "Attribute types:" }
 	.Int16  --- Int16
 	.Half   --- Half, availability depends on: `BGFX_CAPS_VERTEX_ATTRIB_HALF`.
 	.Float  --- Float
+	()
 
 --- Texture format enum.
 ---
