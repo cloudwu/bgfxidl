@@ -46,7 +46,6 @@ local funcgen = {}
 
 local functemp = {}
 
-functemp.c99decl = "/**/\nBGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS);"
 functemp.interface_struct = "$CRET (*$CFUNCNAME)($CARGS);"
 functemp.interface_import = "bgfx_$CFUNCNAME"
 functemp.c99_interface = [[
@@ -111,7 +110,7 @@ local function cppdecl(func)
 				cname = "bgfx_" .. func.cname
 			end
 		end
-		doc = codegen.doxygen_type(doc, cname, func)
+		doc = codegen.doxygen_type(doc, func, cname)
 	end
 	local funcdecl = codegen.apply_functemp(func, "$RET $FUNCNAME($ARGS)$CONST;\n")
 	if doc then
@@ -128,11 +127,27 @@ function funcgen.cppdecl(func)
 	end
 end
 
+funcgen.c99decl = cfunc(function(func)
+	local doc = func.comments
+	if not doc and func.comment then
+		doc = { func.comment }
+	end
+	if doc then
+		doc = codegen.doxygen_ctype(doc, func)
+	end
+	local funcdecl = codegen.apply_functemp(func, "BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS);")
+	if doc then
+		return "\n" .. doc .. "\n" .. funcdecl
+	else
+		return funcdecl
+	end
+end)
+
 local typegen = {}
 
 local function add_doxygen(typedef, define, cstyle, cname)
 		local func = cstyle and codegen.doxygen_ctype or codegen.doxygen_type
-		local doc = func(typedef.comments, cname or typedef.cname, typedef)
+		local doc = func(typedef.comments, typedef, cname or typedef.cname)
 		if doc then
 			return doc .. "\n" .. define
 		else

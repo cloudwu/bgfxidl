@@ -514,7 +514,7 @@ local function doxygen_func(r, func, prefix)
 	return r
 end
 
-function codegen.doxygen_type(doxygen, cname, func)
+function codegen.doxygen_type(doxygen, func, cname)
 	if doxygen == nil then
 		return
 	end
@@ -539,7 +539,7 @@ function codegen.doxygen_type(doxygen, cname, func)
 	return table.concat(result, "\n")
 end
 
-function codegen.doxygen_ctype(doxygen)
+function codegen.doxygen_ctype(doxygen, func)
 	if doxygen == nil then
 		return
 	end
@@ -550,6 +550,7 @@ function codegen.doxygen_ctype(doxygen)
 		result[#result+1] = " * " .. line
 	end
 	doxygen_func(result, func, " *")
+	result[#result+1] = " *"
 	result[#result+1] = " */"
 	return table.concat(result, "\n")
 end
