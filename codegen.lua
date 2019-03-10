@@ -104,13 +104,13 @@ local function gen_arg_conversion(all_types, arg)
 		elseif arg.out and ctype.enum then
 			local aname = alternative_name(arg.name)
 			local cpptype = arg.cpptype:match "(.-)%s*&"	-- remove &
-			local ctype = arg.ctype:match "(.-)%s*%*"	-- remove *
+			local c99type = arg.ctype:match "(.-)%s*%*"	-- remove *
 			arg.aname = aname
 			arg.aname_cpp2c = "&" .. aname
 			arg.conversion = string.format("%s %s;", cpptype, aname)
-			arg.conversion_back = string.format("%s %s;", ctype, aname);
+			arg.conversion_back = string.format("%s %s;", c99type, aname);
 			arg.out_conversion = string.format("*%s = (%s)%s;", arg.name, ctype.cname, aname)
-			arg.out_conversion_back = string.format("%s = (%s)%s;", arg.name, ctype, aname)
+			arg.out_conversion_back = string.format("%s = (%s)%s;", arg.name, c99type, aname)
 		else
 			arg.aname = alternative_name(arg.name)
 			arg.aname_cpp2c = string.format("(%s)&%s" , arg.ctype , arg.name)
@@ -514,7 +514,7 @@ local function doxygen_func(r, func, prefix)
 	return r
 end
 
-function codegen.doxygen_type(doxygen, cname, func)
+function codegen.doxygen_type(doxygen, func, cname)
 	if doxygen == nil then
 		return
 	end
@@ -539,7 +539,7 @@ function codegen.doxygen_type(doxygen, cname, func)
 	return table.concat(result, "\n")
 end
 
-function codegen.doxygen_ctype(doxygen)
+function codegen.doxygen_ctype(doxygen, func)
 	if doxygen == nil then
 		return
 	end
@@ -550,6 +550,7 @@ function codegen.doxygen_ctype(doxygen)
 		result[#result+1] = " * " .. line
 	end
 	doxygen_func(result, func, " *")
+	result[#result+1] = " *"
 	result[#result+1] = " */"
 	return table.concat(result, "\n")
 end

@@ -121,12 +121,12 @@ enum.TextureFormat { comment = "Texture formats:" }
 	.ATC                             --- ATC RGB 4BPP
 	.ATCE                            --- ATCE RGBA 8 BPP explicit alpha
 	.ATCI                            --- ATCI RGBA 8 BPP interpolated alpha
-	.ASTC4x4  { cname = "ASTC4x4"  } --- ASTC 4x4 8.0 BPP
-	.ASTC5x5  { cname = "ASTC5x5"  } --- ASTC 5x5 5.12 BPP
-	.ASTC6x6  { cname = "ASTC6x6"  } --- ASTC 6x6 3.56 BPP
-	.ASTC8x5  { cname = "ASTC8x5"  } --- ASTC 8x5 3.20 BPP
-	.ASTC8x6  { cname = "ASTC8x6"  } --- ASTC 8x6 2.67 BPP
-	.ASTC10x5 { cname = "ASTC10x5" } --- ASTC 10x5 2.56 BPP
+	.ASTC4x4                         --- ASTC 4x4 8.0 BPP
+	.ASTC5x5                         --- ASTC 5x5 5.12 BPP
+	.ASTC6x6                         --- ASTC 6x6 3.56 BPP
+	.ASTC8x5                         --- ASTC 8x5 3.20 BPP
+	.ASTC8x6                         --- ASTC 8x6 2.67 BPP
+	.ASTC10x5                        --- ASTC 10x5 2.56 BPP
 	.Unknown                         --- Compressed formats above.
 	.R1
 	.A8
@@ -258,69 +258,6 @@ enum.RenderFrame { underscore, comment = "" }
 	.Exiting   --- Renderer context is getting destroyed.
 	()
 
---- Internal data.
-struct.InternalData
-	.caps    "const struct Caps*" --- Renderer capabilities.
-	.context "void*"              --- GL context, or D3D device.
-
---- Platform data.
-struct.PlatformData { ctor }
-	.ndt          "void*" --- Native display type.
-	.nwh          "void*" --- Native window handle.
-	.context      "void*" --- GL context, or D3D device.
-	.backBuffer   "void*" --- GL backbuffer, or D3D render target view.
-	.backBufferDS "void*" --- Backbuffer depth/stencil.
-
---- Backbuffer resolution and reset parameters.
-struct.Resolution { ctor }
-	.format          "TextureFormat::Enum" --- Backbuffer format.
-	.width           "uint32_t"            --- Backbuffer width.
-	.height          "uint32_t"            --- Backbuffer height.
-	.reset           "uint32_t"            --- Reset parameters.
-	.numBackBuffers  "uint8_t"             --- Number of back buffers.
-	.maxFrameLatency "uint8_t"             --- Maximum frame latency.
-
-struct.Limits { namespace = "Init" }
-	.maxEncoders    "uint16_t"             --- Maximum number of encoder threads.
-	.transientVbSize "uint32_t"            --- Maximum transient vertex buffer size.
-	.transientIbSize "uint32_t"            --- Maximum transient index buffer size.
-
---- Initialization parameters used by `bgfx::init`.
-struct.Init { ctor }
-	.type            "RendererType::Enum"  --- Select rendering backend. When set to RendererType::Count
-	                                       --- a default rendering backend will be selected appropriate to the platform.
-	                                       --- See: `bgfx::RendererType`
-
-	.vendorId       "uint16_t"             --- Vendor PCI id. If set to `BGFX_PCI_ID_NONE` it will select the first
-	                                       --- device.
-	                                       ---   - `BGFX_PCI_ID_NONE` - Autoselect adapter.
-	                                       ---   - `BGFX_PCI_ID_SOFTWARE_RASTERIZER` - Software rasterizer.
-	                                       ---   - `BGFX_PCI_ID_AMD` - AMD adapter.
-	                                       ---   - `BGFX_PCI_ID_INTEL` - Intel adapter.
-	                                       ---   - `BGFX_PCI_ID_NVIDIA` - nVidia adapter.
-
-	.deviceId       "uint16_t"             --- Device id. If set to 0 it will select first device, or device with
-	                                       --- matching id.
-
-	.debug          "bool"                 --- Enable device for debuging.
-	.profile        "bool"                 --- Enable device for profiling.
-	.platformData   "PlatformData"         --- Platform data.
-	.resolution     "Resolution"           --- Backbuffer resolution and reset parameters. See: `bgfx::Resolution`.
-	.limits         "Limits"
-	.callback       "CallbackI*"           --- Provide application specific callback interface.
-	                                       --- See: `bgfx::CallbackI`
-
-	.allocator      "bx::AllocatorI*"      --- Custom allocator. When a custom allocator is not
-	                                       --- specified, bgfx uses the CRT allocator. Bgfx assumes
-	                                       --- custom allocator is thread safe.
-
---- Memory must be obtained by calling `bgfx::alloc`, `bgfx::copy`, or `bgfx::makeRef`.
----
---- @attention It is illegal to create this structure on stack and pass it to any bgfx API.
-struct.Memory
-	.data "uint8_t*" [[Pointer to data.]]
-	.size "uint32_t" [[Data size.]]
-
 --- GPU info.
 struct.GPU  { namespace = "Caps" }
 	.vendorId    "uint16_t"                --- Vendor PCI id. See `BGFX_PCI_ID_*`.
@@ -386,6 +323,69 @@ struct.Caps
 		---   - `BGFX_CAPS_FORMAT_TEXTURE_MSAA` - Texture can be sampled as MSAA.
 		---   - `BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN` - Texture format supports auto-generated
 		---     mips.
+
+--- Internal data.
+struct.InternalData
+	.caps    "const Caps*" --- Renderer capabilities.
+	.context "void*"              --- GL context, or D3D device.
+
+--- Platform data.
+struct.PlatformData { ctor }
+	.ndt          "void*" --- Native display type.
+	.nwh          "void*" --- Native window handle.
+	.context      "void*" --- GL context, or D3D device.
+	.backBuffer   "void*" --- GL backbuffer, or D3D render target view.
+	.backBufferDS "void*" --- Backbuffer depth/stencil.
+
+--- Backbuffer resolution and reset parameters.
+struct.Resolution { ctor }
+	.format          "TextureFormat::Enum" --- Backbuffer format.
+	.width           "uint32_t"            --- Backbuffer width.
+	.height          "uint32_t"            --- Backbuffer height.
+	.reset           "uint32_t"            --- Reset parameters.
+	.numBackBuffers  "uint8_t"             --- Number of back buffers.
+	.maxFrameLatency "uint8_t"             --- Maximum frame latency.
+
+struct.Limits { namespace = "Init" }
+	.maxEncoders    "uint16_t"             --- Maximum number of encoder threads.
+	.transientVbSize "uint32_t"            --- Maximum transient vertex buffer size.
+	.transientIbSize "uint32_t"            --- Maximum transient index buffer size.
+
+--- Initialization parameters used by `bgfx::init`.
+struct.Init { ctor }
+	.type            "RendererType::Enum"  --- Select rendering backend. When set to RendererType::Count
+	                                       --- a default rendering backend will be selected appropriate to the platform.
+	                                       --- See: `bgfx::RendererType`
+
+	.vendorId       "uint16_t"             --- Vendor PCI id. If set to `BGFX_PCI_ID_NONE` it will select the first
+	                                       --- device.
+	                                       ---   - `BGFX_PCI_ID_NONE` - Autoselect adapter.
+	                                       ---   - `BGFX_PCI_ID_SOFTWARE_RASTERIZER` - Software rasterizer.
+	                                       ---   - `BGFX_PCI_ID_AMD` - AMD adapter.
+	                                       ---   - `BGFX_PCI_ID_INTEL` - Intel adapter.
+	                                       ---   - `BGFX_PCI_ID_NVIDIA` - nVidia adapter.
+
+	.deviceId       "uint16_t"             --- Device id. If set to 0 it will select first device, or device with
+	                                       --- matching id.
+
+	.debug          "bool"                 --- Enable device for debuging.
+	.profile        "bool"                 --- Enable device for profiling.
+	.platformData   "PlatformData"         --- Platform data.
+	.resolution     "Resolution"           --- Backbuffer resolution and reset parameters. See: `bgfx::Resolution`.
+	.limits         "Limits"
+	.callback       "CallbackI*"           --- Provide application specific callback interface.
+	                                       --- See: `bgfx::CallbackI`
+
+	.allocator      "bx::AllocatorI*"      --- Custom allocator. When a custom allocator is not
+	                                       --- specified, bgfx uses the CRT allocator. Bgfx assumes
+	                                       --- custom allocator is thread safe.
+
+--- Memory must be obtained by calling `bgfx::alloc`, `bgfx::copy`, or `bgfx::makeRef`.
+---
+--- @attention It is illegal to create this structure on stack and pass it to any bgfx API.
+struct.Memory
+	.data "uint8_t*" [[Pointer to data.]]
+	.size "uint32_t" [[Data size.]]
 
 --- Transient index buffer.
 struct.TransientIndexBuffer
