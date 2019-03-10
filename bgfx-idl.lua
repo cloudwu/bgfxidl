@@ -13,6 +13,8 @@ local func_actions = {
 	interface_import = ",\n\t\t\t",
 	c99_interface = "\n",
 	cpp_interface = "\n",
+	c99_functionid = "\n\t",
+	cpp_functionid = "\n\t\t",
 }
 
 local type_actions = {
@@ -56,6 +58,8 @@ BGFX_C_API $CRET bgfx_$CFUNCNAME($CARGS)
 	$POSTRETCTOC
 }
 ]]
+functemp.c99_functionid = "BGFX_FUNCTION_ID_$CFUNCNAMEUPPER,"
+functemp.cpp_functionid = "$CFUNCNAMECAML,"
 
 for action,temp in pairs(functemp) do
 	funcgen[action] = cfunc(function(func)
