@@ -1206,7 +1206,8 @@ func.createTexture2D { cname = "create_texture_2d_scaled" }
 	                                           --- `BGFX_CAPS_TEXTURE_2D_ARRAY` flag is not set.
 	.format    "TextureFormat::Enum"           --- Texture format. See: `TextureFormat::Enum`.
 	.flags     "uint64_t"                      --- Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`)
-	 { "BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE" } --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
+	 { default = "BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE" }
+	                                           --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
 	                                           --- - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
 	                                           ---   mode.
 	                                           --- - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
@@ -1221,7 +1222,8 @@ func.createTexture3D
 	.hasMips   "bool"                          --- Indicates that texture contains full mip-map chain.
 	.format    "TextureFormat::Enum"           --- Texture format. See: `TextureFormat::Enum`.
 	.flags     "uint64_t"                      --- Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`)
-	 { "BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE" } --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
+	 { default = "BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE" }
+	                                           --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
 	                                           --- - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
 	                                           ---   mode.
 	                                           --- - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
@@ -1239,7 +1241,8 @@ func.createTextureCube
 	                                           --- `BGFX_CAPS_TEXTURE_2D_ARRAY` flag is not set.
 	.format    "TextureFormat::Enum"           --- Texture format. See: `TextureFormat::Enum`.
 	.flags     "uint64_t"                      --- Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`)
-	 { "BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE" } --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
+	 { default = "BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE" }
+	                                           --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
 	                                           --- - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
 	                                           ---   mode.
 	                                           --- - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
@@ -1368,6 +1371,7 @@ func.createFrameBuffer { cname = "create_frame_buffer_scaled" }
 	.ratio  "BackbufferRatio::Enum"     --- Frame buffer size in respect to back-buffer size. See:
 	                                    --- `BackbufferRatio::Enum`.
 	.format "TextureFormat::Enum"       --- Texture format. See: `TextureFormat::Enum`.
+	.textureFlags "uint64_t"            --- Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`)
 	 { default = "BGFX_SAMPLER_U_CLAMP|BGFX_SAMPLER_V_CLAMP" }
 	                                    --- flags. Default texture sampling mode is linear, and wrap mode is repeat.
 	                                    --- - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
