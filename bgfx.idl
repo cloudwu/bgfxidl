@@ -1558,7 +1558,7 @@ func.setViewClear
 	.flags   "uint16_t" --- Clear flags. Use `BGFX_CLEAR_NONE` to remove any clear
 	                    --- operation. See: `BGFX_CLEAR_*`.
 	.rgba    "uint32_t" --- Color clear value.
-	 { default = 0x000000ff }
+	 { default = "0x000000ff" }
 	.depth   "float"    --- Depth clear value.
 	 { default = "1.0f" }
 	.stencil "uint8_t"  --- Stencil clear value.
