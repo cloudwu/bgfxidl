@@ -246,11 +246,11 @@ local function codes()
 		end
 	end
 
-	for k, ident in pairs(func_actions) do
-		temp[k] = table.concat(temp[k], ident)
+	for k, indent in pairs(func_actions) do
+		temp[k] = table.concat(temp[k], indent)
 	end
-	for k, ident in pairs(type_actions) do
-		temp[k] = table.concat(temp[k], ident)
+	for k, indent in pairs(type_actions) do
+		temp[k] = table.concat(temp[k], indent)
 	end
 
 	return temp
@@ -277,7 +277,7 @@ local function change_indent(str, indent)
 	end)
 end
 
-local function genidl(filename, outputfile, ident)
+local function genidl(filename, outputfile, indent)
 	local tempfile = "temp." .. filename
 	print ("Generate", outputfile, "from", tempfile)
 	local f = assert(io.open(tempfile, "rb"))
@@ -286,7 +286,7 @@ local function genidl(filename, outputfile, ident)
 	local out = assert(io.open(outputfile, "wb"))
 	codes_tbl.source = tempfile
 	local codes = temp:gsub("$([%l%d_]+)", codes_tbl)
-	out:write(change_indent(codes, ident))
+	out:write(change_indent(codes, indent))
 	out:close()
 end
 
