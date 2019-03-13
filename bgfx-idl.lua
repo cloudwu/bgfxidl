@@ -268,7 +268,16 @@ local function add_path(filename)
 	return path .. "/" .. filename
 end
 
-local function genidl(filename, outputfile)
+local function change_indent(str, indent)
+	return str:gsub("(.-)\n", function (line)
+		return line:gsub("^(\t*)(.-)[ \t]*$",
+			function (tabs, content)
+				return indent:rep(#tabs) .. content .. "\n"
+			end)
+	end)
+end
+
+local function genidl(filename, outputfile, ident)
 	local tempfile = "temp." .. filename
 	print ("Generate", outputfile, "from", tempfile)
 	local f = assert(io.open(tempfile, "rb"))
@@ -276,7 +285,8 @@ local function genidl(filename, outputfile)
 	f:close()
 	local out = assert(io.open(outputfile, "wb"))
 	codes_tbl.source = tempfile
-	out:write((temp:gsub("$([%l%d_]+)", codes_tbl)))
+	local codes = temp:gsub("$([%l%d_]+)", codes_tbl)
+	out:write(change_indent(codes, ident))
 	out:close()
 end
 
@@ -290,5 +300,5 @@ local files = {
 
 for filename, path in pairs (files) do
 	path = (...) or path
-	genidl(filename, path .. "/" .. filename)
+	genidl(filename, path .. "/" .. filename, "    ")
 end
