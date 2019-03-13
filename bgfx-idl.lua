@@ -293,16 +293,25 @@ end
 local files = {
 	{ temp = "temp.bgfx.h" , output = "../include/bgfx/c99/bgfx.h", indent = "    " },
 	{ temp = "temp.bgfx.idl.inl", output = "../src/bgfx.idl.inl" },
-	{ temp = "temp.bgfx.hpp", output = "./bgfx.hpp" },
+	{ temp = "temp.bgfx.hpp", output = "./bgfx.h" },
 	{ temp = "temp.bgfx.shim.cpp", output = "./bgfx.shim.cpp" },
 }
 
 local path = (...)
+local dupfile = {}
 
 for _, f in ipairs (files) do
 	local output = f.output
 	if path then
 		output = output:gsub(".-(/[^/]+)$", path .. "%1")
+		local dup = dupfile[output]
+		if dup then
+			dup = dup + 1
+			output = output .. "." .. dup
+		else
+			dup = 1
+		end
+		dupfile[output] = dup
 	end
 	genidl(f.temp, output, f.indent or "\t")
 end
