@@ -277,8 +277,7 @@ local function change_indent(str, indent)
 	end))
 end
 
-local function genidl(filename, outputfile, indent)
-	local tempfile = "temp." .. filename
+local function genidl(tempfile, outputfile, indent)
 	print ("Generate", outputfile, "from", tempfile)
 	local f = assert(io.open(tempfile, "rb"))
 	local temp = f:read "a"
@@ -292,13 +291,18 @@ end
 
 
 local files = {
-	["bgfx.h"] = "../include/bgfx/c99",
-	["bgfx.idl.inl"] = "../src",
-	["bgfx.hpp"] = ".",
-	["bgfx.shim.cpp"] = ".",
+	{ temp = "temp.bgfx.h" , output = "../include/bgfx/c99/bgfx.h", indent = "    " },
+	{ temp = "temp.bgfx.idl.inl", output = "../src/bgfx.idl.inl" },
+	{ temp = "temp.bgfx.hpp", output = "./bgfx.hpp" },
+	{ temp = "temp.bgfx.shim.cpp", output = "./bgfx.shim.cpp" },
 }
 
-for filename, path in pairs (files) do
-	path = (...) or path
-	genidl(filename, path .. "/" .. filename, "    ")
+local path = (...)
+
+for _, f in ipairs (files) do
+	local output = f.output
+	if path then
+		output = output:gsub(".-(/[^/]+)$", path .. "%1")
+	end
+	genidl(f.temp, output, f.indent or "\t")
 end
