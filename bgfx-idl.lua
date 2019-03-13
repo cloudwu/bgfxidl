@@ -269,12 +269,12 @@ local function add_path(filename)
 end
 
 local function change_indent(str, indent)
-	return str:gsub("(.-)\n", function (line)
+	return (str:gsub("(.-)\n", function (line)
 		return line:gsub("^(\t*)(.-)[ \t]*$",
 			function (tabs, content)
 				return indent:rep(#tabs) .. content .. "\n"
 			end)
-	end)
+	end))
 end
 
 local function genidl(filename, outputfile, indent)
