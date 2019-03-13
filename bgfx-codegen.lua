@@ -269,12 +269,18 @@ local function add_path(filename)
 end
 
 local function change_indent(str, indent)
-	return (str:gsub("(.-)\n", function (line)
-		return line:gsub("^(\t*)(.-)[ \t]*$",
-			function (tabs, content)
-				return indent:rep(#tabs) .. content .. "\n"
-			end)
-	end))
+	if indent == "\t" then
+		-- strip trailing space only
+		return (str:gsub("(.-)\n", function (line)
+			return line:gsub("([ \t]*)$","") end))
+	else
+		return (str:gsub("(.-)\n", function (line)
+			return line:gsub("^(\t*)(.-)[ \t]*$",
+				function (tabs, content)
+					return indent:rep(#tabs) .. content .. "\n"
+				end)
+		end))
+	end
 end
 
 local gen = {}
