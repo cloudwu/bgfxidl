@@ -291,14 +291,7 @@ local function genidl(filename, outputfile, indent)
 end
 
 
-local files = {
-	["bgfx.h"] = "../include/bgfx/c99",
-	["bgfx.idl.inl"] = "../src",
-	["bgfx.hpp"] = ".",
-	["bgfx.shim.cpp"] = ".",
-}
-
-for filename, path in pairs (files) do
-	path = (...) or path
-	genidl(filename, path .. "/" .. filename, "    ")
-end
+genidl("bgfx.h",        "../include/bgfx/c99/bgfx.h", "    ")
+genidl("bgfx.idl.inl",  "../src/bgfx.idl.inl",        "\t")
+--genidl("bgfx.h",        "../include/bgfx/bgfx.h",     "\t")
+--genidl("bgfx.shim.cpp", "../src/bgfx.shim.cpp",       "\t")
