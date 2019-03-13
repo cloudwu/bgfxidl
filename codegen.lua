@@ -616,9 +616,9 @@ end
 local cenum_temp = [[
 typedef enum $NAME
 {
-    $ITEMS
+	$ITEMS
 
-    $COUNT
+	$COUNT
 
 } $NAME_t;
 ]]
@@ -650,7 +650,7 @@ function codegen.gen_enum_cdefine(enum)
 	local temp = {
 		NAME = cname,
 		COUNT = uname .. "_COUNT",
-		ITEMS = table.concat(items, "\n    "),
+		ITEMS = table.concat(items, "\n\t"),
 	}
 
 	return (cenum_temp:gsub("$(%u+)", temp))
@@ -750,7 +750,7 @@ end
 local cstruct_temp = [[
 typedef struct $NAME_s
 {
-    $ITEMS
+	$ITEMS
 
 } $NAME_t;
 ]]
@@ -767,7 +767,7 @@ function codegen.gen_struct_cdefine(struct)
 	end
 	local temp = {
 		NAME = cname,
-		ITEMS = table.concat(items, "\n    "),
+		ITEMS = table.concat(items, "\n\t"),
 	}
 	local codetemp = #struct.struct == 0 and cstruct_empty_temp or cstruct_temp
 	return (codetemp:gsub("$(%u+)", temp))
