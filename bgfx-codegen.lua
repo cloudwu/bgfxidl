@@ -272,7 +272,7 @@ local function change_indent(str, indent)
 	if indent == "\t" then
 		-- strip trailing space only
 		return (str:gsub("(.-)\n", function (line)
-			return line:gsub("([ \t]*)$","") end))
+			return line:gsub("([ \t]*)$","\n") end))
 	else
 		return (str:gsub("(.-)\n", function (line)
 			return line:gsub("^(\t*)(.-)[ \t]*$",
