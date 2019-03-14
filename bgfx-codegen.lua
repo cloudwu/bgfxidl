@@ -285,28 +285,44 @@ end
 
 local gen = {}
 
-function gen.gen(tempfile, outputfile, indent)
-	print ("Generate", outputfile, "from", tempfile)
+function gen.apply(tempfile)
 	local f = assert(io.open(tempfile, "rb"))
 	local temp = f:read "a"
 	f:close()
 	codes_tbl.source = tempfile
-	local codes = temp:gsub("$([%l%d_]+)", codes_tbl)
-	codes = change_indent(codes, indent)
+	return (temp:gsub("$([%l%d_]+)", codes_tbl))
+end
 
+function gen.format(codes, f)
+	return change_indent(codes, f.indent)
+end
+
+function gen.changed(codes, outputfile)
 	local out = io.open(outputfile, "rb")
 	if out then
 		local origin = out:read "a"
-		if origin == codes then
-			print("No change")
-		end
 		out:close()
-		return
+		return origin ~= codes
 	end
+	return true
+end
 
+function gen.write(codes, outputfile)
 	local out = assert(io.open(outputfile, "wb"))
 	out:write(codes)
 	out:close()
+end
+
+function gen.gen(tempfile, outputfile, indent)
+	print ("Generate", outputfile, "from", tempfile)
+	local codes = gen.apply(tempfile)
+	codes = change_indent(codes, indent)
+
+	if not gen.changed(codes, outputfile) then
+		print("No change")
+	end
+
+	gen.write(codes, outputfile)
 end
 
 return gen
