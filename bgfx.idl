@@ -104,7 +104,7 @@ flag.State { bits = 64 , range = 64 , desc = "State" }
 	.ConservativeRaster (59) --- Enable conservative rasterization.
 	.None (0)                --- No state.
 	.BlendIndependent(35)    --- Enable blend independent.
-	.BlendAlphaToCl (36)     --- Enable alpha to coverage.
+	.BlendAlphaToCoverage (36)     --- Enable alpha to coverage.
 	.Default { "WriteRgb", "WriteA", "WriteZ", "DepthTestLess", "CullCw", "Msaa" }
 				 --- Default state is write to RGB, alpha, and depth with depth test less enabled, with clockwise
 				 --- culling and MSAA (when writing into MSAA frame buffer, otherwise this flag is ignored).
@@ -330,12 +330,12 @@ flag.Reset { bits = 32 }
 	.Vsync               (8)   --- Enable V-Sync.
 	.Maxanisotropy       (9)   --- Turn on/off max anisotropy.
 	.Capture             (10)  --- Begin screen capture.
-	.Flush_after_render  (14)  --- Flush rendering after submitting to GPU.
-	.Flip_after_render   (15)  --- This flag  specifies where flip occurs. Default behavior is that flip occurs before rendering new frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
-	.Srgb_backbuffer     (16)  --- Enable sRGB backbuffer.
+	.FlushAfterRender    (14)  --- Flush rendering after submitting to GPU.
+	.FlipAfterRender     (15)  --- This flag  specifies where flip occurs. Default behavior is that flip occurs before rendering new frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
+	.SrgbBackbuffer      (16)  --- Enable sRGB backbuffer.
 	.Hdr10               (17)  --- Enable HDR10 rendering.
 	.Hidpi               (18)  --- Enable HiDPI rendering.
-	.Depth_clamp         (19)  --- Enable depth clamp.
+	.DepthClamp          (19)  --- Enable depth clamp.
 	.Suspend             (20)  --- Suspend rendering.
 	()
 
