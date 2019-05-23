@@ -10,6 +10,7 @@ local files = {
 	{ temp = "temp.bgfx.idl.inl", output = "../src/bgfx.idl.inl" },
 	{ temp = "temp.bgfx.hpp", output = "./bgfx.hpp" },
 	{ temp = "temp.bgfx.shim.cpp", output = "./bgfx.shim.cpp" },
+	{ temp = "temp.defines.h", output = "./defines.h" },
 }
 
 for _, f in ipairs (files) do
