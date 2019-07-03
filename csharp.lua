@@ -29,9 +29,12 @@ internal struct NativeFunctions
 }
 ]]
 
+local function hasPrefix(str, prefix)
+	return prefix == "" or str:sub(1, #prefix) == prefix
+end
 
-local function ends_with(str, ending)
-	return ending == "" or str:sub(-#ending) == ending
+local function hasSuffix(str, suffix)
+	return suffix == "" or str:sub(-#suffix) == suffix
 end
 
 local function convert_type_0(arg)
@@ -46,9 +49,9 @@ local function convert_type_0(arg)
 		return "byte"
 	elseif arg.ctype == "const char*" then
 		return "[MarshalAs(UnmanagedType.LPStr)] string"
-	elseif ends_with(arg.fulltype, "Handle") then
+	elseif hasSuffix(arg.fulltype, "Handle") then
 		return arg.fulltype
-	elseif ends_with(arg.fulltype, "::Enum") then
+	elseif hasSuffix(arg.fulltype, "::Enum") then
 		return arg.fulltype:gsub("::Enum", "")
 	end
 
@@ -87,10 +90,36 @@ local function gen()
 	return r
 end
 
+local lastCombinedIdx = -1
+
+local combined = { "State", "Stencil", "Buffer", "Texture", "Sampler", "Reset" }
+
+local function isCombinedBlock(str)
+	for idx, prefix in ipairs(combined) do
+		if hasPrefix(str, prefix) then
+			return idx
+		end
+	end
+
+	return -1
+end
+
+local function endCombinedBlock()
+	if lastCombinedIdx ~= -1 then
+		yield("}")
+	end
+
+	lastCombinedIdx = -1
+end
+
 function converter.types(typ)
 	if typ.handle then
+		endCombinedBlock()
+
 		yield("public struct " .. typ.name .. "{ public ushort idx; }")
-	elseif ends_with(typ.name, "::Enum") then
+	elseif hasSuffix(typ.name, "::Enum") then
+		endCombinedBlock()
+
 		yield("public enum " .. typ.typename)
 		yield("{")
 		for _, enum in ipairs(typ.enum) do
@@ -99,20 +128,33 @@ function converter.types(typ)
 		yield("}")
 	elseif typ.bits ~= nil then
 
-		yield("[Flags]")
+		local idx = isCombinedBlock(typ.name)
 
-		local format = "0x%08x"
-		if typ.bits == 64 then
-			format = "0x%016x"
-			yield("public enum " .. typ.name .. " : long")
-		elseif typ.bits == 16 then
-			format = "0x%04x"
-			yield("public enum " .. typ.name .. " : short")
-		else
-			yield("public enum " .. typ.name)
+		if idx ~= lastCombinedIdx then
+			endCombinedBlock()
 		end
 
-		yield("{")
+		local format = "0x%08x"
+		local enumType = ""
+		if typ.bits == 64 then
+			format = "0x%016x"
+			enumType = " : ulong"
+		elseif typ.bits == 16 then
+			format = "0x%04x"
+			enumType = " : ushort"
+		end
+
+		if lastCombinedIdx == -1 then
+			yield("[Flags]")
+			if idx ~= -1 then
+				yield("public enum " .. combined[idx] .. enumType)
+			else
+				yield("public enum " .. typ.name .. enumType)
+			end
+
+			lastCombinedIdx = idx
+			yield("{")
+		end
 
 		for _, flag in ipairs(typ.flag) do
 			if flag.value then
@@ -131,7 +173,10 @@ function converter.types(typ)
 					)
 			end
 		end
-		yield("}")
+
+		if lastCombinedIdx == -1 then
+			yield("}")
+		end
 	end
 end
 
