@@ -225,6 +225,15 @@ local function calc_flag_values(flag)
 	local shift = flag.shift
 	local base = flag.base or 0
 	local cap = 1 << (flag.range or 0)
+
+	if flag.range then
+		if flag.range == 64 then
+			flag.mask = 0xffffffffffffffff
+		else
+			flag.mask = ((1 << flag.range) - 1) << shift
+		end
+	end
+
 	local values = {}
 	for index, item in ipairs(flag.flag) do
 		local value = item.value
@@ -780,12 +789,8 @@ function codegen.gen_flag_cdefine(flag)
 	end
 
 	local mask
-	if flag.range then
-		if flag.range == 64 then
-			mask = "ffffffffffffffff"
-		else
-			mask = string.format(flag.format, ((1 << flag.range) - 1) << shift)
-		end
+	if flag.mask then
+		mask = string.format(flag.format, flag.mask)
 		mask = string.format("UINT%d_C(0x%s)", flag.bits, mask)
 	end
 
