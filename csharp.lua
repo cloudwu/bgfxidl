@@ -261,6 +261,15 @@ function converter.types(typ)
 end
 
 function converter.funcs(func)
+
+	if func.comments ~= nil then
+		yield("/// <summary>")
+		for _, line in ipairs(func.comments) do
+			yield("/// " .. line)
+		end
+		yield("/// </summary>")
+	end
+
 	yield("[DllImport(DllName, EntryPoint=\"bgfx_" .. func.cname .. "\", CallingConvention = CallingConvention.Cdecl)]")
 
 	if func.ret.cpptype == "bool" then
@@ -271,6 +280,21 @@ function converter.funcs(func)
 
 	local first = ""
 	local args  = "("
+
+	if func.this ~= nil then
+
+		local thisType = func.this:gsub("const ", "")
+		if thisType == "bgfx_encoder_t*" then
+			thisType = "Encoder*"
+		elseif thisType == "bgfx_attachment_t*" then
+			thisType = "Attachment*"
+		elseif thisType == "bgfx_vertex_decl_t*" then
+			thisType = "VertexDecl*"
+		end
+
+		args = args .. thisType .. " " .. "_this"
+		first = ", "
+	end
 
 	for _, arg in ipairs(func.args) do
 
