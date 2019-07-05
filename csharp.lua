@@ -6,7 +6,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security;
 
-internal struct NativeFunctions
+internal struct bgfx
 {
 	$types
 
@@ -85,7 +85,9 @@ end
 local converter = {}
 local yield = coroutine.yield
 
-local function gen()
+local gen = {}
+
+function gen.gen()
 	local r = csharp_template:gsub("$(%l+)", function(what)
 		local tmp = {}
 		for _, object in ipairs(idl[what]) do
@@ -137,14 +139,16 @@ local function FlagBlock(typ)
 	yield("{")
 
 	for _, flag in ipairs(typ.flag) do
+		local flagName = flag.name:gsub("_", "")
 		yield("\t"
-			.. flag.name
-			.. string.rep(" ", 22 - #(flag.name))
+			.. flagName
+			.. string.rep(" ", 22 - #(flagName))
 			.. " = "
 			.. string.format(flag.format or format, flag.value)
 			.. ","
 			)
 	end
+
 	if typ.shift then
 		yield("\t"
 			.. "Shift"
@@ -203,7 +207,7 @@ function converter.types(typ)
 			local lookup = combinedFlag.lookup or {}
 			combinedFlag.lookup = lookup
 			for _, flag in ipairs(typ.flag) do
-				local flagName = name .. flag.name
+				local flagName = name .. flag.name:gsub("_", "")
 				local value = flag.value
 				if value == nil then
 					-- It's a combined flag
@@ -257,7 +261,7 @@ function converter.types(typ)
 end
 
 function converter.funcs(func)
-	yield("[DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]")
+	yield("[DllImport(DllName, EntryPoint=\"bgfx_" .. func.cname .. "\", CallingConvention = CallingConvention.Cdecl)]")
 
 	if func.ret.cpptype == "bool" then
 		yield("[return: MarshalAs(UnmanagedType.I1)]")
@@ -276,10 +280,16 @@ function converter.funcs(func)
 		first = ", "
 	end
 
-	yield("internal static extern unsafe " .. convert_ret_type(func.ret) .. " bgfx_" .. func.cname .. args .. ");")
+	yield("internal static extern unsafe " .. convert_ret_type(func.ret) .. " " .. func.cname .. args .. ");")
 end
-
-print(gen())
 
 -- printtable("idl types", idl.types)
 -- printtable("idl funcs", idl.funcs)
+
+function gen.write(codes, outputfile)
+	local out = assert(io.open(outputfile, "wb"))
+	out:write(codes)
+	out:close()
+end
+
+return gen
