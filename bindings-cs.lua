@@ -301,18 +301,22 @@ function converter.types(typ)
 					comment = flag.comment,
 				})
 			end
+
 			if typ.shift then
 				table.insert(flags, {
 					name = name .. "Shift",
 					value = typ.shift,
 					format = "%d",
+					comment = typ.comment,
 				})
 			end
+
 			if typ.mask then
 				-- generate Mask
 				table.insert(flags, {
 					name = name .. "Mask",
 					value = typ.mask,
+					comment = typ.comment,
 				})
 				lookup[name .. "Mask"] = typ.mask
 			end
