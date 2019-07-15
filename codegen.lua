@@ -673,8 +673,9 @@ function codegen.gen_enum_define(enum)
 		if not item.comment then
 			text = item.name .. ","
 		else
+			local comment = table.concat(item.comment, " ")
 			text = string.format("%s,%s //!< %s",
-				item.name, namealign(item.name), item.comment)
+				item.name, namealign(item.name), comment)
 		end
 		items[#items+1] = text
 	end
@@ -705,7 +706,10 @@ function codegen.gen_enum_cdefine(enum)
 	local uname = cname:upper()
 	local items = {}
 	for index , item in ipairs(enum.enum) do
-		local comment = item.comment or ""
+		local comment = ""
+		if item.comment then
+			comment = table.concat(item.comment, " ")
+		end
 		local ename = item.cname
 		if not ename then
 			if enum.underscore then
@@ -846,7 +850,7 @@ local function text_with_comments(items, item, cstyle, is_classmember)
 	end
 	local text = string.format("%s%s %s;", typename, namealign(typename), name)
 	if item.comment then
-		if type(item.comment) == "table" then
+		if #item.comment > 1 then
 			table.insert(items, "")
 			if cstyle then
 				table.insert(items, "/**")
@@ -862,7 +866,7 @@ local function text_with_comments(items, item, cstyle, is_classmember)
 		else
 			text = string.format(
 				cstyle and "%s %s/** %s%s */" or "%s %s//!< %s",
-				text, namealign(text, 40),  item.comment, namealign(item.comment, 40))
+				text, namealign(text, 40),  item.comment[1], namealign(item.comment[1], 40))
 		end
 	end
 	items[#items+1] = text

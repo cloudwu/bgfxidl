@@ -369,12 +369,7 @@ function converter.funcs(func)
 
 		for _, arg in ipairs(func.args) do
 			if arg.comment ~= nil then
-				local comment = ""
-				if (type(arg.comment) == "table") then
-					comment = table.concat(arg.comment, " ")
-				else
-					comment = arg.comment
-				end
+				local comment = table.concat(arg.comment, " ")
 
 				yield("/// <param name=\""
 					.. arg.name
