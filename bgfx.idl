@@ -202,7 +202,7 @@ flag.Clear { bits = 16 }
 flag.Debug { bits = 32 }
 	.None                    --- No debug.
 	.Wireframe               --- Enable wireframe for all primitives.
-	.Ifh                     --- Enable infinitely fast hardware test. No draw calls will be submitted to driver. It’s useful when profiling to quickly assess bottleneck between CPU and GPU.
+	.Ifh                     --- Enable infinitely fast hardware test. No draw calls will be submitted to driver. It's useful when profiling to quickly assess bottleneck between CPU and GPU.
 	.Stats                   --- Enable statistics display.
 	.Text                    --- Enable debug text display.
 	.Profiler                --- Enable profiler.

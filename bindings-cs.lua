@@ -169,7 +169,13 @@ local function FlagBlock(typ)
 			end
 
 			yield("\t/// <summary>")
-			yield("\t/// " .. flag.comment)
+			if type(flag.comment) == "string" then
+				yield("\t/// " .. flag.comment)
+			else
+				for _, comment in ipairs(flag.comment) do
+					yield("\t/// " .. comment)
+				end
+			end
 			yield("\t/// </summary>")
 		end
 
@@ -294,6 +300,7 @@ function converter.types(typ)
 				table.insert(flags, {
 					name = flagName,
 					value = value,
+					comment = flag.comment,
 				})
 			end
 			if typ.shift then
@@ -411,6 +418,11 @@ function gen.write(codes, outputfile)
 	local out = assert(io.open(outputfile, "wb"))
 	out:write(codes)
 	out:close()
+end
+
+if (...) == nil then
+	-- run `lua bindings-cs.lua` in command line
+	print(gen.gen())
 end
 
 return gen
