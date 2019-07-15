@@ -169,12 +169,8 @@ local function FlagBlock(typ)
 			end
 
 			yield("\t/// <summary>")
-			if type(flag.comment) == "string" then
-				yield("\t/// " .. flag.comment)
-			else
-				for _, comment in ipairs(flag.comment) do
-					yield("\t/// " .. comment)
-				end
+			for _, comment in ipairs(flag.comment) do
+				yield("\t/// " .. comment)
 			end
 			yield("\t/// </summary>")
 		end
@@ -260,7 +256,9 @@ function converter.types(typ)
 				end
 
 				yield("\t/// <summary>")
-				yield("\t/// " .. enum.comment)
+				for _, comment in ipairs(enum.comment) do
+					yield("\t/// " .. comment)
+				end
 				yield("\t/// </summary>")
 			end
 
