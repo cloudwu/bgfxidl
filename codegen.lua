@@ -660,7 +660,7 @@ struct $NAME
 	{
 		$ITEMS
 
-		Count
+		$COUNT
 	};
 };
 ]]
@@ -668,14 +668,24 @@ struct $NAME
 function codegen.gen_enum_define(enum)
 	assert(type(enum.enum) == "table", "Not an enum")
 	local items = {}
+	local count = "Count"
 	for _, item in ipairs(enum.enum) do
+		local value = item.value
+		if value then
+			count = ""
+		end
+		local v = item.name
+		if count == "" then
+			value = string.format(enum.format or "%d", value)
+			v = string.format("%s = %s", v, value)
+		end
 		local text
 		if not item.comment then
-			text = item.name .. ","
+			text = v .. ","
 		else
 			local comment = table.concat(item.comment, " ")
 			text = string.format("%s,%s //!< %s",
-				item.name, namealign(item.name), comment)
+				v, namealign(v), comment)
 		end
 		items[#items+1] = text
 	end
@@ -687,6 +697,7 @@ function codegen.gen_enum_define(enum)
 		NAME = enum.typename,
 		COMMENT = comment,
 		ITEMS = table.concat(items, "\n\t\t"),
+		COUNT = count,
 	}
 	return (enum_temp:gsub("$(%u+)", temp))
 end
@@ -705,6 +716,8 @@ function codegen.gen_enum_cdefine(enum)
 	local cname = enum.cname:match "(.-)_t$"
 	local uname = cname:upper()
 	local items = {}
+	local count = uname .. "_COUNT"
+	local iota = 0
 	for index , item in ipairs(enum.enum) do
 		local comment = ""
 		if item.comment then
@@ -720,17 +733,34 @@ function codegen.gen_enum_cdefine(enum)
 			ename = ename:upper()
 		end
 		local name = uname .. "_" .. ename
-		items[#items+1] = string.format("%s,%s /** (%2d) %s%s */",
-			name,
-			namealign(name, 40),
-			index - 1,
-			comment,
-			namealign(comment, 30))
+		local value = item.value
+		if value then
+			count = ""
+			iota = value
+		end
+
+		if count == "" then
+			value = string.format(enum.format or "%d", value)
+			local v = string.format("%s = %s",name, value)
+			items[#items+1] = string.format("%s,%s /** %s%s */",
+				v,
+				namealign(v, 40),
+				comment,
+				namealign(comment, 30))
+		else
+			items[#items+1] = string.format("%s,%s /** (%2d) %s%s */",
+				name,
+				namealign(name, 40),
+				iota,
+				comment,
+				namealign(comment, 30))
+		end
+		iota = iota + 1
 	end
 
 	local temp = {
 		NAME = cname,
-		COUNT = uname .. "_COUNT",
+		COUNT = count,
 		ITEMS = table.concat(items, "\n\t"),
 	}
 

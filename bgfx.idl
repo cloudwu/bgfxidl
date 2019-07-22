@@ -399,7 +399,7 @@ flag.Resolve { bits = 8 }
 	.AutoGenMips   --- Auto-generate mip maps on resolve.
 	()
 
-flag.PciId { bits = 16 , const }
+enum.PciId { format = "0x%04x", comment = "" }
 	.None                (0x0000) --- Autoselect adapter.
 	.SoftwareRasterizer  (0x0001) --- Software rasterizer.
 	.Amd                 (0x1002) --- AMD adapter.
@@ -407,13 +407,13 @@ flag.PciId { bits = 16 , const }
 	.Nvidia              (0x10de) --- nVidia adapter.
 	()
 
-flag.CubeMap { bits = 8, const }
-	.PositiveX (0x00) --- Cubemap +x.
-	.NegativeX (0x01) --- Cubemap -x.
-	.PositiveY (0x02) --- Cubemap +y.
-	.NegativeY (0x03) --- Cubemap -y.
-	.PositiveZ (0x04) --- Cubemap +z.
-	.NegativeZ (0x05) --- Cubemap -z.
+enum.CubeMap { comment = "" }
+	.PositiveX  --- Cubemap +x.
+	.NegativeX  --- Cubemap -x.
+	.PositiveY  --- Cubemap +y.
+	.NegativeY  --- Cubemap -y.
+	.PositiveZ  --- Cubemap +z.
+	.NegativeZ  --- Cubemap -z.
 	()
 
 --- Fatal error enum.
@@ -652,7 +652,7 @@ enum.RenderFrame { underscore, comment = "" }
 
 --- GPU info.
 struct.GPU  { namespace = "Caps" }
-	.vendorId    "uint16_t"                --- Vendor PCI id. See `BGFX_PCI_ID_*`.
+	.vendorId    "PciId::Enum"                --- Vendor PCI id. See `BGFX_PCI_ID_*`.
 	.deviceId    "uint16_t"                --- Device id.
 
 --- Renderer capabilities limits.
@@ -686,7 +686,7 @@ struct.Caps
 	.rendererType "RendererType::Enum" --- Renderer backend type. See: `bgfx::RendererType`
 	.supported    "uint64_t"           --- Supported functionality.
 	                                   ---   @attention See BGFX_CAPS_* flags at https://bkaradzic.github.io/bgfx/bgfx.html#available-caps
-	.vendorId     "uint16_t"           --- Selected GPU vendor PCI id.
+	.vendorId     "PciId::Enum"           --- Selected GPU vendor PCI id.
 	.deviceId     "uint16_t"           --- Selected GPU device id.
 	.homogeneousDepth "bool"           --- True when NDC depth is in [-1, 1] range, otherwise its [0, 1].
 	.originBottomLeft "bool"           --- True when NDC origin is at bottom left.
@@ -749,7 +749,7 @@ struct.Init { ctor }
 	                                       --- a default rendering backend will be selected appropriate to the platform.
 	                                       --- See: `bgfx::RendererType`
 
-	.vendorId       "uint16_t"             --- Vendor PCI id. If set to `BGFX_PCI_ID_NONE` it will select the first
+	.vendorId       "PciId::Enum"          --- Vendor PCI id. If set to `BGFX_PCI_ID_NONE` it will select the first
 	                                       --- device.
 	                                       ---   - `BGFX_PCI_ID_NONE` - Autoselect adapter.
 	                                       ---   - `BGFX_PCI_ID_SOFTWARE_RASTERIZER` - Software rasterizer.
