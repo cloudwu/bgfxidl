@@ -262,7 +262,13 @@ function converter.types(typ)
 				yield("\t/// </summary>")
 			end
 
-			yield("\t" .. enum.name .. ",")
+			if enum.value then
+				local value = string.format(typ.format or "%d", enum.value)
+				local align = string.rep(" ", 23 - #enum.name)
+				yield(string.format("\t%s%s= %s,", enum.name, align, value))
+			else
+				yield("\t" .. enum.name .. ",")
+			end
 		end
 		yield("");
 		yield("\tCount")
